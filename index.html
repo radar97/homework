@@ -16,20 +16,30 @@
   h1{font-size:18px;margin:2px 0 12px;font-weight:700;letter-spacing:.5px;}
 
   .topbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
-  .tabs{display:flex;background:#e5e7eb;border-radius:10px;padding:3px;gap:3px;}
+  .tabs{display:flex;background:#e5e7eb;border-radius:10px;padding:3px;gap:3px;overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%;}
+  .tabs::-webkit-scrollbar{display:none;}
   .tab{
     border:0;background:transparent;font:inherit;font-size:15px;font-weight:600;
     color:#4b5563;padding:7px 16px;border-radius:8px;cursor:pointer;
-    transition:background .15s,color .15s;
+    transition:background .15s,color .15s;white-space:nowrap;flex:none;
   }
   .tab.active{background:#fff;color:#111827;box-shadow:0 1px 3px rgba(0,0,0,.1);}
 
   input[type="date"]{
-    flex:1 1 140px;min-width:0;height:40px;padding:0 10px;
+    flex:1 1 130px;min-width:0;height:40px;padding:0 10px;
     border:1px solid #d1d5db;border-radius:10px;background:#fff;
     font:inherit;font-size:16px;color:#111827;outline:none;
   }
   input[type="date"]:focus{border-color:#9ca3af;}
+
+  .settings-btn{
+    flex:none;width:40px;height:40px;padding:0;
+    border:1px solid #d1d5db;border-radius:10px;background:#fff;
+    font-size:18px;color:#4b5563;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:background .12s;
+  }
+  .settings-btn:active{background:#f3f4f6;}
 
   .modes{display:flex;gap:8px;margin-top:10px;}
   .mode{
@@ -96,14 +106,72 @@
   }
   .note-body.empty{color:#d1d5db;font-style:italic;}
 
+  .tool-row{
+    display:flex;gap:6px;margin-top:12px;flex-wrap:wrap;
+    align-items:center;
+  }
+  .tool-row .search-wrap{
+    flex:1;min-width:150px;position:relative;display:flex;
+  }
+  .tool-row .search-input{
+    width:100%;height:42px;padding:0 34px 0 34px;
+    border:1px solid #e5e7eb;border-radius:10px;
+    font:inherit;font-size:14px;background:#fff;outline:none;
+    color:#111827;
+  }
+  .tool-row .search-input:focus{border-color:#9ca3af;}
+  .tool-row .search-icon{
+    position:absolute;left:11px;top:50%;transform:translateY(-50%);
+    font-size:14px;color:#9ca3af;pointer-events:none;
+  }
+  .tool-row .search-clear{
+    position:absolute;right:6px;top:50%;transform:translateY(-50%);
+    width:26px;height:26px;border:0;background:transparent;
+    color:#9ca3af;font-size:14px;cursor:pointer;
+    display:none;align-items:center;justify-content:center;
+    border-radius:50%;
+  }
+  .tool-row .search-clear.show{display:flex;}
+  .tool-row .search-clear:active{background:#f3f4f6;}
+
+  .tool-btn{
+    flex:none;padding:0 14px;height:42px;
+    border:1px solid #e5e7eb;border-radius:10px;
+    background:#fff;font:inherit;font-size:13px;font-weight:700;
+    color:#4b5563;cursor:pointer;transition:background .12s,transform .08s;
+    display:inline-flex;align-items:center;gap:4px;
+    -webkit-user-select:none;user-select:none;
+  }
+  .tool-btn:active{transform:scale(.96);}
+  .tool-btn:disabled{opacity:.35;pointer-events:none;}
+  .tool-all{color:#fff;background:#16a34a;border-color:#16a34a;}
+  .tool-all:active{background:#15803d;}
+  .tool-undo{color:#6b7280;}
+  .tool-undo:active{background:#f3f4f6;}
+
+  .cell.highlight{
+    outline:3px solid #3b82f6;outline-offset:2px;z-index:2;
+    animation:hl-pulse 1s ease-in-out infinite;
+  }
+  .cell.highlight.exact{
+    outline-color:#dc2626;
+    animation:hl-pulse-exact .8s ease-in-out infinite;
+  }
+  @keyframes hl-pulse{0%,100%{outline-color:#3b82f6;}50%{outline-color:#93c5fd;}}
+  @keyframes hl-pulse-exact{0%,100%{outline-color:#dc2626;}50%{outline-color:#fca5a5;}}
+
+  .search-info{
+    font-size:12px;color:#6b7280;margin-top:8px;text-align:center;min-height:16px;
+  }
+  .search-info b{color:#111827;font-weight:700;}
+
   .grid{
     display:grid;
     grid-template-columns:repeat(auto-fill,minmax(50px,1fr));
     gap:8px;margin-top:12px;
   }
   .cell{
-    position:relative;
-    aspect-ratio:1/1;min-height:50px;
+    position:relative;aspect-ratio:1/1;min-height:50px;
     display:flex;align-items:center;justify-content:center;
     padding:0;border:0;border-radius:9px;
     font:inherit;font-size:16px;font-weight:600;
@@ -127,16 +195,16 @@
   .grid.mode-cb .cell[data-state="2"]{background:#b91c1c;color:#fff;}
 
   .cell .lv{
-    position:absolute;right:2px;bottom:2px;
-    display:none;font-size:9px;font-weight:800;line-height:1;
-    letter-spacing:-.5px;color:rgba(255,255,255,.95);pointer-events:none;
+    position:absolute;right:2px;bottom:2px;display:none;
+    font-size:9px;font-weight:800;line-height:1;letter-spacing:-.5px;
+    color:rgba(255,255,255,.95);pointer-events:none;
   }
   .cell .lv.show{display:block;}
   .cell[data-state="1"][data-lv=""] .lv{display:none;}
 
   .cell .sc{
-    position:absolute;top:2px;right:4px;
-    display:none;font-size:10px;font-weight:700;line-height:1;
+    position:absolute;top:2px;right:4px;display:none;
+    font-size:10px;font-weight:700;line-height:1;
     color:rgba(255,255,255,.95);pointer-events:none;
   }
   .cell .sc.show{display:block;}
@@ -166,7 +234,6 @@
   }
   .summary-btn:active{background:#dbeafe;}
 
-  /* 数据管理按钮 */
   .data-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;}
   .data-btn{
     padding:13px 8px;border:1px solid #bae6fd;border-radius:11px;
@@ -183,6 +250,7 @@
   }
   .clear-btn:active{background:#fef2f2;}
 
+  /* 通用面板 */
   .sheet-mask{
     position:fixed;left:0;top:0;right:0;bottom:0;z-index:1000;
     display:flex;align-items:flex-end;justify-content:center;
@@ -261,8 +329,7 @@
   }
   .note-mask.show .note-dialog{transform:scale(1);}
   .note-dialog-head{
-    display:flex;align-items:center;justify-content:space-between;
-    margin-bottom:12px;
+    display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;
   }
   .note-dialog-head span{font-size:16px;font-weight:700;}
   .note-close{
@@ -286,6 +353,7 @@
   .note-cancel{color:#6b7280;}
   .note-save{background:#111827!important;border-color:#111827!important;color:#fff;}
 
+  /* 汇总 */
   .summary-mask{
     position:fixed;left:0;top:0;right:0;bottom:0;z-index:2000;
     background:rgba(17,24,39,.45);
@@ -394,8 +462,7 @@
     display:flex;align-items:center;padding-left:5px;
   }
   .det-cell{
-    position:relative;
-    display:flex;align-items:center;justify-content:center;
+    position:relative;display:flex;align-items:center;justify-content:center;
     height:26px;font-size:10px;font-weight:700;border-radius:4px;
   }
   .det-cell.st0{background:#f3f4f6;color:#d1d5db;}
@@ -416,29 +483,153 @@
 
   .empty{text-align:center;color:#9ca3af;font-size:13px;padding:30px 0;}
 
+  /* ================ 设置面板 ================ */
+  .settings-mask{
+    position:fixed;left:0;top:0;right:0;bottom:0;z-index:4000;
+    background:rgba(17,24,39,.45);
+    display:flex;align-items:center;justify-content:center;
+    opacity:0;pointer-events:none;transition:opacity .2s ease;
+  }
+  .settings-mask.show{opacity:1;pointer-events:auto;}
+  .settings-panel{
+    width:100%;height:100%;background:#f5f6f8;
+    display:flex;flex-direction:column;
+    transform:translateY(20px);
+    transition:transform .28s cubic-bezier(.2,.8,.3,1);
+  }
+  .settings-mask.show .settings-panel{transform:translateY(0);}
+  .settings-head{
+    display:flex;align-items:center;gap:10px;
+    padding:calc(14px + env(safe-area-inset-top)) 16px 14px;
+    border-bottom:1px solid #e5e7eb;flex-shrink:0;
+    background:#fff;
+  }
+  .settings-head .sm-title{font-size:17px;font-weight:700;}
+  .settings-head .sm-close{
+    margin-left:auto;border:0;background:#f3f4f6;
+    width:34px;height:34px;border-radius:9px;
+    font-size:14px;color:#6b7280;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .settings-head .sm-close:active{background:#e5e7eb;}
+
+  .settings-body{
+    flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+    padding:14px 14px calc(20px + env(safe-area-inset-bottom));
+  }
+
+  .settings-section{
+    background:#fff;border-radius:12px;
+    padding:14px;margin-bottom:12px;
+    box-shadow:0 1px 2px rgba(0,0,0,.03);
+  }
+  .section-label{
+    font-size:13px;font-weight:700;color:#374151;
+    margin-bottom:10px;
+  }
+
+  .class-chips{
+    display:flex;gap:8px;flex-wrap:wrap;align-items:center;
+  }
+  .class-chip{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:8px 12px;border-radius:9px;
+    border:1.5px solid #e5e7eb;background:#fff;
+    font:inherit;font-size:14px;font-weight:600;color:#4b5563;
+    cursor:pointer;transition:all .12s;
+    -webkit-user-select:none;user-select:none;
+  }
+  .class-chip:active{transform:scale(.96);}
+  .class-chip.active{
+    background:#111827;border-color:#111827;color:#fff;
+  }
+  .class-chip .chip-count{
+    font-size:11px;font-weight:500;opacity:.7;
+  }
+  .add-class-chip{
+    display:inline-flex;align-items:center;gap:4px;
+    padding:8px 12px;border-radius:9px;
+    border:1.5px dashed #d1d5db;background:transparent;
+    font:inherit;font-size:14px;font-weight:600;color:#6b7280;
+    cursor:pointer;transition:all .12s;
+  }
+  .add-class-chip:active{background:#f9fafb;}
+
+  .roster-textarea{
+    width:100%;min-height:160px;
+    border:1px solid #e5e7eb;border-radius:10px;
+    padding:10px 12px;font:inherit;font-size:14px;line-height:1.7;
+    color:#111827;resize:vertical;outline:none;
+    font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;
+  }
+  .roster-textarea:focus{border-color:#9ca3af;}
+  .section-hint{
+    font-size:11px;color:#9ca3af;line-height:1.8;
+    margin-top:8px;
+  }
+  .section-hint code{
+    background:#f3f4f6;padding:1px 5px;border-radius:3px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+    color:#6b7280;font-size:11px;
+  }
+  .edit-actions{
+    display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;
+  }
+  .edit-btn{
+    padding:11px;border-radius:10px;border:1px solid #e5e7eb;
+    background:#fff;font:inherit;font-size:14px;font-weight:600;
+    cursor:pointer;transition:background .12s;
+  }
+  .edit-btn:active{background:#f9fafb;}
+  .edit-save{
+    grid-column:1 / -1;
+    background:#111827;border-color:#111827;color:#fff;
+  }
+  .edit-save:active{background:#1f2937;}
+  .edit-delete{color:#dc2626;border-color:#fecaca;}
+  .edit-delete:active{background:#fef2f2;}
+
+  .danger-btn{
+    display:block;width:100%;padding:13px;
+    border:1px solid #fecaca;border-radius:10px;
+    background:#fff;color:#dc2626;
+    font:inherit;font-size:14px;font-weight:600;
+    cursor:pointer;transition:background .12s;
+  }
+  .danger-btn:active{background:#fef2f2;}
+
   @media (min-width: 640px){
     .sheet-mask{align-items:center;}
     .sheet{border-radius:18px;padding-bottom:16px;}
     .summary-panel{
-      width:100%;max-width:820px;
-      height:auto;max-height:88vh;
-      border-radius:18px;overflow:hidden;
-      transform:scale(.96);
+      width:100%;max-width:820px;height:auto;max-height:88vh;
+      border-radius:18px;overflow:hidden;transform:scale(.96);
     }
     .summary-mask.show .summary-panel{transform:scale(1);}
     .summary-head{padding:14px 18px;}
+
+    .settings-panel{
+      width:100%;max-width:640px;height:auto;max-height:88vh;
+      border-radius:18px;overflow:hidden;transform:scale(.96);
+    }
+    .settings-mask.show .settings-panel{transform:scale(1);}
+    .settings-head{padding:14px 18px;}
   }
 
   @media (max-width:360px){
     .grid{gap:6px;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));}
     .cell{font-size:14px;border-radius:8px;min-height:44px;}
-    .tab{padding:7px 12px;}
+    .tab{padding:7px 12px;font-size:14px;}
     .stat{font-size:12px;}
     .mode{font-size:13px;padding:9px;}
     .lvbar .item{font-size:11px;}
     .fixbar .item{font-size:11px;}
     .seg-btn{font-size:13px;padding:10px 2px;}
     .sum-table{font-size:11px;}
+    .tool-btn{padding:0 10px;font-size:12px;}
+    .tool-row .search-input{font-size:13px;height:40px;}
+    .tool-btn{height:40px;}
+    .settings-btn{width:38px;height:38px;font-size:16px;}
   }
 </style>
 </head>
@@ -448,11 +639,9 @@
   <h1>班级登记本</h1>
 
   <div class="topbar">
-    <div class="tabs">
-      <button class="tab active" data-cls="14" type="button">14班</button>
-      <button class="tab" data-cls="15" type="button">15班</button>
-    </div>
+    <div class="tabs" id="classTabs"></div>
     <input type="date" id="datePicker">
+    <button class="settings-btn" id="settingsBtn" type="button" title="设置">⚙️</button>
   </div>
 
   <div class="modes" id="modeTabs">
@@ -486,6 +675,20 @@
     <div class="note-body empty" id="noteBody">点击“编辑”填写今日作业内容</div>
   </div>
 
+  <div class="tool-row" id="toolRow">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" class="search-input"
+             placeholder="输入学号定位" autocomplete="off"
+             autocorrect="off" autocapitalize="off" spellcheck="false">
+      <button class="search-clear" id="searchClear" type="button" aria-label="清除">✕</button>
+    </div>
+    <button class="tool-btn tool-all" id="allDoneBtn" type="button">✓ 全部已交</button>
+    <button class="tool-btn tool-undo" id="undoBtn" type="button" disabled>↺ 撤销</button>
+  </div>
+
+  <div class="search-info" id="searchInfo"></div>
+
   <div class="grid" id="grid"></div>
 
   <p class="hint" id="hint"></p>
@@ -503,14 +706,13 @@
 
 </div>
 
-<!-- ================= 作业 & 改错面板 ================= -->
+<!-- 作业 & 改错面板 -->
 <div class="sheet-mask" id="sheetMask">
   <div class="sheet" id="sheet">
     <div class="sheet-head">
       <span class="sn" id="sheetNum">3 号</span>
       <button class="sheet-close" id="sheetClose" type="button" aria-label="关闭">✕</button>
     </div>
-
     <div class="sheet-group">
       <div class="group-label">作业状态</div>
       <div class="seg-row" id="hwSeg">
@@ -519,7 +721,6 @@
         <button class="seg-btn" type="button" data-hw="0">未登记</button>
       </div>
     </div>
-
     <div class="sheet-group">
       <div class="group-label">作业等级</div>
       <div class="sheet-hint">仅“已交”状态下可选</div>
@@ -531,7 +732,6 @@
         <button class="seg-btn" type="button" data-lv="">无</button>
       </div>
     </div>
-
     <div class="sheet-group">
       <div class="group-label">改错过关</div>
       <div class="seg-row" id="fixSeg">
@@ -543,7 +743,7 @@
   </div>
 </div>
 
-<!-- ================= 作业内容编辑弹窗 ================= -->
+<!-- 作业内容编辑 -->
 <div class="note-mask" id="noteMask">
   <div class="note-dialog">
     <div class="note-dialog-head">
@@ -558,7 +758,7 @@
   </div>
 </div>
 
-<!-- ================= 汇总统计面板 ================= -->
+<!-- 汇总统计 -->
 <div class="summary-mask" id="summaryMask">
   <div class="summary-panel">
     <div class="summary-head">
@@ -588,35 +788,96 @@
   </div>
 </div>
 
+<!-- ================= 设置面板 ================= -->
+<div class="settings-mask" id="settingsMask">
+  <div class="settings-panel">
+    <div class="settings-head">
+      <span class="sm-title">⚙️ 设置</span>
+      <button class="sm-close" id="settingsClose" type="button" aria-label="关闭">✕</button>
+    </div>
+    <div class="settings-body">
+
+      <div class="settings-section">
+        <div class="section-label">班级管理</div>
+        <div class="class-chips" id="classChips"></div>
+        <div class="section-hint">
+          点击班级选中，即可在下方编辑名单。设置会自动保存在本机浏览器。
+        </div>
+      </div>
+
+      <div class="settings-section" id="editSection">
+        <div class="section-label">
+          编辑名单：<span id="editClassName" style="color:#111827;">14班</span>
+        </div>
+        <textarea id="rosterTextarea" class="roster-textarea"
+          placeholder="每行一个学号，或输入范围，例如：&#10;1-71&#10;&#10;或混合：&#10;1-23&#10;25-69"></textarea>
+        <div class="section-hint">
+          支持格式：<br>
+          • 范围：<code>1-70</code>（生成 1 到 70 号）<br>
+          • 每行一个：<code>1</code> <code>2</code> <code>3</code> ...<br>
+          • 混合：第一行 <code>1-23</code>，第二行 <code>25-69</code><br>
+          • 也支持 <code>到</code> 或 <code>~</code> 作为范围连接符
+        </div>
+        <div class="edit-actions">
+          <button class="edit-btn" id="renameClassBtn" type="button">重命名</button>
+          <button class="edit-btn edit-delete" id="deleteClassBtn" type="button">删除班级</button>
+          <button class="edit-btn edit-save" id="saveRosterBtn" type="button">保存名单</button>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <button class="danger-btn" id="resetDataBtn" type="button">⚠️ 清空所有打卡记录</button>
+        <div class="section-hint">
+          清空所有日期、所有班级的打卡数据，班级和名单保留。此操作不可恢复。
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 <script>
 (function () {
   'use strict';
 
-  var KEY = 'homework_register_v10';
+  var KEY        = 'homework_register_v13';        // 数据存储键
+  var CONFIG_KEY = 'homework_register_config_v1';  // 配置存储键
   var LONG_PRESS_MS = 600;
+  var UNDO_LIMIT = 30;
 
-  function range(a, b){
+  var LV_LABEL = { 'A+':'A+', 'A':'A', 'A-':'A\u2212', 'B':'B' };
+
+  /* ================= 默认配置 ================= */
+  function rangeIds(a, b){
     var out = [];
     for (var i = a; i <= b; i++) out.push(i);
     return out;
   }
 
-  var ROSTER = {
-    '14': range(1, 71),
-    '15': range(1, 23).concat([24]).concat(range(25, 69))
-  };
+  /* 默认班级（兼容旧数据，id 用 '14' '15'） */
+  function defaultConfig(){
+    return {
+      classes: [
+        { id: '14', name: '14班', ids: rangeIds(1, 71) },
+        { id: '15', name: '15班', ids: rangeIds(1, 69) }
+      ]
+    };
+  }
 
-  var LV_LABEL = { 'A+':'A+', 'A':'A', 'A-':'A\u2212', 'B':'B' };
-
+  var config = defaultConfig();
   var data = {};
   var currentClass = '14';
   var currentDate  = todayStr();
   var mode = 'hw';
   var cells = [];
   var activeId = null;
+  var undoStack = [];
+  var editingClassId = null;
 
   var currentView = 'summary';
   var currentQuick = '7';
+  var searchTimer = null;
+  var highlightTimer = null;
 
   function pad(n){ return n < 10 ? '0' + n : '' + n; }
   function todayStr(){
@@ -626,23 +887,103 @@
   function fmtDate(d){
     return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
   }
-  function idsOf(cls){ return (ROSTER[cls] || []).slice(); }
 
-  function dateRange(start, end){
-    var out = [];
-    var s = new Date(start + 'T00:00:00');
-    var e = new Date(end   + 'T00:00:00');
-    if (isNaN(s.getTime()) || isNaN(e.getTime())) return out;
-    if (s > e) return out;
-    var cur = new Date(s);
-    while (cur <= e){
-      out.push(fmtDate(cur));
-      cur.setDate(cur.getDate() + 1);
-      if (out.length > 366) break;
-    }
-    return out;
+  /* ================= 配置读写 ================= */
+  function loadConfig(){
+    try {
+      var raw = localStorage.getItem(CONFIG_KEY);
+      if (raw) {
+        var obj = JSON.parse(raw);
+        if (obj && Array.isArray(obj.classes) && obj.classes.length > 0){
+          config = obj;
+          return;
+        }
+      }
+    } catch(e){}
+    // 没有配置或格式不对，用默认配置
+    config = defaultConfig();
+    saveConfig();
+  }
+  function saveConfig(){
+    try { localStorage.setItem(CONFIG_KEY, JSON.stringify(config)); }catch(e){}
   }
 
+  function classById(clsId){
+    for (var i = 0; i < config.classes.length; i++){
+      if (config.classes[i].id === clsId) return config.classes[i];
+    }
+    return null;
+  }
+  function idsOf(clsId){
+    var c = classById(clsId);
+    return c ? c.ids.slice() : [];
+  }
+  function classNameOf(clsId){
+    var c = classById(clsId);
+    return c ? c.name : clsId;
+  }
+
+  /* ================= 名单文本 ↔ 数组 ================= */
+  function parseRoster(text){
+    var ids = [];
+    var lines = String(text || '').split(/\r?\n/);
+    lines.forEach(function(line){
+      line = line.trim();
+      if (!line) return;
+
+      // "1-23" / "1到23" / "1~23"
+      var m = line.match(/^(\d+)\s*(?:[-~到至])\s*(\d+)$/);
+      if (m){
+        var a = parseInt(m[1], 10);
+        var b = parseInt(m[2], 10);
+        if (a <= b){
+          for (var i = a; i <= b; i++) ids.push(i);
+        } else {
+          for (var i = a; i >= b; i--) ids.push(i);
+        }
+        return;
+      }
+
+      // 一行一个数字开头（忽略后面可能跟的姓名）
+      var m2 = line.match(/^(\d+)/);
+      if (m2){
+        ids.push(parseInt(m2[1], 10));
+      }
+    });
+
+    // 去重 + 排序
+    var seen = {};
+    var uniq = [];
+    for (var k = 0; k < ids.length; k++){
+      var n = ids[k];
+      if (!seen[n]){
+        seen[n] = true;
+        uniq.push(n);
+      }
+    }
+    uniq.sort(function(x, y){ return x - y; });
+    return uniq;
+  }
+
+  function idsToText(ids){
+    if (!ids || ids.length === 0) return '';
+    var sorted = ids.slice().sort(function(a, b){ return a - b; });
+    var ranges = [];
+    var start = sorted[0], prev = sorted[0];
+
+    for (var i = 1; i < sorted.length; i++){
+      if (sorted[i] === prev + 1){
+        prev = sorted[i];
+      } else {
+        ranges.push(start === prev ? String(start) : start + '-' + prev);
+        start = prev = sorted[i];
+      }
+    }
+    ranges.push(start === prev ? String(start) : start + '-' + prev);
+    return ranges.join('\n');
+  }
+
+  /* ================= 数据读写 ================= */
   function load(){
     try{
       var raw = localStorage.getItem(KEY);
@@ -708,7 +1049,6 @@
     else { c.hwLv[id] = lv; }
     save();
   }
-
   function getFix(date, cls, id){
     var d = data[date]; if (!d) return 0;
     var c = d[cls];     if (!c || !c.fix) return 0;
@@ -725,7 +1065,6 @@
     ensure(date, cls).fix[id] = st;
     save();
   }
-
   function getCb(date, cls, id){
     var d = data[date]; if (!d) return 0;
     var c = d[cls];     if (!c || !c.cb) return 0;
@@ -742,7 +1081,6 @@
     ensure(date, cls).cb[id] = v;
     save();
   }
-
   function getNote(date, cls){
     var d = data[date]; if (!d) return '';
     var c = d[cls];     if (!c) return '';
@@ -757,6 +1095,43 @@
       c.note = text;
     }
     save();
+  }
+
+  function pushUndo(){
+    var c = data[currentDate] && data[currentDate][currentClass];
+    var snap = {
+      date: currentDate,
+      cls: currentClass,
+      hw:   c && c.hw   ? JSON.parse(JSON.stringify(c.hw))   : {},
+      hwLv: c && c.hwLv ? JSON.parse(JSON.stringify(c.hwLv)) : {},
+      cb:   c && c.cb   ? JSON.parse(JSON.stringify(c.cb))   : {},
+      fix:  c && c.fix  ? JSON.parse(JSON.stringify(c.fix))  : {},
+      note: c && c.note ? c.note : ''
+    };
+    undoStack.push(snap);
+    if (undoStack.length > UNDO_LIMIT) undoStack.shift();
+    updateUndoBtn();
+  }
+  function doUndo(){
+    if (undoStack.length === 0) return;
+    var snap = undoStack.pop();
+    if (!data[snap.date]) data[snap.date] = {};
+    var c = data[snap.date][snap.cls];
+    if (!c) c = data[snap.date][snap.cls] = {};
+    c.hw = snap.hw;
+    c.hwLv = snap.hwLv;
+    c.cb = snap.cb;
+    c.fix = snap.fix;
+    if (snap.note) c.note = snap.note;
+    else delete c.note;
+    cleanup(snap.date, snap.cls);
+    save();
+    updateUndoBtn();
+    render();
+  }
+  function clearUndo(){
+    undoStack = [];
+    updateUndoBtn();
   }
 
   function currentHwMap(){
@@ -780,13 +1155,9 @@
     return c.cb || {};
   }
 
+  /* ================= DOM ================= */
+  var classTabs   = document.getElementById('classTabs');
   var gridEl     = document.getElementById('grid');
-  var statsEl    = document.getElementById('stats');
-  var lvBarEl    = document.getElementById('lvBar');
-  var fixBarEl   = document.getElementById('fixBar');
-  var noteCard   = document.getElementById('noteCard');
-  var noteBody   = document.getElementById('noteBody');
-  var noteEditBtn= document.getElementById('noteEditBtn');
   var datePicker = document.getElementById('datePicker');
   var lblA = document.getElementById('lblA');
   var lblB = document.getElementById('lblB');
@@ -800,13 +1171,23 @@
   var cntB1 = document.getElementById('cntB1');
   var cntPend = document.getElementById('cntPend');
   var cntPass = document.getElementById('cntPass');
+  var lvBarEl    = document.getElementById('lvBar');
+  var fixBarEl   = document.getElementById('fixBar');
+  var noteCard   = document.getElementById('noteCard');
+  var noteBody   = document.getElementById('noteBody');
+  var noteEditBtn= document.getElementById('noteEditBtn');
   var hintEl   = document.getElementById('hint');
   var clearBtn = document.getElementById('clearBtn');
   var exportBtn = document.getElementById('exportBtn');
   var importBtn = document.getElementById('importBtn');
   var importFile = document.getElementById('importFile');
-  var tabs     = Array.prototype.slice.call(document.querySelectorAll('.tab'));
-  var modeBtns = Array.prototype.slice.call(document.querySelectorAll('.mode'));
+  var searchInput = document.getElementById('searchInput');
+  var searchClear = document.getElementById('searchClear');
+  var searchInfo  = document.getElementById('searchInfo');
+  var allDoneBtn  = document.getElementById('allDoneBtn');
+  var undoBtn     = document.getElementById('undoBtn');
+  var settingsBtn = document.getElementById('settingsBtn');
+  var modeBtns    = Array.prototype.slice.call(document.querySelectorAll('.mode'));
 
   var sheetMask   = document.getElementById('sheetMask');
   var sheetNum    = document.getElementById('sheetNum');
@@ -832,15 +1213,159 @@
   var viewToggle  = document.getElementById('viewToggle');
   var summaryResult = document.getElementById('summaryResult');
 
+  /* 设置面板 DOM */
+  var settingsMask   = document.getElementById('settingsMask');
+  var settingsClose  = document.getElementById('settingsClose');
+  var classChips     = document.getElementById('classChips');
+  var editClassName  = document.getElementById('editClassName');
+  var rosterTextarea = document.getElementById('rosterTextarea');
+  var renameClassBtn = document.getElementById('renameClassBtn');
+  var deleteClassBtn = document.getElementById('deleteClassBtn');
+  var saveRosterBtn  = document.getElementById('saveRosterBtn');
+  var resetDataBtn   = document.getElementById('resetDataBtn');
+
+  function updateUndoBtn(){
+    undoBtn.disabled = undoStack.length === 0;
+  }
+
+  /* ================= 班级 tabs（动态生成） ================= */
+  function renderTabs(){
+    classTabs.innerHTML = '';
+    config.classes.forEach(function(c){
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'tab' + (c.id === currentClass ? ' active' : '');
+      btn.dataset.clsId = c.id;
+      btn.textContent = c.name;
+      btn.addEventListener('click', function(){
+        if (c.id === currentClass) return;
+        closeSheet(); closeNoteEditor(); closeSummary();
+        clearSearchHighlight();
+        searchInput.value = '';
+        searchClear.classList.remove('show');
+        currentClass = c.id;
+        Array.prototype.forEach.call(classTabs.children, function(t){
+          t.classList.toggle('active', t.dataset.clsId === c.id);
+        });
+        clearUndo();
+        buildGrid();
+        render();
+      });
+      classTabs.appendChild(btn);
+    });
+  }
+
+  /* 保证 currentClass 至少指向一个存在的班级 */
+  function ensureCurrentClass(){
+    if (!classById(currentClass)){
+      currentClass = config.classes[0] ? config.classes[0].id : '';
+    }
+  }
+
+  /* ================= 搜索 ================= */
+  function clearSearchHighlight(){
+    if (highlightTimer){ clearTimeout(highlightTimer); highlightTimer = null; }
+    for (var i = 0; i < cells.length; i++){
+      cells[i].classList.remove('highlight', 'exact');
+    }
+    searchInfo.textContent = '';
+  }
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(m){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];
+    });
+  }
+  function doSearch(){
+    clearSearchHighlight();
+    var q = searchInput.value.trim();
+    searchClear.classList.toggle('show', !!q);
+    if (!q) return;
+
+    var digits = q.replace(/[^0-9]/g, '');
+    var matched = [];
+    var exact = null;
+
+    for (var i = 0; i < cells.length; i++){
+      var btn = cells[i];
+      var numStr = String(btn.dataset.id);
+      if (digits && numStr === digits){ exact = btn; matched.push(btn); }
+      else if (digits && numStr.indexOf(digits) === 0){ matched.push(btn); }
+    }
+    if (exact) matched = [exact];
+
+    if (matched.length === 0){
+      searchInfo.innerHTML = '未找到学号 <b>' + escapeHtml(q) + '</b>';
+      return;
+    }
+    for (var j = 0; j < matched.length; j++){
+      matched[j].classList.add('highlight');
+      if (matched[j] === exact) matched[j].classList.add('exact');
+    }
+    var scrollTo = exact || matched[0];
+    try { scrollTo.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+    catch (e) { scrollTo.scrollIntoView(); }
+
+    if (exact){
+      searchInfo.innerHTML = '已定位到 <b>' + digits + ' 号</b>';
+    } else if (matched.length === 1){
+      searchInfo.innerHTML = '已定位到 <b>' + matched[0].dataset.id + ' 号</b>';
+    } else {
+      searchInfo.innerHTML = '匹配到 <b>' + matched.length + '</b> 个学号';
+    }
+    highlightTimer = setTimeout(function(){
+      for (var k = 0; k < matched.length; k++){
+        matched[k].classList.remove('highlight', 'exact');
+      }
+      highlightTimer = null;
+    }, 3200);
+  }
+  searchInput.addEventListener('input', function(){
+    if (searchTimer) clearTimeout(searchTimer);
+    searchTimer = setTimeout(doSearch, 150);
+  });
+  searchInput.addEventListener('keydown', function(e){
+    if (e.key === 'Enter' || e.keyCode === 13){
+      e.preventDefault();
+      if (searchTimer) clearTimeout(searchTimer);
+      doSearch();
+      searchInput.blur();
+    }
+  });
+  searchClear.addEventListener('click', function(){
+    searchInput.value = '';
+    clearSearchHighlight();
+    searchClear.classList.remove('show');
+    searchInput.focus();
+  });
+
+  /* ================= 快捷操作 ================= */
+  allDoneBtn.addEventListener('click', function(){
+    if (mode !== 'hw') return;
+    pushUndo();
+    var ids = idsOf(currentClass);
+    ids.forEach(function(id){
+      if (getHw(currentDate, currentClass, id) === 0){
+        setHw(currentDate, currentClass, id, 1);
+      }
+    });
+    render();
+  });
+  undoBtn.addEventListener('click', doUndo);
+
   /* ================= 导出 / 导入 ================= */
   exportBtn.addEventListener('click', function () {
     try {
-      var json = JSON.stringify(data);
-      var blob = new Blob([json], { type: 'application/json' });
+      var bundle = {
+        version: 13,
+        exportTime: new Date().toISOString(),
+        config: config,
+        data: data
+      };
+      var blob = new Blob([JSON.stringify(bundle)], { type: 'application/json' });
       var url = URL.createObjectURL(blob);
       var a = document.createElement('a');
       a.href = url;
-      a.download = '作业登记备份-' + todayStr() + '.json';
+      a.download = '班级登记备份-' + todayStr() + '.json';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -857,17 +1382,37 @@
   importFile.addEventListener('change', function (e) {
     var file = e.target.files && e.target.files[0];
     if (!file) return;
-
     var reader = new FileReader();
     reader.onload = function (ev) {
       try {
         var obj = JSON.parse(ev.target.result);
-        if (!obj || typeof obj !== 'object' || Array.isArray(obj)) {
-          throw new Error('格式错误');
+        if (!obj || typeof obj !== 'object') throw new Error('格式错误');
+
+        // 兼容新旧两种备份文件
+        var newData, newConfig;
+        if (obj.config && obj.data){
+          // 新格式
+          newConfig = obj.config;
+          newData = obj.data;
+        } else {
+          // 旧格式（纯 data），config 保持不变
+          newData = obj;
+          newConfig = config;
         }
-        if (!confirm('导入将【覆盖】当前所有记录，确定继续吗？')) return;
-        data = obj;
+
+        if (!confirm('导入将【覆盖】当前的名单配置和所有记录，确定继续吗？')) return;
+
+        if (newConfig && Array.isArray(newConfig.classes) && newConfig.classes.length > 0){
+          config = newConfig;
+          saveConfig();
+        }
+        data = newData;
         save();
+
+        ensureCurrentClass();
+        clearUndo();
+        renderTabs();
+        buildGrid();
         render();
         alert('导入成功！');
       } catch (err) {
@@ -878,7 +1423,7 @@
     e.target.value = '';
   });
 
-  /* ================= 面板 ================= */
+  /* ================= 作业 & 改错面板 ================= */
   function refreshSheet(){
     if (activeId == null) return;
     var hw = getHw(currentDate, currentClass, activeId);
@@ -893,12 +1438,10 @@
       btn.classList.toggle('active', btnLv === lv);
     });
     lvSeg.classList.toggle('disabled', hw !== 1);
-
     Array.prototype.forEach.call(fixSeg.children, function(btn){
       btn.classList.toggle('active', Number(btn.dataset.fix) === fx);
     });
   }
-
   function openSheet(id){
     activeId = id;
     sheetNum.textContent = id + ' 号';
@@ -911,7 +1454,6 @@
     document.body.style.overflow = '';
     activeId = null;
   }
-
   sheetMask.addEventListener('click', function(e){
     if (e.target === sheetMask) closeSheet();
   });
@@ -920,29 +1462,30 @@
   Array.prototype.forEach.call(hwSeg.children, function(btn){
     btn.addEventListener('click', function(){
       if (activeId == null) return;
+      pushUndo();
       setHw(currentDate, currentClass, activeId, Number(btn.dataset.hw));
-      refreshSheet();
-      render();
+      refreshSheet(); render();
     });
   });
   Array.prototype.forEach.call(lvSeg.children, function(btn){
     btn.addEventListener('click', function(){
       if (activeId == null) return;
+      pushUndo();
       var lv = btn.dataset.lv === undefined ? '' : btn.dataset.lv;
       setLv(currentDate, currentClass, activeId, lv);
-      refreshSheet();
-      render();
+      refreshSheet(); render();
     });
   });
   Array.prototype.forEach.call(fixSeg.children, function(btn){
     btn.addEventListener('click', function(){
       if (activeId == null) return;
+      pushUndo();
       setFix(currentDate, currentClass, activeId, Number(btn.dataset.fix));
-      refreshSheet();
-      render();
+      refreshSheet(); render();
     });
   });
 
+  /* ================= 作业内容编辑 ================= */
   function openNoteEditor(){
     noteInput.value = getNote(currentDate, currentClass);
     noteMask.classList.add('show');
@@ -960,11 +1503,11 @@
     if (e.target === noteMask) closeNoteEditor();
   });
   noteSave.addEventListener('click', function(){
+    pushUndo();
     setNote(currentDate, currentClass, noteInput.value);
     closeNoteEditor();
     renderNote();
   });
-
   function renderNote(){
     var txt = getNote(currentDate, currentClass);
     if (txt && txt.trim()){
@@ -976,20 +1519,22 @@
     }
   }
 
+  /* ================= 点击方格 ================= */
   function onTap(id){
     if (mode === 'hw'){
       var cur = getHw(currentDate, currentClass, id);
       if (cur === 0){
+        pushUndo();
         setHw(currentDate, currentClass, id, 1);
         render();
       } else {
         openSheet(id);
       }
     } else {
+      pushUndo();
       addCb(id, 1);
     }
   }
-
   function addCb(id, delta){
     var cur  = getCb(currentDate, currentClass, id);
     var next = cur + delta;
@@ -1000,66 +1545,45 @@
   }
 
   function bindCell(btn, id){
-    var timer = null;
-    var suppressClick = false;
-    var startX = 0, startY = 0;
-
-    function cancelTimer(){
-      if (timer){ clearTimeout(timer); timer = null; }
-    }
+    var timer = null, suppressClick = false, startX = 0, startY = 0;
+    function cancelTimer(){ if (timer){ clearTimeout(timer); timer = null; } }
     function pressStart(x, y){
-      suppressClick = false;
-      startX = x; startY = y;
+      suppressClick = false; startX = x; startY = y;
       cancelTimer();
       timer = setTimeout(function(){
-        timer = null;
-        suppressClick = true;
+        timer = null; suppressClick = true;
         if (mode === 'cb'){
+          pushUndo();
           addCb(id, -1);
           if (navigator.vibrate){ try{ navigator.vibrate(25); }catch(err){} }
         }
       }, LONG_PRESS_MS);
     }
     function pressMove(x, y){
-      if (Math.abs(x - startX) > 12 || Math.abs(y - startY) > 12){
-        cancelTimer();
-      }
+      if (Math.abs(x - startX) > 12 || Math.abs(y - startY) > 12) cancelTimer();
     }
     function pressEnd(){ cancelTimer(); }
 
     btn.addEventListener('touchstart', function(e){
       if (e.touches.length !== 1) return;
-      var t = e.touches[0];
-      pressStart(t.clientX, t.clientY);
+      var t = e.touches[0]; pressStart(t.clientX, t.clientY);
     }, {passive: true});
     btn.addEventListener('touchmove', function(e){
       if (e.touches.length !== 1) return;
-      var t = e.touches[0];
-      pressMove(t.clientX, t.clientY);
+      var t = e.touches[0]; pressMove(t.clientX, t.clientY);
     }, {passive: true});
     btn.addEventListener('touchend', pressEnd);
-    btn.addEventListener('touchcancel', function(){
-      pressEnd();
-      suppressClick = false;
-    });
-
+    btn.addEventListener('touchcancel', function(){ pressEnd(); suppressClick = false; });
     btn.addEventListener('mousedown', function(e){
       if (e.button !== 0) return;
       pressStart(e.clientX, e.clientY);
     });
     btn.addEventListener('mousemove', function(e){ pressMove(e.clientX, e.clientY); });
     btn.addEventListener('mouseup', pressEnd);
-    btn.addEventListener('mouseleave', function(){
-      pressEnd();
-      suppressClick = false;
-    });
+    btn.addEventListener('mouseleave', function(){ pressEnd(); suppressClick = false; });
 
     btn.addEventListener('click', function(e){
-      if (suppressClick){
-        suppressClick = false;
-        e.preventDefault();
-        return;
-      }
+      if (suppressClick){ suppressClick = false; e.preventDefault(); return; }
       onTap(id);
     });
     btn.addEventListener('contextmenu', function(e){ e.preventDefault(); });
@@ -1081,16 +1605,11 @@
       btn.setAttribute('aria-label', id + '号');
 
       var lv = document.createElement('span');
-      lv.className = 'lv';
-      btn.appendChild(lv);
-
+      lv.className = 'lv'; btn.appendChild(lv);
       var sc = document.createElement('span');
-      sc.className = 'sc';
-      btn.appendChild(sc);
-
+      sc.className = 'sc'; btn.appendChild(sc);
       var fx = document.createElement('span');
-      fx.className = 'fx-dot';
-      btn.appendChild(fx);
+      fx.className = 'fx-dot'; btn.appendChild(fx);
 
       bindCell(btn, id);
       frag.appendChild(btn);
@@ -1104,6 +1623,12 @@
   function render(){
     gridEl.classList.remove('mode-hw', 'mode-cb');
     gridEl.classList.add('mode-' + mode);
+
+    if (mode === 'hw'){
+      allDoneBtn.style.display = 'inline-flex';
+    } else {
+      allDoneBtn.style.display = 'none';
+    }
 
     if (mode === 'hw'){
       var hwMap = currentHwMap();
@@ -1121,17 +1646,11 @@
         btn.dataset.fix = String(fx);
 
         var lvEl = btn.querySelector('.lv');
-        if (lv){
-          lvEl.className = 'lv show';
-          lvEl.textContent = LV_LABEL[lv];
-        } else {
-          lvEl.className = 'lv';
-          lvEl.textContent = '';
-        }
+        if (lv){ lvEl.className = 'lv show'; lvEl.textContent = LV_LABEL[lv]; }
+        else { lvEl.className = 'lv'; lvEl.textContent = ''; }
 
         var scEl = btn.querySelector('.sc');
-        scEl.className = 'sc';
-        scEl.textContent = '';
+        scEl.className = 'sc'; scEl.textContent = '';
 
         var fxEl = btn.querySelector('.fx-dot');
         fxEl.className = fx > 0 ? 'fx-dot show' : 'fx-dot';
@@ -1146,10 +1665,8 @@
       lblB.textContent = '缺交';
       lblC.textContent = '未登记';
       hintEl.innerHTML =
-        '单击未登记 → 已交；单击已交/缺交 → 打开面板<br>' +
-        '面板里可设「作业状态 · 等级 · 改错过关」<br>' +
-        '方格左下角 <span class="fx-mini" style="background:#f59e0b;"></span>待过关 ' +
-        '<span class="fx-mini" style="background:#22c55e;"></span>已过关';
+        '① 点「全部已交」→ ② 点缺交的同学 → ③ 点已交方格改等级<br>' +
+        '点已交/缺交方格可打开面板，设置等级和改错过关';
       clearBtn.textContent = '清空【当前日期 + 当前班级】的作业 & 改错记录';
 
     } else {
@@ -1163,9 +1680,7 @@
         btn.removeAttribute('data-fix');
 
         var lvEl = btn.querySelector('.lv');
-        lvEl.className = 'lv';
-        lvEl.textContent = '';
-
+        lvEl.className = 'lv'; lvEl.textContent = '';
         var fxEl = btn.querySelector('.fx-dot');
         fxEl.className = 'fx-dot';
 
@@ -1194,7 +1709,6 @@
   function updateHwStats(map, lvMap, fixMap){
     var a = 0, b = 0;
     var cAp = 0, cA = 0, cAm = 0, cB = 0;
-
     for (var k in map){
       if (!Object.prototype.hasOwnProperty.call(map, k)) continue;
       if (map[k] === 1){
@@ -1204,19 +1718,13 @@
         else if (lv === 'A') cA++;
         else if (lv === 'A-') cAm++;
         else if (lv === 'B') cB++;
-      } else if (map[k] === 2){
-        b++;
-      }
+      } else if (map[k] === 2){ b++; }
     }
-
     var total = cells.length;
-    cntA.textContent = a;
-    cntB.textContent = b;
+    cntA.textContent = a; cntB.textContent = b;
     cntC.textContent = total - a - b;
-    cntAp.textContent = cAp;
-    cntA1.textContent = cA;
-    cntAm.textContent = cAm;
-    cntB1.textContent = cB;
+    cntAp.textContent = cAp; cntA1.textContent = cA;
+    cntAm.textContent = cAm; cntB1.textContent = cB;
 
     var pending = 0, passed = 0;
     for (var j in fixMap){
@@ -1224,25 +1732,22 @@
       if (fixMap[j] === 1) pending++;
       else if (fixMap[j] === 2) passed++;
     }
-    cntPend.textContent = pending;
-    cntPass.textContent = passed;
+    cntPend.textContent = pending; cntPass.textContent = passed;
   }
-
   function updateCbStats(map){
     var a = 0, b = 0;
     for (var k in map){
       if (!Object.prototype.hasOwnProperty.call(map, k)) continue;
-      if (map[k] > 0) a++;
-      else if (map[k] < 0) b++;
+      if (map[k] > 0) a++; else if (map[k] < 0) b++;
     }
     var total = cells.length;
-    cntA.textContent = a;
-    cntB.textContent = b;
+    cntA.textContent = a; cntB.textContent = b;
     cntC.textContent = total - a - b;
   }
 
+  /* ================= 汇总统计 ================= */
   function openSummary(){
-    smClass.textContent = currentClass + '班';
+    smClass.textContent = classNameOf(currentClass);
     setQuickRange('7');
     summaryMask.classList.add('show');
     document.body.style.overflow = 'hidden';
@@ -1252,7 +1757,6 @@
     summaryMask.classList.remove('show');
     document.body.style.overflow = '';
   }
-
   function setQuickRange(kind){
     var now = new Date();
     var end = fmtDate(now);
@@ -1265,14 +1769,12 @@
       s.setDate(s.getDate() - (n - 1));
       start = fmtDate(s);
     }
-    rangeStart.value = start;
-    rangeEnd.value = end;
+    rangeStart.value = start; rangeEnd.value = end;
     currentQuick = kind;
     Array.prototype.forEach.call(quickRow.children, function(b){
       b.classList.toggle('active', b.dataset.days === kind);
     });
   }
-
   function computeStats(days, cls, m){
     var ids = idsOf(cls);
     var result = {};
@@ -1281,22 +1783,18 @@
         done: 0, miss: 0,
         Aplus: 0, A: 0, Aminus: 0, B: 0,
         pending: 0, passed: 0,
-        plus: 0, minus: 0, score: 0,
-        byDate: {}
+        plus: 0, minus: 0, score: 0, byDate: {}
       };
     });
-
     days.forEach(function(date){
       var d = data[date];
       var c = d && d[cls];
-
       if (!c){
         ids.forEach(function(id){
           result[id].byDate[date] = { st: 0, lv: '', fx: 0, v: 0 };
         });
         return;
       }
-
       if (m === 'hw'){
         var hw = c.hw || {};
         var lv = c.hwLv || {};
@@ -1307,16 +1805,13 @@
           var f = fx[id] || 0;
           var r = result[id];
           r.byDate[date] = { st: st, lv: l, fx: f };
-
           if (st === 1){
             r.done++;
             if (l === 'A+') r.Aplus++;
             else if (l === 'A') r.A++;
             else if (l === 'A-') r.Aminus++;
             else if (l === 'B') r.B++;
-          } else if (st === 2){
-            r.miss++;
-          }
+          } else if (st === 2){ r.miss++; }
           if (f === 1) r.pending++;
           else if (f === 2) r.passed++;
         });
@@ -1332,27 +1827,21 @@
         });
       }
     });
-
     return result;
   }
-
   function renderSummary(){
-    var start = rangeStart.value;
-    var end   = rangeEnd.value;
+    var start = rangeStart.value, end = rangeEnd.value;
     if (!start || !end) return;
     if (start > end){
       var t = start; start = end; end = t;
-      rangeStart.value = start;
-      rangeEnd.value = end;
+      rangeStart.value = start; rangeEnd.value = end;
     }
-
     var days = dateRange(start, end);
     if (days.length === 0){
       ovLine.innerHTML = '';
       summaryResult.innerHTML = '<p class="empty">日期范围无效</p>';
       return;
     }
-
     var stats = computeStats(days, currentClass, mode);
     var totalSlots = days.length * idsOf(currentClass).length;
 
@@ -1373,7 +1862,6 @@
       for (var id2 in stats) if (Object.prototype.hasOwnProperty.call(stats, id2)) totalScore += stats[id2].score;
       ovLine.innerHTML = '共 <b>' + days.length + '</b> 天 · 全班总得分 <b>' + totalScore + '</b>';
     }
-
     if (currentView === 'summary'){
       if (mode === 'hw') renderHwSummaryTable(stats, days);
       else renderCbSummaryTable(stats, days);
@@ -1381,24 +1869,33 @@
       renderDetailTable(stats, days);
     }
   }
+  function dateRange(start, end){
+    var out = [];
+    var s = new Date(start + 'T00:00:00');
+    var e = new Date(end + 'T00:00:00');
+    if (isNaN(s.getTime()) || isNaN(e.getTime())) return out;
+    if (s > e) return out;
+    var cur = new Date(s);
+    while (cur <= e){
+      out.push(fmtDate(cur));
+      cur.setDate(cur.getDate() + 1);
+      if (out.length > 366) break;
+    }
+    return out;
+  }
 
   function renderHwSummaryTable(stats, days){
     var total = days.length;
     var ids = idsOf(currentClass);
-
     var html = '<div class="sum-scroll"><table class="sum-table"><colgroup>'
-      + '<col style="width:34px">'
-      + '<col style="width:30px"><col style="width:30px"><col style="width:30px">'
+      + '<col style="width:34px"><col style="width:30px"><col style="width:30px"><col style="width:30px">'
       + '<col style="width:26px"><col style="width:26px"><col style="width:26px"><col style="width:26px">'
-      + '<col style="width:36px"><col style="width:36px">'
-      + '<col style="width:48px">'
+      + '<col style="width:36px"><col style="width:36px"><col style="width:48px">'
       + '</colgroup><thead><tr>'
       + '<th>学号</th><th>已交</th><th>缺交</th><th>未登</th>'
       + '<th>A+</th><th>A</th><th>A−</th><th>B</th>'
-      + '<th>待过</th><th>已过</th>'
-      + '<th>完成率</th>'
+      + '<th>待过</th><th>已过</th><th>完成率</th>'
       + '</tr></thead><tbody>';
-
     ids.forEach(function(id){
       var r = stats[id];
       var none = total - r.done - r.miss;
@@ -1420,12 +1917,10 @@
     html += '</tbody></table></div>';
     summaryResult.innerHTML = html;
   }
-
-  function renderCbSummaryTable(stats, days){
+  function renderCbSummaryTable(stats){
     var ids = idsOf(currentClass);
     var html = '<table class="sum-table"><colgroup>'
-      + '<col style="width:44px">'
-      + '<col style="width:52px"><col style="width:52px"><col style="width:52px">'
+      + '<col style="width:44px"><col style="width:52px"><col style="width:52px"><col style="width:52px">'
       + '</colgroup><thead><tr>'
       + '<th>学号</th><th>加分</th><th>扣分</th><th>总得分</th>'
       + '</tr></thead><tbody>';
@@ -1442,7 +1937,6 @@
     html += '</tbody></table>';
     summaryResult.innerHTML = html;
   }
-
   function detailCellInfo(m, d){
     if (m === 'hw'){
       var st = d.st || 0;
@@ -1462,18 +1956,13 @@
     if (v < 0) return {cls:'det-cell st2', txt:'−'+Math.abs(v)};
     return {cls:'det-cell st0', txt:''};
   }
-
   function renderDetailTable(stats, days){
     var ids = idsOf(currentClass);
     var colWidths = '36px';
     days.forEach(function(){ colWidths += ' 32px'; });
-
     var html = '<div class="det-wrap"><div class="det-grid" style="grid-template-columns:' + colWidths + ';">';
     html += '<div class="det-h det-h-id">学号</div>';
-    days.forEach(function(date){
-      html += '<div class="det-h">' + date.slice(5) + '</div>';
-    });
-
+    days.forEach(function(date){ html += '<div class="det-h">' + date.slice(5) + '</div>'; });
     ids.forEach(function(id){
       html += '<div class="det-name">' + id + '</div>';
       days.forEach(function(date){
@@ -1487,7 +1976,6 @@
       });
     });
     html += '</div></div>';
-
     var legend;
     if (mode === 'hw'){
       legend = '✓ 已交（未评等级） &nbsp; ✕ 缺交 &nbsp; 空白 未登记<br>'
@@ -1536,44 +2024,219 @@
     });
   });
 
+  /* ================= 设置面板 ================= */
+  function renderSettingsChips(){
+    classChips.innerHTML = '';
+    config.classes.forEach(function(c){
+      var chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'class-chip' + (c.id === editingClassId ? ' active' : '');
+      chip.dataset.clsId = c.id;
+      chip.innerHTML = '<span>' + c.name + '</span>'
+        + '<span class="chip-count">' + c.ids.length + '人</span>';
+      chip.addEventListener('click', function(){
+        editingClassId = c.id;
+        renderSettingsChips();
+        renderSettingsEditArea();
+      });
+      classChips.appendChild(chip);
+    });
+
+    var addChip = document.createElement('button');
+    addChip.type = 'button';
+    addChip.className = 'add-class-chip';
+    addChip.innerHTML = '+ 添加班级';
+    addChip.addEventListener('click', addClassDialog);
+    classChips.appendChild(addChip);
+  }
+
+  function renderSettingsEditArea(){
+    var c = classById(editingClassId);
+    if (!c) {
+      editClassName.textContent = '（未选中）';
+      rosterTextarea.value = '';
+      renameClassBtn.disabled = true;
+      deleteClassBtn.disabled = true;
+      saveRosterBtn.disabled = true;
+      return;
+    }
+    renameClassBtn.disabled = false;
+    deleteClassBtn.disabled = false;
+    saveRosterBtn.disabled = false;
+    editClassName.textContent = c.name;
+    rosterTextarea.value = idsToText(c.ids);
+  }
+
+  function openSettings(){
+    if (!editingClassId || !classById(editingClassId)){
+      editingClassId = currentClass || (config.classes[0] && config.classes[0].id);
+    }
+    renderSettingsChips();
+    renderSettingsEditArea();
+    settingsMask.classList.add('show');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeSettings(){
+    settingsMask.classList.remove('show');
+    document.body.style.overflow = '';
+  }
+
+  settingsBtn.addEventListener('click', openSettings);
+  settingsClose.addEventListener('click', closeSettings);
+  settingsMask.addEventListener('click', function(e){
+    if (e.target === settingsMask) closeSettings();
+  });
+
+  function addClassDialog(){
+    var name = prompt('请输入新班级名称：', '');
+    if (name === null) return;
+    name = String(name).trim();
+    if (!name){
+      alert('班级名称不能为空');
+      return;
+    }
+    // 检查重名
+    for (var i = 0; i < config.classes.length; i++){
+      if (config.classes[i].name === name){
+        alert('班级名称已存在');
+        return;
+      }
+    }
+    var newId = 'c_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+    var defIds = rangeIds(1, 50); // 默认 1-50 人
+    config.classes.push({ id: newId, name: name, ids: defIds });
+    saveConfig();
+    editingClassId = newId;
+    renderTabs();
+    renderSettingsChips();
+    renderSettingsEditArea();
+  }
+
+  renameClassBtn.addEventListener('click', function(){
+    var c = classById(editingClassId);
+    if (!c) return;
+    var name = prompt('重命名班级：', c.name);
+    if (name === null) return;
+    name = String(name).trim();
+    if (!name){ alert('班级名称不能为空'); return; }
+    for (var i = 0; i < config.classes.length; i++){
+      if (config.classes[i].id !== c.id && config.classes[i].name === name){
+        alert('班级名称已存在'); return;
+      }
+    }
+    c.name = name;
+    saveConfig();
+    renderTabs();
+    renderSettingsChips();
+    renderSettingsEditArea();
+  });
+
+  deleteClassBtn.addEventListener('click', function(){
+    var c = classById(editingClassId);
+    if (!c) return;
+    if (config.classes.length <= 1){
+      alert('至少要保留一个班级');
+      return;
+    }
+    if (!confirm('确定要删除【' + c.name + '】吗？\n\n注意：该班级的所有历史记录也会一起删除，无法恢复！\n\n如果只是想清空数据，建议先导出备份。')) return;
+    // 删除班级数据
+    for (var date in data){
+      if (data[date] && data[date][c.id]){
+        delete data[date][c.id];
+        if (Object.keys(data[date]).length === 0) delete data[date];
+      }
+    }
+    // 删除班级配置
+    config.classes = config.classes.filter(function(x){ return x.id !== c.id; });
+    saveConfig();
+    save();
+
+    // 如果删除的是当前班级，切到第一个
+    if (currentClass === c.id){
+      currentClass = config.classes[0].id;
+      clearUndo();
+      buildGrid();
+      render();
+    }
+    editingClassId = config.classes[0].id;
+
+    renderTabs();
+    renderSettingsChips();
+    renderSettingsEditArea();
+  });
+
+  saveRosterBtn.addEventListener('click', function(){
+    var c = classById(editingClassId);
+    if (!c) return;
+    var ids = parseRoster(rosterTextarea.value);
+    if (ids.length === 0){
+      if (!confirm('名单为空，确定要保存吗？')) return;
+    }
+    c.ids = ids;
+    saveConfig();
+    // 刷新主界面
+    renderSettingsChips();
+    renderTabs();
+    if (currentClass === c.id){
+      clearUndo();
+      clearSearchHighlight();
+      buildGrid();
+      render();
+    }
+    // 提示
+    var tip = '已保存：' + ids.length + ' 名学生';
+    if (ids.length > 0){
+      tip += '（' + ids[0] + ' ~ ' + ids[ids.length - 1] + '）';
+    }
+    alert(tip);
+  });
+
+  resetDataBtn.addEventListener('click', function(){
+    if (!confirm('确定要清空所有打卡记录吗？\n\n班级和名单会保留，但所有日期、所有维度的记录都会丢失。\n\n此操作不可恢复！')) return;
+    if (!confirm('再次确认：真的要清空吗？')) return;
+    data = {};
+    save();
+    clearUndo();
+    render();
+    alert('已清空所有记录');
+  });
+
+  /* ================= ESC ================= */
   document.addEventListener('keydown', function(e){
     if (e.key !== 'Escape') return;
-    if (noteMask.classList.contains('show')) closeNoteEditor();
+    if (settingsMask.classList.contains('show')) closeSettings();
+    else if (noteMask.classList.contains('show')) closeNoteEditor();
     else if (summaryMask.classList.contains('show')) closeSummary();
     else if (sheetMask.classList.contains('show')) closeSheet();
   });
 
-  tabs.forEach(function (tab) {
-    tab.addEventListener('click', function () {
-      var cls = tab.dataset.cls;
-      if (cls === currentClass) return;
-      closeSheet(); closeNoteEditor(); closeSummary();
-      currentClass = cls;
-      tabs.forEach(function (t) { t.classList.toggle('active', t === tab); });
-      buildGrid();
-      render();
-    });
-  });
-
+  /* ================= 模式切换 ================= */
   modeBtns.forEach(function (btn) {
     btn.addEventListener('click', function () {
       var m = btn.dataset.mode;
       if (m === mode) return;
-      closeSheet(); closeNoteEditor(); closeSummary();
+      closeSheet(); closeNoteEditor(); closeSummary(); closeSettings();
       mode = m;
       modeBtns.forEach(function (b) { b.classList.toggle('active', b === btn); });
+      clearUndo();
       render();
     });
   });
 
+  /* ================= 日期 ================= */
   datePicker.value = currentDate;
   datePicker.addEventListener('change', function () {
     if (!datePicker.value){ datePicker.value = currentDate; return; }
-    closeSheet(); closeNoteEditor(); closeSummary();
+    closeSheet(); closeNoteEditor(); closeSummary(); closeSettings();
+    clearSearchHighlight();
+    searchInput.value = '';
+    searchClear.classList.remove('show');
     currentDate = datePicker.value;
+    clearUndo();
     render();
   });
 
+  /* ================= 一键清空当前 ================= */
   clearBtn.addEventListener('click', function () {
     var d = data[currentDate];
     var c = d && d[currentClass];
@@ -1588,16 +2251,14 @@
       alert('当前日期、当前班级的【' + name + '】还没有任何记录。');
       return;
     }
-
     var msg = '确定要清空吗？\n\n'
             + '日期：' + currentDate + '\n'
-            + '班级：' + currentClass + '班\n'
+            + '班级：' + classNameOf(currentClass) + '\n'
             + '内容：' + name + '\n'
             + '共 ' + n + ' 条记录\n\n'
             + '清空后无法恢复！';
-
     if (!confirm(msg)) return;
-
+    pushUndo();
     if (mode === 'hw'){
       c.hw = {}; c.hwLv = {}; c.fix = {};
     } else {
@@ -1608,10 +2269,15 @@
     render();
   });
 
+  /* ================= 启动 ================= */
+  loadConfig();
   load();
+  ensureCurrentClass();
   datePicker.value = currentDate;
+  renderTabs();
   buildGrid();
   render();
+  updateUndoBtn();
 
 })();
 </script>
