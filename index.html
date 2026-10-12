@@ -111,7 +111,7 @@
     align-items:center;
   }
   .tool-row .search-wrap{
-    flex:1;min-width:150px;position:relative;display:flex;
+    flex:1;min-width:120px;position:relative;display:flex;
   }
   .tool-row .search-input{
     width:100%;height:42px;padding:0 34px 0 34px;
@@ -135,7 +135,7 @@
   .tool-row .search-clear:active{background:#f3f4f6;}
 
   .tool-btn{
-    flex:none;padding:0 14px;height:42px;
+    flex:none;padding:0 12px;height:42px;
     border:1px solid #e5e7eb;border-radius:10px;
     background:#fff;font:inherit;font-size:13px;font-weight:700;
     color:#4b5563;cursor:pointer;transition:background .12s,transform .08s;
@@ -144,10 +144,23 @@
   }
   .tool-btn:active{transform:scale(.96);}
   .tool-btn:disabled{opacity:.35;pointer-events:none;}
+
   .tool-all{color:#fff;background:#16a34a;border-color:#16a34a;}
   .tool-all:active{background:#15803d;}
+
   .tool-undo{color:#6b7280;}
   .tool-undo:active{background:#f3f4f6;}
+
+  /* 显示姓名切换按钮 */
+  .tool-eye{
+    width:42px;padding:0;justify-content:center;font-size:16px;
+    color:#6b7280;
+  }
+  .tool-eye.active{
+    background:#111827;border-color:#111827;color:#fff;
+  }
+  .tool-eye:active{background:#f3f4f6;}
+  .tool-eye.active:active{background:#1f2937;}
 
   .cell.highlight{
     outline:3px solid #3b82f6;outline-offset:2px;z-index:2;
@@ -170,6 +183,11 @@
     grid-template-columns:repeat(auto-fill,minmax(50px,1fr));
     gap:8px;margin-top:12px;
   }
+  .grid.show-names{
+    grid-template-columns:repeat(auto-fill,minmax(68px,1fr));
+    gap:7px;
+  }
+
   .cell{
     position:relative;aspect-ratio:1/1;min-height:50px;
     display:flex;align-items:center;justify-content:center;
@@ -181,6 +199,27 @@
     transition:background-color .12s ease,color .12s ease,transform .08s ease;
   }
   .cell:active{transform:scale(.92);}
+
+  .cell .c-num{
+    display:block;font-size:16px;font-weight:600;line-height:1;
+  }
+  .cell .c-name{
+    display:none;font-size:12px;font-weight:600;line-height:1.15;
+    text-align:center;word-break:break-all;max-width:100%;padding:0 2px;
+  }
+
+  /* 显示姓名模式下的布局 */
+  .grid.show-names .cell .c-num{
+    position:absolute;top:2px;left:4px;
+    font-size:9px;font-weight:600;opacity:.7;line-height:1;
+  }
+  .grid.show-names .cell .c-name{display:block;}
+
+  /* 该学号没有姓名时，还是按只显示学号的方式 */
+  .grid.show-names .cell.no-name .c-num{
+    position:static;font-size:16px;opacity:1;
+  }
+  .grid.show-names .cell.no-name .c-name{display:none;}
 
   .grid.mode-hw .cell[data-state="0"]{background:#e5e7eb;color:#6b7280;}
   .grid.mode-hw .cell[data-state="1"][data-lv=""]{background:#86efac;color:#065f46;}
@@ -222,10 +261,6 @@
 
   .hint{margin:14px 0 0;text-align:center;font-size:12px;color:#9ca3af;line-height:1.9;}
   .hint b{color:#6b7280;}
-  .hint .fx-mini{
-    display:inline-block;width:7px;height:7px;border-radius:50%;
-    margin:0 2px;vertical-align:middle;
-  }
 
   .summary-btn{
     display:block;width:100%;margin-top:14px;padding:13px;
@@ -250,7 +285,6 @@
   }
   .clear-btn:active{background:#fef2f2;}
 
-  /* 通用面板 */
   .sheet-mask{
     position:fixed;left:0;top:0;right:0;bottom:0;z-index:1000;
     display:flex;align-items:flex-end;justify-content:center;
@@ -309,11 +343,7 @@
   .seg-btn[data-fix="0"].active{background:#9ca3af;border-color:#9ca3af;color:#fff;}
 
   .seg-row.disabled .seg-btn{opacity:.4;pointer-events:none;}
-
-  .sheet-hint{
-    font-size:11px;color:#9ca3af;
-    margin:-2px 0 8px 2px;line-height:1.6;
-  }
+  .sheet-hint{font-size:11px;color:#9ca3af;margin:-2px 0 8px 2px;line-height:1.6;}
 
   .note-mask{
     position:fixed;left:0;top:0;right:0;bottom:0;z-index:3000;
@@ -353,7 +383,6 @@
   .note-cancel{color:#6b7280;}
   .note-save{background:#111827!important;border-color:#111827!important;color:#fff;}
 
-  /* 汇总 */
   .summary-mask{
     position:fixed;left:0;top:0;right:0;bottom:0;z-index:2000;
     background:rgba(17,24,39,.45);
@@ -436,6 +465,7 @@
   }
   .sum-table tr:last-child td{border-bottom:0;}
   .td-id{color:#6b7280;font-weight:500;}
+  .td-name{color:#374151;font-weight:600;font-size:11px;text-align:left;padding-left:6px;}
   .td-done{color:#16a34a;}
   .td-miss{color:#b91c1c;}
   .td-none{color:#d1d5db;}
@@ -459,7 +489,10 @@
   .det-h-id{text-align:left;padding-left:5px;}
   .det-name{
     font-size:11px;font-weight:600;color:#374151;
-    display:flex;align-items:center;padding-left:5px;
+    display:flex;align-items:center;padding-left:5px;white-space:nowrap;
+  }
+  .det-name .det-id{
+    font-size:9px;color:#9ca3af;margin-right:3px;
   }
   .det-cell{
     position:relative;display:flex;align-items:center;justify-content:center;
@@ -483,7 +516,7 @@
 
   .empty{text-align:center;color:#9ca3af;font-size:13px;padding:30px 0;}
 
-  /* ================ 设置面板 ================ */
+  /* 设置面板 */
   .settings-mask{
     position:fixed;left:0;top:0;right:0;bottom:0;z-index:4000;
     background:rgba(17,24,39,.45);
@@ -517,7 +550,6 @@
     flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
     padding:14px 14px calc(20px + env(safe-area-inset-bottom));
   }
-
   .settings-section{
     background:#fff;border-radius:12px;
     padding:14px;margin-bottom:12px;
@@ -527,10 +559,7 @@
     font-size:13px;font-weight:700;color:#374151;
     margin-bottom:10px;
   }
-
-  .class-chips{
-    display:flex;gap:8px;flex-wrap:wrap;align-items:center;
-  }
+  .class-chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
   .class-chip{
     display:inline-flex;align-items:center;gap:6px;
     padding:8px 12px;border-radius:9px;
@@ -540,12 +569,8 @@
     -webkit-user-select:none;user-select:none;
   }
   .class-chip:active{transform:scale(.96);}
-  .class-chip.active{
-    background:#111827;border-color:#111827;color:#fff;
-  }
-  .class-chip .chip-count{
-    font-size:11px;font-weight:500;opacity:.7;
-  }
+  .class-chip.active{background:#111827;border-color:#111827;color:#fff;}
+  .class-chip .chip-count{font-size:11px;font-weight:500;opacity:.7;}
   .add-class-chip{
     display:inline-flex;align-items:center;gap:4px;
     padding:8px 12px;border-radius:9px;
@@ -556,7 +581,7 @@
   .add-class-chip:active{background:#f9fafb;}
 
   .roster-textarea{
-    width:100%;min-height:160px;
+    width:100%;min-height:180px;
     border:1px solid #e5e7eb;border-radius:10px;
     padding:10px 12px;font:inherit;font-size:14px;line-height:1.7;
     color:#111827;resize:vertical;outline:none;
@@ -572,19 +597,14 @@
     font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
     color:#6b7280;font-size:11px;
   }
-  .edit-actions{
-    display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;
-  }
+  .edit-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;}
   .edit-btn{
     padding:11px;border-radius:10px;border:1px solid #e5e7eb;
     background:#fff;font:inherit;font-size:14px;font-weight:600;
     cursor:pointer;transition:background .12s;
   }
   .edit-btn:active{background:#f9fafb;}
-  .edit-save{
-    grid-column:1 / -1;
-    background:#111827;border-color:#111827;color:#fff;
-  }
+  .edit-save{grid-column:1 / -1;background:#111827;border-color:#111827;color:#fff;}
   .edit-save:active{background:#1f2937;}
   .edit-delete{color:#dc2626;border-color:#fecaca;}
   .edit-delete:active{background:#fef2f2;}
@@ -598,6 +618,28 @@
   }
   .danger-btn:active{background:#fef2f2;}
 
+  /* 开关行 */
+  .switch-row{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:10px 0;
+  }
+  .switch-label{font-size:14px;font-weight:600;color:#374151;}
+  .switch-hint{font-size:11px;color:#9ca3af;margin-top:2px;}
+  .switch{
+    position:relative;width:46px;height:26px;flex:none;
+    border-radius:13px;background:#e5e7eb;
+    cursor:pointer;transition:background .2s;
+    border:0;padding:0;
+  }
+  .switch::after{
+    content:"";position:absolute;left:3px;top:3px;
+    width:20px;height:20px;border-radius:50%;
+    background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.15);
+    transition:transform .2s;
+  }
+  .switch.on{background:#22c55e;}
+  .switch.on::after{transform:translateX(20px);}
+
   @media (min-width: 640px){
     .sheet-mask{align-items:center;}
     .sheet{border-radius:18px;padding-bottom:16px;}
@@ -607,7 +649,6 @@
     }
     .summary-mask.show .summary-panel{transform:scale(1);}
     .summary-head{padding:14px 18px;}
-
     .settings-panel{
       width:100%;max-width:640px;height:auto;max-height:88vh;
       border-radius:18px;overflow:hidden;transform:scale(.96);
@@ -618,7 +659,9 @@
 
   @media (max-width:360px){
     .grid{gap:6px;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));}
+    .grid.show-names{grid-template-columns:repeat(auto-fill,minmax(62px,1fr));gap:6px;}
     .cell{font-size:14px;border-radius:8px;min-height:44px;}
+    .grid.show-names .cell .c-name{font-size:11px;}
     .tab{padding:7px 12px;font-size:14px;}
     .stat{font-size:12px;}
     .mode{font-size:13px;padding:9px;}
@@ -626,9 +669,9 @@
     .fixbar .item{font-size:11px;}
     .seg-btn{font-size:13px;padding:10px 2px;}
     .sum-table{font-size:11px;}
-    .tool-btn{padding:0 10px;font-size:12px;}
+    .tool-btn{padding:0 10px;font-size:12px;height:40px;}
     .tool-row .search-input{font-size:13px;height:40px;}
-    .tool-btn{height:40px;}
+    .tool-eye{width:40px;}
     .settings-btn{width:38px;height:38px;font-size:16px;}
   }
 </style>
@@ -679,12 +722,13 @@
     <div class="search-wrap">
       <span class="search-icon">🔍</span>
       <input type="search" id="searchInput" class="search-input"
-             placeholder="输入学号定位" autocomplete="off"
+             placeholder="学号 / 姓名" autocomplete="off"
              autocorrect="off" autocapitalize="off" spellcheck="false">
       <button class="search-clear" id="searchClear" type="button" aria-label="清除">✕</button>
     </div>
+    <button class="tool-btn tool-eye" id="toggleNamesBtn" type="button" title="显示 / 隐藏姓名">👁</button>
     <button class="tool-btn tool-all" id="allDoneBtn" type="button">✓ 全部已交</button>
-    <button class="tool-btn tool-undo" id="undoBtn" type="button" disabled>↺ 撤销</button>
+    <button class="tool-btn tool-undo" id="undoBtn" type="button" disabled>↺</button>
   </div>
 
   <div class="search-info" id="searchInfo"></div>
@@ -788,7 +832,7 @@
   </div>
 </div>
 
-<!-- ================= 设置面板 ================= -->
+<!-- 设置面板 -->
 <div class="settings-mask" id="settingsMask">
   <div class="settings-panel">
     <div class="settings-head">
@@ -796,6 +840,17 @@
       <button class="sm-close" id="settingsClose" type="button" aria-label="关闭">✕</button>
     </div>
     <div class="settings-body">
+
+      <div class="settings-section">
+        <div class="section-label">显示设置</div>
+        <div class="switch-row">
+          <div>
+            <div class="switch-label">显示学生姓名</div>
+            <div class="switch-hint">开启后，方格显示学号+姓名；关闭只显示学号</div>
+          </div>
+          <button class="switch" id="showNamesSwitch" type="button" aria-label="切换显示姓名"></button>
+        </div>
+      </div>
 
       <div class="settings-section">
         <div class="section-label">班级管理</div>
@@ -810,13 +865,13 @@
           编辑名单：<span id="editClassName" style="color:#111827;">14班</span>
         </div>
         <textarea id="rosterTextarea" class="roster-textarea"
-          placeholder="每行一个学号，或输入范围，例如：&#10;1-71&#10;&#10;或混合：&#10;1-23&#10;25-69"></textarea>
+          placeholder="支持三种格式：&#10;&#10;1-70                  （只学号）&#10;1 张三                （学号+姓名）&#10;1-23                  （混合）&#10;25-69"></textarea>
         <div class="section-hint">
           支持格式：<br>
-          • 范围：<code>1-70</code>（生成 1 到 70 号）<br>
-          • 每行一个：<code>1</code> <code>2</code> <code>3</code> ...<br>
-          • 混合：第一行 <code>1-23</code>，第二行 <code>25-69</code><br>
-          • 也支持 <code>到</code> 或 <code>~</code> 作为范围连接符
+          • 只学号范围：<code>1-70</code><br>
+          • 学号 + 姓名：<code>1 张三</code>（空格、Tab、逗号分隔都可以）<br>
+          • 混合：范围行和学号+姓名行可以同时写<br>
+          • 也可以只填部分学生的姓名
         </div>
         <div class="edit-actions">
           <button class="edit-btn" id="renameClassBtn" type="button">重命名</button>
@@ -840,26 +895,28 @@
 (function () {
   'use strict';
 
-  var KEY        = 'homework_register_v13';        // 数据存储键
-  var CONFIG_KEY = 'homework_register_config_v1';  // 配置存储键
+  var KEY        = 'homework_register_v13';
+  var CONFIG_KEY = 'homework_register_config_v1';
   var LONG_PRESS_MS = 600;
   var UNDO_LIMIT = 30;
 
   var LV_LABEL = { 'A+':'A+', 'A':'A', 'A-':'A\u2212', 'B':'B' };
 
-  /* ================= 默认配置 ================= */
   function rangeIds(a, b){
     var out = [];
     for (var i = a; i <= b; i++) out.push(i);
     return out;
   }
+  function makeRoster(ids){
+    return ids.map(function(id){ return { id: id, name: '' }; });
+  }
 
-  /* 默认班级（兼容旧数据，id 用 '14' '15'） */
   function defaultConfig(){
     return {
+      showNames: false,
       classes: [
-        { id: '14', name: '14班', ids: rangeIds(1, 71) },
-        { id: '15', name: '15班', ids: rangeIds(1, 69) }
+        { id: '14', name: '14班', roster: makeRoster(rangeIds(1, 71)) },
+        { id: '15', name: '15班', roster: makeRoster(rangeIds(1, 69)) }
       ]
     };
   }
@@ -888,19 +945,34 @@
     return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
   }
 
-  /* ================= 配置读写 ================= */
+  /* ================= 配置 ================= */
+  function normalizeClass(c){
+    // 兼容旧格式：ids 数组 → roster 数组
+    if (!c.roster && Array.isArray(c.ids)){
+      c.roster = c.ids.map(function(id){ return { id: id, name: '' }; });
+    }
+    if (!Array.isArray(c.roster)) c.roster = [];
+    // 剔除掉无效项
+    c.roster = c.roster.filter(function(r){
+      return r && typeof r.id === 'number' && isFinite(r.id);
+    });
+    delete c.ids;
+    return c;
+  }
+
   function loadConfig(){
     try {
       var raw = localStorage.getItem(CONFIG_KEY);
-      if (raw) {
+      if (raw){
         var obj = JSON.parse(raw);
         if (obj && Array.isArray(obj.classes) && obj.classes.length > 0){
+          obj.classes = obj.classes.map(normalizeClass);
+          if (typeof obj.showNames !== 'boolean') obj.showNames = false;
           config = obj;
           return;
         }
       }
     } catch(e){}
-    // 没有配置或格式不对，用默认配置
     config = defaultConfig();
     saveConfig();
   }
@@ -914,76 +986,110 @@
     }
     return null;
   }
-  function idsOf(clsId){
+  function rosterOf(clsId){
     var c = classById(clsId);
-    return c ? c.ids.slice() : [];
+    return c ? c.roster.slice() : [];
+  }
+  function idsOf(clsId){
+    return rosterOf(clsId).map(function(r){ return r.id; });
+  }
+  function nameOf(clsId, id){
+    var c = classById(clsId);
+    if (!c) return '';
+    for (var i = 0; i < c.roster.length; i++){
+      if (c.roster[i].id === id) return c.roster[i].name || '';
+    }
+    return '';
   }
   function classNameOf(clsId){
     var c = classById(clsId);
     return c ? c.name : clsId;
   }
+  function rosterHasName(clsId){
+    var r = rosterOf(clsId);
+    for (var i = 0; i < r.length; i++){
+      if (r[i].name) return true;
+    }
+    return false;
+  }
 
-  /* ================= 名单文本 ↔ 数组 ================= */
+  /* ================= 名单解析 ================= */
   function parseRoster(text){
-    var ids = [];
+    var items = [];
     var lines = String(text || '').split(/\r?\n/);
     lines.forEach(function(line){
-      line = line.trim();
+      line = line.replace(/^\s+|\s+$/g, '');
       if (!line) return;
 
-      // "1-23" / "1到23" / "1~23"
+      // 1-23 / 1到23 / 1~23 / 1至23
       var m = line.match(/^(\d+)\s*(?:[-~到至])\s*(\d+)$/);
       if (m){
         var a = parseInt(m[1], 10);
         var b = parseInt(m[2], 10);
         if (a <= b){
-          for (var i = a; i <= b; i++) ids.push(i);
+          for (var i = a; i <= b; i++) items.push({ id: i, name: '' });
         } else {
-          for (var i = a; i >= b; i--) ids.push(i);
+          for (var i = a; i >= b; i--) items.push({ id: i, name: '' });
         }
         return;
       }
 
-      // 一行一个数字开头（忽略后面可能跟的姓名）
-      var m2 = line.match(/^(\d+)/);
+      // 1 张三 / 1\t张三 / 1,张三 / 1，张三
+      var m2 = line.match(/^(\d+)[\s\t,，]+(.+)$/);
       if (m2){
-        ids.push(parseInt(m2[1], 10));
+        items.push({ id: parseInt(m2[1], 10), name: m2[2].trim() });
+        return;
+      }
+
+      // 只有数字
+      var m3 = line.match(/^(\d+)/);
+      if (m3){
+        items.push({ id: parseInt(m3[1], 10), name: '' });
       }
     });
 
-    // 去重 + 排序
+    // 去重，后来的覆盖前者的姓名（如果有的话）
     var seen = {};
     var uniq = [];
-    for (var k = 0; k < ids.length; k++){
-      var n = ids[k];
-      if (!seen[n]){
-        seen[n] = true;
-        uniq.push(n);
+    for (var k = 0; k < items.length; k++){
+      var it = items[k];
+      if (seen[it.id] === undefined){
+        seen[it.id] = uniq.length;
+        uniq.push({ id: it.id, name: it.name });
+      } else if (it.name){
+        uniq[seen[it.id]].name = it.name;
       }
     }
-    uniq.sort(function(x, y){ return x - y; });
+    uniq.sort(function(a, b){ return a.id - b.id; });
     return uniq;
   }
 
-  function idsToText(ids){
-    if (!ids || ids.length === 0) return '';
-    var sorted = ids.slice().sort(function(a, b){ return a - b; });
-    var ranges = [];
-    var start = sorted[0], prev = sorted[0];
-
-    for (var i = 1; i < sorted.length; i++){
-      if (sorted[i] === prev + 1){
-        prev = sorted[i];
-      } else {
-        ranges.push(start === prev ? String(start) : start + '-' + prev);
-        start = prev = sorted[i];
+  function rosterToText(roster){
+    if (!roster || roster.length === 0) return '';
+    var hasName = roster.some(function(r){ return r.name; });
+    if (hasName){
+      // 每行一个
+      return roster.map(function(r){
+        return r.name ? (r.id + ' ' + r.name) : String(r.id);
+      }).join('\n');
+    } else {
+      // 压缩为范围
+      var sorted = roster.map(function(r){ return r.id; }).sort(function(a, b){ return a - b; });
+      var ranges = [];
+      var start = sorted[0], prev = sorted[0];
+      for (var i = 1; i < sorted.length; i++){
+        if (sorted[i] === prev + 1){ prev = sorted[i]; }
+        else {
+          ranges.push(start === prev ? String(start) : start + '-' + prev);
+          start = prev = sorted[i];
+        }
       }
+      ranges.push(start === prev ? String(start) : start + '-' + prev);
+      return ranges.join('\n');
     }
-    ranges.push(start === prev ? String(start) : start + '-' + prev);
-    return ranges.join('\n');
   }
 
-  /* ================= 数据读写 ================= */
+  /* ================= 数据 ================= */
   function load(){
     try{
       var raw = localStorage.getItem(KEY);
@@ -1100,8 +1206,7 @@
   function pushUndo(){
     var c = data[currentDate] && data[currentDate][currentClass];
     var snap = {
-      date: currentDate,
-      cls: currentClass,
+      date: currentDate, cls: currentClass,
       hw:   c && c.hw   ? JSON.parse(JSON.stringify(c.hw))   : {},
       hwLv: c && c.hwLv ? JSON.parse(JSON.stringify(c.hwLv)) : {},
       cb:   c && c.cb   ? JSON.parse(JSON.stringify(c.cb))   : {},
@@ -1129,31 +1234,12 @@
     updateUndoBtn();
     render();
   }
-  function clearUndo(){
-    undoStack = [];
-    updateUndoBtn();
-  }
+  function clearUndo(){ undoStack = []; updateUndoBtn(); }
 
-  function currentHwMap(){
-    var d = data[currentDate]; if (!d) return {};
-    var c = d[currentClass];   if (!c) return {};
-    return c.hw || {};
-  }
-  function currentLvMap(){
-    var d = data[currentDate]; if (!d) return {};
-    var c = d[currentClass];   if (!c) return {};
-    return c.hwLv || {};
-  }
-  function currentFixMap(){
-    var d = data[currentDate]; if (!d) return {};
-    var c = d[currentClass];   if (!c) return {};
-    return c.fix || {};
-  }
-  function currentCbMap(){
-    var d = data[currentDate]; if (!d) return {};
-    var c = d[currentClass];   if (!c) return {};
-    return c.cb || {};
-  }
+  function currentHwMap(){ var d = data[currentDate]; if (!d) return {}; var c = d[currentClass]; if (!c) return {}; return c.hw || {}; }
+  function currentLvMap(){ var d = data[currentDate]; if (!d) return {}; var c = d[currentClass]; if (!c) return {}; return c.hwLv || {}; }
+  function currentFixMap(){ var d = data[currentDate]; if (!d) return {}; var c = d[currentClass]; if (!c) return {}; return c.fix || {}; }
+  function currentCbMap(){ var d = data[currentDate]; if (!d) return {}; var c = d[currentClass]; if (!c) return {}; return c.cb || {}; }
 
   /* ================= DOM ================= */
   var classTabs   = document.getElementById('classTabs');
@@ -1187,6 +1273,7 @@
   var allDoneBtn  = document.getElementById('allDoneBtn');
   var undoBtn     = document.getElementById('undoBtn');
   var settingsBtn = document.getElementById('settingsBtn');
+  var toggleNamesBtn = document.getElementById('toggleNamesBtn');
   var modeBtns    = Array.prototype.slice.call(document.querySelectorAll('.mode'));
 
   var sheetMask   = document.getElementById('sheetMask');
@@ -1213,7 +1300,6 @@
   var viewToggle  = document.getElementById('viewToggle');
   var summaryResult = document.getElementById('summaryResult');
 
-  /* 设置面板 DOM */
   var settingsMask   = document.getElementById('settingsMask');
   var settingsClose  = document.getElementById('settingsClose');
   var classChips     = document.getElementById('classChips');
@@ -1223,12 +1309,13 @@
   var deleteClassBtn = document.getElementById('deleteClassBtn');
   var saveRosterBtn  = document.getElementById('saveRosterBtn');
   var resetDataBtn   = document.getElementById('resetDataBtn');
+  var showNamesSwitch = document.getElementById('showNamesSwitch');
 
   function updateUndoBtn(){
     undoBtn.disabled = undoStack.length === 0;
   }
 
-  /* ================= 班级 tabs（动态生成） ================= */
+  /* ================= 班级 tabs ================= */
   function renderTabs(){
     classTabs.innerHTML = '';
     config.classes.forEach(function(c){
@@ -1239,7 +1326,7 @@
       btn.textContent = c.name;
       btn.addEventListener('click', function(){
         if (c.id === currentClass) return;
-        closeSheet(); closeNoteEditor(); closeSummary();
+        closeSheet(); closeNoteEditor(); closeSummary(); closeSettings();
         clearSearchHighlight();
         searchInput.value = '';
         searchClear.classList.remove('show');
@@ -1254,12 +1341,52 @@
       classTabs.appendChild(btn);
     });
   }
-
-  /* 保证 currentClass 至少指向一个存在的班级 */
   function ensureCurrentClass(){
     if (!classById(currentClass)){
       currentClass = config.classes[0] ? config.classes[0].id : '';
     }
+  }
+
+  /* ================= 姓名显示切换 ================= */
+  function updateNamesBtnState(){
+    var hasAny = rosterHasName(currentClass);
+    if (config.showNames && hasAny){
+      toggleNamesBtn.classList.add('active');
+      toggleNamesBtn.title = '当前：显示姓名（点击隐藏）';
+    } else {
+      toggleNamesBtn.classList.remove('active');
+      toggleNamesBtn.title = hasAny ? '当前：隐藏姓名（点击显示）' : '本班未录入姓名';
+    }
+  }
+
+  toggleNamesBtn.addEventListener('click', function(){
+    if (!rosterHasName(currentClass)){
+      var go = confirm('当前班级还没有录入姓名。\n\n要打开设置去录入姓名吗？');
+      if (go) openSettings();
+      return;
+    }
+    config.showNames = !config.showNames;
+    saveConfig();
+    updateNamesBtnState();
+    // 切换显示姓名时要重建方格（尺寸变了），但保留状态
+    applyGridClass();
+    applyCellNames();
+  });
+
+  function applyGridClass(){
+    var show = config.showNames && rosterHasName(currentClass);
+    gridEl.classList.toggle('show-names', show);
+  }
+  function applyCellNames(){
+    var nameMap = {};
+    rosterOf(currentClass).forEach(function(r){ nameMap[r.id] = r.name || ''; });
+    cells.forEach(function(btn){
+      var id = Number(btn.dataset.id);
+      var name = nameMap[id] || '';
+      btn.querySelector('.c-num').textContent = id;
+      btn.querySelector('.c-name').textContent = name;
+      btn.classList.toggle('no-name', !name);
+    });
   }
 
   /* ================= 搜索 ================= */
@@ -1282,19 +1409,24 @@
     if (!q) return;
 
     var digits = q.replace(/[^0-9]/g, '');
+    var qLower = q.toLowerCase();
     var matched = [];
     var exact = null;
 
     for (var i = 0; i < cells.length; i++){
       var btn = cells[i];
-      var numStr = String(btn.dataset.id);
+      var id = Number(btn.dataset.id);
+      var numStr = String(id);
+      var name = nameOf(currentClass, id);
+
       if (digits && numStr === digits){ exact = btn; matched.push(btn); }
       else if (digits && numStr.indexOf(digits) === 0){ matched.push(btn); }
+      else if (name && name.toLowerCase().indexOf(qLower) !== -1){ matched.push(btn); }
     }
     if (exact) matched = [exact];
 
     if (matched.length === 0){
-      searchInfo.innerHTML = '未找到学号 <b>' + escapeHtml(q) + '</b>';
+      searchInfo.innerHTML = '未找到 <b>' + escapeHtml(q) + '</b>';
       return;
     }
     for (var j = 0; j < matched.length; j++){
@@ -1306,11 +1438,12 @@
     catch (e) { scrollTo.scrollIntoView(); }
 
     if (exact){
-      searchInfo.innerHTML = '已定位到 <b>' + digits + ' 号</b>';
+      var n = nameOf(currentClass, Number(exact.dataset.id));
+      searchInfo.innerHTML = '已定位到 <b>' + digits + ' 号' + (n ? ' ' + escapeHtml(n) : '') + '</b>';
     } else if (matched.length === 1){
-      searchInfo.innerHTML = '已定位到 <b>' + matched[0].dataset.id + ' 号</b>';
+      searchInfo.innerHTML = '已定位到 <b>' + escapeHtml(matched[0].dataset.id) + ' 号</b>';
     } else {
-      searchInfo.innerHTML = '匹配到 <b>' + matched.length + '</b> 个学号';
+      searchInfo.innerHTML = '匹配到 <b>' + matched.length + '</b> 项';
     }
     highlightTimer = setTimeout(function(){
       for (var k = 0; k < matched.length; k++){
@@ -1342,8 +1475,7 @@
   allDoneBtn.addEventListener('click', function(){
     if (mode !== 'hw') return;
     pushUndo();
-    var ids = idsOf(currentClass);
-    ids.forEach(function(id){
+    idsOf(currentClass).forEach(function(id){
       if (getHw(currentDate, currentClass, id) === 0){
         setHw(currentDate, currentClass, id, 1);
       }
@@ -1356,7 +1488,7 @@
   exportBtn.addEventListener('click', function () {
     try {
       var bundle = {
-        version: 13,
+        version: 14,
         exportTime: new Date().toISOString(),
         config: config,
         data: data
@@ -1388,20 +1520,18 @@
         var obj = JSON.parse(ev.target.result);
         if (!obj || typeof obj !== 'object') throw new Error('格式错误');
 
-        // 兼容新旧两种备份文件
         var newData, newConfig;
         if (obj.config && obj.data){
-          // 新格式
           newConfig = obj.config;
           newData = obj.data;
+          if (Array.isArray(newConfig.classes)) newConfig.classes = newConfig.classes.map(normalizeClass);
+          if (typeof newConfig.showNames !== 'boolean') newConfig.showNames = false;
         } else {
-          // 旧格式（纯 data），config 保持不变
           newData = obj;
           newConfig = config;
         }
 
         if (!confirm('导入将【覆盖】当前的名单配置和所有记录，确定继续吗？')) return;
-
         if (newConfig && Array.isArray(newConfig.classes) && newConfig.classes.length > 0){
           config = newConfig;
           saveConfig();
@@ -1412,6 +1542,7 @@
         ensureCurrentClass();
         clearUndo();
         renderTabs();
+        updateNamesBtnState();
         buildGrid();
         render();
         alert('导入成功！');
@@ -1423,7 +1554,7 @@
     e.target.value = '';
   });
 
-  /* ================= 作业 & 改错面板 ================= */
+  /* ================= 面板 ================= */
   function refreshSheet(){
     if (activeId == null) return;
     var hw = getHw(currentDate, currentClass, activeId);
@@ -1444,7 +1575,8 @@
   }
   function openSheet(id){
     activeId = id;
-    sheetNum.textContent = id + ' 号';
+    var name = nameOf(currentClass, id);
+    sheetNum.textContent = id + ' 号' + (name ? '  ' + name : '');
     refreshSheet();
     sheetMask.classList.add('show');
     document.body.style.overflow = 'hidden';
@@ -1485,7 +1617,7 @@
     });
   });
 
-  /* ================= 作业内容编辑 ================= */
+  /* ================= 作业内容 ================= */
   function openNoteEditor(){
     noteInput.value = getNote(currentDate, currentClass);
     noteMask.classList.add('show');
@@ -1601,8 +1733,15 @@
       btn.dataset.id = id;
       btn.dataset.state = '0';
       btn.dataset.fix = '0';
-      btn.textContent = id;
       btn.setAttribute('aria-label', id + '号');
+
+      var numEl = document.createElement('span');
+      numEl.className = 'c-num';
+      btn.appendChild(numEl);
+
+      var nameEl = document.createElement('span');
+      nameEl.className = 'c-name';
+      btn.appendChild(nameEl);
 
       var lv = document.createElement('span');
       lv.className = 'lv'; btn.appendChild(lv);
@@ -1618,6 +1757,9 @@
 
     gridEl.innerHTML = '';
     gridEl.appendChild(frag);
+
+    applyGridClass();
+    applyCellNames();
   }
 
   function render(){
@@ -1666,7 +1808,7 @@
       lblC.textContent = '未登记';
       hintEl.innerHTML =
         '① 点「全部已交」→ ② 点缺交的同学 → ③ 点已交方格改等级<br>' +
-        '点已交/缺交方格可打开面板，设置等级和改错过关';
+        '点右上角 👁 切换显示姓名，方便核对';
       clearBtn.textContent = '清空【当前日期 + 当前班级】的作业 & 改错记录';
 
     } else {
@@ -1703,6 +1845,7 @@
       clearBtn.textContent = '清空【当前日期 + 当前班级】的课堂表现记录';
     }
 
+    updateNamesBtnState();
     renderNote();
   }
 
@@ -1745,7 +1888,7 @@
     cntC.textContent = total - a - b;
   }
 
-  /* ================= 汇总统计 ================= */
+  /* ================= 汇总 ================= */
   function openSummary(){
     smClass.textContent = classNameOf(currentClass);
     setQuickRange('7');
@@ -1829,6 +1972,20 @@
     });
     return result;
   }
+  function dateRange(start, end){
+    var out = [];
+    var s = new Date(start + 'T00:00:00');
+    var e = new Date(end + 'T00:00:00');
+    if (isNaN(s.getTime()) || isNaN(e.getTime())) return out;
+    if (s > e) return out;
+    var cur = new Date(s);
+    while (cur <= e){
+      out.push(fmtDate(cur));
+      cur.setDate(cur.getDate() + 1);
+      if (out.length > 366) break;
+    }
+    return out;
+  }
   function renderSummary(){
     var start = rangeStart.value, end = rangeEnd.value;
     if (!start || !end) return;
@@ -1864,35 +2021,28 @@
     }
     if (currentView === 'summary'){
       if (mode === 'hw') renderHwSummaryTable(stats, days);
-      else renderCbSummaryTable(stats, days);
+      else renderCbSummaryTable(stats);
     } else {
       renderDetailTable(stats, days);
     }
   }
-  function dateRange(start, end){
-    var out = [];
-    var s = new Date(start + 'T00:00:00');
-    var e = new Date(end + 'T00:00:00');
-    if (isNaN(s.getTime()) || isNaN(e.getTime())) return out;
-    if (s > e) return out;
-    var cur = new Date(s);
-    while (cur <= e){
-      out.push(fmtDate(cur));
-      cur.setDate(cur.getDate() + 1);
-      if (out.length > 366) break;
-    }
-    return out;
-  }
-
   function renderHwSummaryTable(stats, days){
     var total = days.length;
     var ids = idsOf(currentClass);
-    var html = '<div class="sum-scroll"><table class="sum-table"><colgroup>'
-      + '<col style="width:34px"><col style="width:30px"><col style="width:30px"><col style="width:30px">'
-      + '<col style="width:26px"><col style="width:26px"><col style="width:26px"><col style="width:26px">'
-      + '<col style="width:36px"><col style="width:36px"><col style="width:48px">'
-      + '</colgroup><thead><tr>'
-      + '<th>学号</th><th>已交</th><th>缺交</th><th>未登</th>'
+    var showName = config.showNames && rosterHasName(currentClass);
+    var nameMap = {};
+    rosterOf(currentClass).forEach(function(r){ nameMap[r.id] = r.name || ''; });
+
+    var cols = '<col style="width:34px">';
+    if (showName) cols += '<col style="width:66px">';
+    cols += '<col style="width:30px"><col style="width:30px"><col style="width:30px">'
+          + '<col style="width:26px"><col style="width:26px"><col style="width:26px"><col style="width:26px">'
+          + '<col style="width:36px"><col style="width:36px"><col style="width:48px">';
+
+    var html = '<div class="sum-scroll"><table class="sum-table"><colgroup>' + cols + '</colgroup><thead><tr>'
+      + '<th>学号</th>';
+    if (showName) html += '<th>姓名</th>';
+    html += '<th>已交</th><th>缺交</th><th>未登</th>'
       + '<th>A+</th><th>A</th><th>A−</th><th>B</th>'
       + '<th>待过</th><th>已过</th><th>完成率</th>'
       + '</tr></thead><tbody>';
@@ -1900,9 +2050,9 @@
       var r = stats[id];
       var none = total - r.done - r.miss;
       var rate = total > 0 ? Math.round(r.done / total * 100) : 0;
-      html += '<tr>'
-        + '<td class="td-id">' + id + '</td>'
-        + '<td class="td-done">' + r.done + '</td>'
+      html += '<tr><td class="td-id">' + id + '</td>';
+      if (showName) html += '<td class="td-name">' + escapeHtml(nameMap[id] || '') + '</td>';
+      html += '<td class="td-done">' + r.done + '</td>'
         + '<td class="td-miss">' + r.miss + '</td>'
         + '<td class="td-none">' + none + '</td>'
         + '<td class="td-ap">' + r.Aplus + '</td>'
@@ -1911,28 +2061,33 @@
         + '<td class="td-b">' + r.B + '</td>'
         + '<td class="td-pending">' + r.pending + '</td>'
         + '<td class="td-passed">' + r.passed + '</td>'
-        + '<td class="td-rate">' + rate + '%</td>'
-        + '</tr>';
+        + '<td class="td-rate">' + rate + '%</td></tr>';
     });
     html += '</tbody></table></div>';
     summaryResult.innerHTML = html;
   }
   function renderCbSummaryTable(stats){
     var ids = idsOf(currentClass);
-    var html = '<table class="sum-table"><colgroup>'
-      + '<col style="width:44px"><col style="width:52px"><col style="width:52px"><col style="width:52px">'
-      + '</colgroup><thead><tr>'
-      + '<th>学号</th><th>加分</th><th>扣分</th><th>总得分</th>'
-      + '</tr></thead><tbody>';
+    var showName = config.showNames && rosterHasName(currentClass);
+    var nameMap = {};
+    rosterOf(currentClass).forEach(function(r){ nameMap[r.id] = r.name || ''; });
+
+    var cols = '<col style="width:44px">';
+    if (showName) cols += '<col style="width:66px">';
+    cols += '<col style="width:52px"><col style="width:52px"><col style="width:52px">';
+
+    var html = '<table class="sum-table"><colgroup>' + cols + '</colgroup><thead><tr>'
+      + '<th>学号</th>';
+    if (showName) html += '<th>姓名</th>';
+    html += '<th>加分</th><th>扣分</th><th>总得分</th></tr></thead><tbody>';
     ids.forEach(function(id){
       var r = stats[id];
       var cls = r.score > 0 ? 'td-done' : (r.score < 0 ? 'td-miss' : 'td-none');
-      html += '<tr>'
-        + '<td class="td-id">' + id + '</td>'
-        + '<td class="td-done">' + r.plus + '</td>'
+      html += '<tr><td class="td-id">' + id + '</td>';
+      if (showName) html += '<td class="td-name">' + escapeHtml(nameMap[id] || '') + '</td>';
+      html += '<td class="td-done">' + r.plus + '</td>'
         + '<td class="td-miss">' + r.minus + '</td>'
-        + '<td class="' + cls + '">' + (r.score > 0 ? '+' : '') + r.score + '</td>'
-        + '</tr>';
+        + '<td class="' + cls + '">' + (r.score > 0 ? '+' : '') + r.score + '</td></tr>';
     });
     html += '</tbody></table>';
     summaryResult.innerHTML = html;
@@ -1958,13 +2113,24 @@
   }
   function renderDetailTable(stats, days){
     var ids = idsOf(currentClass);
-    var colWidths = '36px';
+    var showName = config.showNames && rosterHasName(currentClass);
+    var nameMap = {};
+    rosterOf(currentClass).forEach(function(r){ nameMap[r.id] = r.name || ''; });
+
+    var colWidths = showName ? '86px' : '36px';
     days.forEach(function(){ colWidths += ' 32px'; });
+
     var html = '<div class="det-wrap"><div class="det-grid" style="grid-template-columns:' + colWidths + ';">';
     html += '<div class="det-h det-h-id">学号</div>';
     days.forEach(function(date){ html += '<div class="det-h">' + date.slice(5) + '</div>'; });
+
     ids.forEach(function(id){
-      html += '<div class="det-name">' + id + '</div>';
+      if (showName){
+        var nm = nameMap[id] || '';
+        html += '<div class="det-name"><span class="det-id">' + id + '</span>' + escapeHtml(nm || '—') + '</div>';
+      } else {
+        html += '<div class="det-name">' + id + '</div>';
+      }
       days.forEach(function(date){
         var c = stats[id].byDate[date] || { st: 0, lv: '', fx: 0, v: 0 };
         var info = detailCellInfo(mode, c);
@@ -1976,6 +2142,7 @@
       });
     });
     html += '</div></div>';
+
     var legend;
     if (mode === 'hw'){
       legend = '✓ 已交（未评等级） &nbsp; ✕ 缺交 &nbsp; 空白 未登记<br>'
@@ -2032,8 +2199,8 @@
       chip.type = 'button';
       chip.className = 'class-chip' + (c.id === editingClassId ? ' active' : '');
       chip.dataset.clsId = c.id;
-      chip.innerHTML = '<span>' + c.name + '</span>'
-        + '<span class="chip-count">' + c.ids.length + '人</span>';
+      chip.innerHTML = '<span>' + escapeHtml(c.name) + '</span>'
+        + '<span class="chip-count">' + c.roster.length + '人</span>';
       chip.addEventListener('click', function(){
         editingClassId = c.id;
         renderSettingsChips();
@@ -2049,10 +2216,9 @@
     addChip.addEventListener('click', addClassDialog);
     classChips.appendChild(addChip);
   }
-
   function renderSettingsEditArea(){
     var c = classById(editingClassId);
-    if (!c) {
+    if (!c){
       editClassName.textContent = '（未选中）';
       rosterTextarea.value = '';
       renameClassBtn.disabled = true;
@@ -2064,8 +2230,21 @@
     deleteClassBtn.disabled = false;
     saveRosterBtn.disabled = false;
     editClassName.textContent = c.name;
-    rosterTextarea.value = idsToText(c.ids);
+    rosterTextarea.value = rosterToText(c.roster);
   }
+  function updateShowNamesSwitch(){
+    if (config.showNames) showNamesSwitch.classList.add('on');
+    else showNamesSwitch.classList.remove('on');
+  }
+  showNamesSwitch.addEventListener('click', function(){
+    config.showNames = !config.showNames;
+    saveConfig();
+    updateShowNamesSwitch();
+    // 主界面同步
+    updateNamesBtnState();
+    applyGridClass();
+    applyCellNames();
+  });
 
   function openSettings(){
     if (!editingClassId || !classById(editingClassId)){
@@ -2073,6 +2252,7 @@
     }
     renderSettingsChips();
     renderSettingsEditArea();
+    updateShowNamesSwitch();
     settingsMask.classList.add('show');
     document.body.style.overflow = 'hidden';
   }
@@ -2080,7 +2260,6 @@
     settingsMask.classList.remove('show');
     document.body.style.overflow = '';
   }
-
   settingsBtn.addEventListener('click', openSettings);
   settingsClose.addEventListener('click', closeSettings);
   settingsMask.addEventListener('click', function(e){
@@ -2091,20 +2270,16 @@
     var name = prompt('请输入新班级名称：', '');
     if (name === null) return;
     name = String(name).trim();
-    if (!name){
-      alert('班级名称不能为空');
-      return;
-    }
-    // 检查重名
+    if (!name){ alert('班级名称不能为空'); return; }
     for (var i = 0; i < config.classes.length; i++){
-      if (config.classes[i].name === name){
-        alert('班级名称已存在');
-        return;
-      }
+      if (config.classes[i].name === name){ alert('班级名称已存在'); return; }
     }
     var newId = 'c_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
-    var defIds = rangeIds(1, 50); // 默认 1-50 人
-    config.classes.push({ id: newId, name: name, ids: defIds });
+    config.classes.push({
+      id: newId,
+      name: name,
+      roster: makeRoster(rangeIds(1, 50))
+    });
     saveConfig();
     editingClassId = newId;
     renderTabs();
@@ -2138,20 +2313,16 @@
       alert('至少要保留一个班级');
       return;
     }
-    if (!confirm('确定要删除【' + c.name + '】吗？\n\n注意：该班级的所有历史记录也会一起删除，无法恢复！\n\n如果只是想清空数据，建议先导出备份。')) return;
-    // 删除班级数据
+    if (!confirm('确定要删除【' + c.name + '】吗？\n\n该班级的所有历史记录也会一起删除，无法恢复！')) return;
     for (var date in data){
       if (data[date] && data[date][c.id]){
         delete data[date][c.id];
         if (Object.keys(data[date]).length === 0) delete data[date];
       }
     }
-    // 删除班级配置
     config.classes = config.classes.filter(function(x){ return x.id !== c.id; });
     saveConfig();
     save();
-
-    // 如果删除的是当前班级，切到第一个
     if (currentClass === c.id){
       currentClass = config.classes[0].id;
       clearUndo();
@@ -2159,7 +2330,6 @@
       render();
     }
     editingClassId = config.classes[0].id;
-
     renderTabs();
     renderSettingsChips();
     renderSettingsEditArea();
@@ -2168,13 +2338,12 @@
   saveRosterBtn.addEventListener('click', function(){
     var c = classById(editingClassId);
     if (!c) return;
-    var ids = parseRoster(rosterTextarea.value);
-    if (ids.length === 0){
+    var roster = parseRoster(rosterTextarea.value);
+    if (roster.length === 0){
       if (!confirm('名单为空，确定要保存吗？')) return;
     }
-    c.ids = ids;
+    c.roster = roster;
     saveConfig();
-    // 刷新主界面
     renderSettingsChips();
     renderTabs();
     if (currentClass === c.id){
@@ -2183,11 +2352,9 @@
       buildGrid();
       render();
     }
-    // 提示
-    var tip = '已保存：' + ids.length + ' 名学生';
-    if (ids.length > 0){
-      tip += '（' + ids[0] + ' ~ ' + ids[ids.length - 1] + '）';
-    }
+    var withName = roster.filter(function(r){ return r.name; }).length;
+    var tip = '已保存：' + roster.length + ' 名学生';
+    if (withName > 0) tip += '（其中 ' + withName + ' 人有姓名）';
     alert(tip);
   });
 
@@ -2210,7 +2377,7 @@
     else if (sheetMask.classList.contains('show')) closeSheet();
   });
 
-  /* ================= 模式切换 ================= */
+  /* ================= 模式 ================= */
   modeBtns.forEach(function (btn) {
     btn.addEventListener('click', function () {
       var m = btn.dataset.mode;
@@ -2236,7 +2403,7 @@
     render();
   });
 
-  /* ================= 一键清空当前 ================= */
+  /* ================= 清空当前 ================= */
   clearBtn.addEventListener('click', function () {
     var d = data[currentDate];
     var c = d && d[currentClass];
@@ -2259,11 +2426,8 @@
             + '清空后无法恢复！';
     if (!confirm(msg)) return;
     pushUndo();
-    if (mode === 'hw'){
-      c.hw = {}; c.hwLv = {}; c.fix = {};
-    } else {
-      c.cb = {};
-    }
+    if (mode === 'hw'){ c.hw = {}; c.hwLv = {}; c.fix = {}; }
+    else { c.cb = {}; }
     cleanup(currentDate, currentClass);
     save();
     render();
