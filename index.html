@@ -1,0 +1,1619 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#f5f6f8">
+<title>班级登记本</title>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    background:#f5f6f8;color:#111827;-webkit-font-smoothing:antialiased;
+  }
+  .app{max-width:860px;margin:0 auto;padding:14px 12px calc(24px + env(safe-area-inset-bottom));}
+  h1{font-size:18px;margin:2px 0 12px;font-weight:700;letter-spacing:.5px;}
+
+  .topbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .tabs{display:flex;background:#e5e7eb;border-radius:10px;padding:3px;gap:3px;}
+  .tab{
+    border:0;background:transparent;font:inherit;font-size:15px;font-weight:600;
+    color:#4b5563;padding:7px 16px;border-radius:8px;cursor:pointer;
+    transition:background .15s,color .15s;
+  }
+  .tab.active{background:#fff;color:#111827;box-shadow:0 1px 3px rgba(0,0,0,.1);}
+
+  input[type="date"]{
+    flex:1 1 140px;min-width:0;height:40px;padding:0 10px;
+    border:1px solid #d1d5db;border-radius:10px;background:#fff;
+    font:inherit;font-size:16px;color:#111827;outline:none;
+  }
+  input[type="date"]:focus{border-color:#9ca3af;}
+
+  .modes{display:flex;gap:8px;margin-top:10px;}
+  .mode{
+    flex:1;padding:10px;border:1px solid #e5e7eb;background:#fff;border-radius:10px;
+    font:inherit;font-size:14px;font-weight:600;color:#6b7280;
+    cursor:pointer;transition:background .15s,color .15s,border-color .15s;
+  }
+  .mode.active{background:#111827;border-color:#111827;color:#fff;}
+
+  .stats{display:flex;gap:8px;margin-top:12px;}
+  .stat{
+    flex:1;display:flex;align-items:center;justify-content:center;gap:5px;
+    background:#fff;border-radius:10px;padding:9px 4px;font-size:13px;color:#6b7280;
+    box-shadow:0 1px 2px rgba(0,0,0,.03);
+  }
+  .stat b{font-size:15px;color:#111827;font-weight:700;}
+  .dot{width:9px;height:9px;border-radius:50%;flex:none;}
+  .dot.d1{background:#22c55e;}
+  .dot.d2{background:#b91c1c;}
+  .dot.d0{background:#d1d5db;}
+
+  .lvbar{display:flex;gap:6px;margin-top:8px;}
+  .lvbar .item{
+    flex:1;display:flex;align-items:center;justify-content:center;gap:4px;
+    background:#fff;border-radius:9px;padding:7px 2px;
+    font-size:12px;color:#6b7280;box-shadow:0 1px 2px rgba(0,0,0,.03);
+  }
+  .lvbar .item b{font-size:14px;font-weight:700;color:#111827;}
+  .lvbar .tag{
+    display:inline-flex;align-items:center;justify-content:center;
+    min-width:26px;height:18px;padding:0 5px;border-radius:5px;
+    font-size:11px;font-weight:700;color:#fff;
+  }
+  .tag.tAplus{background:#22c55e;}
+  .tag.tA{background:#eab308;}
+  .tag.tAminus{background:#f97316;}
+  .tag.tB{background:#ef4444;}
+
+  .fixbar{display:flex;gap:6px;margin-top:6px;}
+  .fixbar .item{
+    flex:1;display:flex;align-items:center;justify-content:center;gap:5px;
+    background:#fff;border-radius:9px;padding:7px 2px;
+    font-size:12px;color:#6b7280;box-shadow:0 1px 2px rgba(0,0,0,.03);
+  }
+  .fixbar .item b{font-size:14px;font-weight:700;color:#111827;}
+  .tag.tPending{background:#f59e0b;}
+  .tag.tPassed{background:#22c55e;}
+
+  .note-card{
+    margin-top:12px;background:#fff;border-radius:10px;
+    padding:11px 14px;box-shadow:0 1px 2px rgba(0,0,0,.03);
+  }
+  .note-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+  .note-head .ttl{font-size:13px;font-weight:700;color:#374151;}
+  .note-edit{
+    border:1px solid #e5e7eb;background:#fff;border-radius:7px;
+    padding:5px 12px;font:inherit;font-size:12px;font-weight:600;
+    color:#4b5563;cursor:pointer;transition:background .12s;
+  }
+  .note-edit:active{background:#f9fafb;}
+  .note-body{
+    font-size:13px;color:#4b5563;line-height:1.6;
+    white-space:pre-wrap;word-break:break-word;min-height:20px;
+  }
+  .note-body.empty{color:#d1d5db;font-style:italic;}
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(50px,1fr));
+    gap:8px;margin-top:12px;
+  }
+  .cell{
+    position:relative;
+    aspect-ratio:1/1;min-height:50px;
+    display:flex;align-items:center;justify-content:center;
+    padding:0;border:0;border-radius:9px;
+    font:inherit;font-size:16px;font-weight:600;
+    background:#e5e7eb;color:#6b7280;cursor:pointer;
+    -webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;
+    -webkit-touch-callout:none;touch-action:manipulation;
+    transition:background-color .12s ease,color .12s ease,transform .08s ease;
+  }
+  .cell:active{transform:scale(.92);}
+
+  .grid.mode-hw .cell[data-state="0"]{background:#e5e7eb;color:#6b7280;}
+  .grid.mode-hw .cell[data-state="1"][data-lv=""]{background:#86efac;color:#065f46;}
+  .grid.mode-hw .cell[data-state="1"][data-lv="A+"]{background:#22c55e;color:#fff;}
+  .grid.mode-hw .cell[data-state="1"][data-lv="A"]{background:#eab308;color:#fff;}
+  .grid.mode-hw .cell[data-state="1"][data-lv="A-"]{background:#f97316;color:#fff;}
+  .grid.mode-hw .cell[data-state="1"][data-lv="B"]{background:#ef4444;color:#fff;}
+  .grid.mode-hw .cell[data-state="2"]{background:#b91c1c;color:#fff;}
+
+  .grid.mode-cb .cell[data-state="0"]{background:#e5e7eb;color:#6b7280;}
+  .grid.mode-cb .cell[data-state="1"]{background:#22c55e;color:#fff;}
+  .grid.mode-cb .cell[data-state="2"]{background:#b91c1c;color:#fff;}
+
+  .cell .lv{
+    position:absolute;right:2px;bottom:2px;
+    display:none;font-size:9px;font-weight:800;line-height:1;
+    letter-spacing:-.5px;color:rgba(255,255,255,.95);pointer-events:none;
+  }
+  .cell .lv.show{display:block;}
+  .cell[data-state="1"][data-lv=""] .lv{display:none;}
+
+  .cell .sc{
+    position:absolute;top:2px;right:4px;
+    display:none;font-size:10px;font-weight:700;line-height:1;
+    color:rgba(255,255,255,.95);pointer-events:none;
+  }
+  .cell .sc.show{display:block;}
+  .cell[data-state="0"] .sc{color:#9ca3af;}
+
+  .cell .fx-dot{
+    position:absolute;left:3px;bottom:3px;
+    width:7px;height:7px;border-radius:50%;
+    display:none;pointer-events:none;
+    box-shadow:0 0 0 1.5px rgba(255,255,255,.85);
+  }
+  .grid.mode-hw .cell .fx-dot.show{display:block;}
+  .grid.mode-hw .cell[data-fix="1"] .fx-dot{background:#f59e0b;}
+  .grid.mode-hw .cell[data-fix="2"] .fx-dot{background:#22c55e;}
+
+  .hint{margin:14px 0 0;text-align:center;font-size:12px;color:#9ca3af;line-height:1.9;}
+  .hint b{color:#6b7280;}
+  .hint .fx-mini{
+    display:inline-block;width:7px;height:7px;border-radius:50%;
+    margin:0 2px;vertical-align:middle;
+  }
+
+  .summary-btn{
+    display:block;width:100%;margin-top:14px;padding:13px;
+    border:1px solid #bfdbfe;border-radius:11px;background:#eff6ff;color:#1d4ed8;
+    font:inherit;font-size:15px;font-weight:600;cursor:pointer;transition:background .15s;
+  }
+  .summary-btn:active{background:#dbeafe;}
+
+  /* 数据管理按钮 */
+  .data-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;}
+  .data-btn{
+    padding:13px 8px;border:1px solid #bae6fd;border-radius:11px;
+    background:#f0f9ff;color:#0369a1;
+    font:inherit;font-size:14px;font-weight:600;cursor:pointer;
+    transition:background .15s;
+  }
+  .data-btn:active{background:#e0f2fe;}
+
+  .clear-btn{
+    display:block;width:100%;margin-top:8px;padding:13px;
+    border:1px solid #fecaca;border-radius:11px;background:#fff;color:#dc2626;
+    font:inherit;font-size:15px;font-weight:600;cursor:pointer;transition:background .15s;
+  }
+  .clear-btn:active{background:#fef2f2;}
+
+  .sheet-mask{
+    position:fixed;left:0;top:0;right:0;bottom:0;z-index:1000;
+    display:flex;align-items:flex-end;justify-content:center;
+    background:rgba(17,24,39,.4);
+    opacity:0;pointer-events:none;transition:opacity .2s ease;
+  }
+  .sheet-mask.show{opacity:1;pointer-events:auto;}
+  .sheet{
+    width:100%;max-width:480px;background:#fff;
+    border-radius:18px 18px 0 0;
+    padding:16px 14px calc(16px + env(safe-area-inset-bottom));
+    transform:translateY(100%);
+    transition:transform .28s cubic-bezier(.2,.8,.3,1);
+    box-shadow:0 -8px 30px rgba(0,0,0,.15);
+    max-height:90vh;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  }
+  .sheet-mask.show .sheet{transform:translateY(0);}
+  .sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px;}
+  .sheet-head .sn{font-size:16px;font-weight:700;}
+  .sheet-close{
+    border:0;background:#f3f4f6;width:36px;height:36px;border-radius:9px;
+    font-size:14px;color:#6b7280;cursor:pointer;flex:none;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .sheet-close:active{background:#e5e7eb;}
+
+  .sheet-group{margin-bottom:14px;}
+  .sheet-group:last-child{margin-bottom:0;}
+  .group-label{
+    font-size:12px;font-weight:700;color:#6b7280;
+    margin-bottom:7px;padding-left:2px;
+  }
+  .seg-row{display:flex;gap:6px;}
+  .seg-btn{
+    flex:1;padding:11px 4px;
+    border:1.5px solid #e5e7eb;background:#fff;border-radius:9px;
+    font:inherit;font-size:14px;font-weight:700;
+    color:#6b7280;cursor:pointer;transition:all .12s;
+    -webkit-user-select:none;user-select:none;
+    min-width:0;white-space:nowrap;
+  }
+  .seg-btn:active{transform:scale(.96);}
+
+  .seg-btn[data-hw="1"].active{background:#22c55e;border-color:#22c55e;color:#fff;}
+  .seg-btn[data-hw="2"].active{background:#b91c1c;border-color:#b91c1c;color:#fff;}
+  .seg-btn[data-hw="0"].active{background:#9ca3af;border-color:#9ca3af;color:#fff;}
+
+  .seg-btn[data-lv="A+"].active{background:#22c55e;border-color:#22c55e;color:#fff;}
+  .seg-btn[data-lv="A"].active{background:#eab308;border-color:#eab308;color:#fff;}
+  .seg-btn[data-lv="A-"].active{background:#f97316;border-color:#f97316;color:#fff;}
+  .seg-btn[data-lv="B"].active{background:#ef4444;border-color:#ef4444;color:#fff;}
+  .seg-btn[data-lv=""].active{background:#9ca3af;border-color:#9ca3af;color:#fff;}
+
+  .seg-btn[data-fix="1"].active{background:#f59e0b;border-color:#f59e0b;color:#fff;}
+  .seg-btn[data-fix="2"].active{background:#22c55e;border-color:#22c55e;color:#fff;}
+  .seg-btn[data-fix="0"].active{background:#9ca3af;border-color:#9ca3af;color:#fff;}
+
+  .seg-row.disabled .seg-btn{opacity:.4;pointer-events:none;}
+
+  .sheet-hint{
+    font-size:11px;color:#9ca3af;
+    margin:-2px 0 8px 2px;line-height:1.6;
+  }
+
+  .note-mask{
+    position:fixed;left:0;top:0;right:0;bottom:0;z-index:3000;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(17,24,39,.45);padding:20px;
+    opacity:0;pointer-events:none;transition:opacity .2s;
+  }
+  .note-mask.show{opacity:1;pointer-events:auto;}
+  .note-dialog{
+    width:100%;max-width:480px;background:#fff;border-radius:16px;
+    padding:16px;transform:scale(.96);transition:transform .2s;
+    box-shadow:0 20px 50px rgba(0,0,0,.2);
+  }
+  .note-mask.show .note-dialog{transform:scale(1);}
+  .note-dialog-head{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:12px;
+  }
+  .note-dialog-head span{font-size:16px;font-weight:700;}
+  .note-close{
+    border:0;background:#f3f4f6;width:32px;height:32px;border-radius:8px;
+    font-size:13px;color:#6b7280;cursor:pointer;
+  }
+  .note-close:active{background:#e5e7eb;}
+  #noteInput{
+    width:100%;min-height:120px;
+    border:1px solid #e5e7eb;border-radius:10px;
+    padding:10px 12px;font:inherit;font-size:14px;line-height:1.6;
+    color:#111827;resize:vertical;outline:none;
+  }
+  #noteInput:focus{border-color:#9ca3af;}
+  .note-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;}
+  .note-actions button{
+    padding:12px;border-radius:10px;border:1px solid #e5e7eb;
+    background:#fff;font:inherit;font-size:14px;font-weight:600;cursor:pointer;
+  }
+  .note-actions button:active{opacity:.85;}
+  .note-cancel{color:#6b7280;}
+  .note-save{background:#111827!important;border-color:#111827!important;color:#fff;}
+
+  .summary-mask{
+    position:fixed;left:0;top:0;right:0;bottom:0;z-index:2000;
+    background:rgba(17,24,39,.45);
+    display:flex;align-items:center;justify-content:center;
+    opacity:0;pointer-events:none;transition:opacity .2s ease;
+  }
+  .summary-mask.show{opacity:1;pointer-events:auto;}
+  .summary-panel{
+    width:100%;height:100%;background:#fff;
+    display:flex;flex-direction:column;
+    transform:translateY(20px);
+    transition:transform .28s cubic-bezier(.2,.8,.3,1);
+  }
+  .summary-mask.show .summary-panel{transform:translateY(0);}
+  .summary-head{
+    display:flex;align-items:center;gap:10px;
+    padding:calc(14px + env(safe-area-inset-top)) 16px 14px;
+    border-bottom:1px solid #f3f4f6;flex-shrink:0;
+  }
+  .summary-head .sm-title{font-size:17px;font-weight:700;}
+  .summary-head .sm-class{
+    font-size:12px;color:#6b7280;background:#f3f4f6;
+    padding:3px 8px;border-radius:6px;font-weight:600;
+  }
+  .summary-head .sm-close{
+    margin-left:auto;border:0;background:#f3f4f6;
+    width:34px;height:34px;border-radius:9px;
+    font-size:14px;color:#6b7280;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .summary-head .sm-close:active{background:#e5e7eb;}
+  .summary-body{
+    flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+    padding:12px 14px calc(20px + env(safe-area-inset-bottom));
+  }
+  .range-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+  .range-row input{
+    flex:1;min-width:0;height:38px;padding:0 10px;
+    border:1px solid #e5e7eb;border-radius:9px;
+    font:inherit;font-size:15px;color:#111827;background:#fff;outline:none;
+  }
+  .range-row input:focus{border-color:#9ca3af;}
+  .range-sep{color:#9ca3af;font-size:13px;flex-shrink:0;}
+  .quick-row{display:flex;gap:6px;margin-bottom:12px;}
+  .quick-row button{
+    flex:1;padding:9px 4px;
+    border:1px solid #e5e7eb;background:#fff;border-radius:9px;
+    font:inherit;font-size:12px;font-weight:600;color:#4b5563;
+    cursor:pointer;transition:background .12s;
+  }
+  .quick-row button:active{background:#f9fafb;}
+  .quick-row button.active{background:#111827;color:#fff;border-color:#111827;}
+  .ov-line{
+    font-size:12px;color:#6b7280;text-align:center;
+    margin-bottom:10px;padding:9px;
+    background:#f9fafb;border-radius:8px;
+  }
+  .ov-line b{color:#111827;font-weight:700;}
+  .view-toggle{
+    display:flex;background:#f3f4f6;border-radius:9px;padding:3px;gap:3px;
+    margin-bottom:12px;
+  }
+  .view-toggle button{
+    flex:1;padding:8px;border:0;background:transparent;border-radius:7px;
+    font:inherit;font-size:13px;font-weight:600;color:#6b7280;cursor:pointer;
+  }
+  .view-toggle button.active{background:#fff;color:#111827;box-shadow:0 1px 2px rgba(0,0,0,.08);}
+  .summary-result{min-height:120px;}
+
+  .sum-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .sum-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px;min-width:520px;}
+  .sum-table th{
+    font-size:10px;font-weight:600;color:#9ca3af;
+    padding:7px 1px;text-align:center;white-space:nowrap;
+    border-bottom:1px solid #e5e7eb;
+  }
+  .sum-table td{
+    text-align:center;padding:8px 1px;
+    border-bottom:1px solid #f3f4f6;font-weight:600;
+  }
+  .sum-table tr:last-child td{border-bottom:0;}
+  .td-id{color:#6b7280;font-weight:500;}
+  .td-done{color:#16a34a;}
+  .td-miss{color:#b91c1c;}
+  .td-none{color:#d1d5db;}
+  .td-ap{color:#16a34a;}
+  .td-a{color:#ca8a04;}
+  .td-am{color:#ea580c;}
+  .td-b{color:#dc2626;}
+  .td-pending{color:#d97706;}
+  .td-passed{color:#16a34a;}
+  .td-rate{color:#6b7280;font-size:11px;}
+
+  .det-wrap{
+    overflow-x:auto;-webkit-overflow-scrolling:touch;
+    border-radius:8px;background:#fafafa;padding:4px;
+  }
+  .det-grid{display:grid;gap:2px;min-width:max-content;}
+  .det-h{
+    font-size:10px;color:#9ca3af;text-align:center;
+    padding:4px 0;font-weight:600;white-space:nowrap;
+  }
+  .det-h-id{text-align:left;padding-left:5px;}
+  .det-name{
+    font-size:11px;font-weight:600;color:#374151;
+    display:flex;align-items:center;padding-left:5px;
+  }
+  .det-cell{
+    position:relative;
+    display:flex;align-items:center;justify-content:center;
+    height:26px;font-size:10px;font-weight:700;border-radius:4px;
+  }
+  .det-cell.st0{background:#f3f4f6;color:#d1d5db;}
+  .det-cell.st1{background:#86efac;color:#065f46;}
+  .det-cell.st2{background:#fecaca;color:#b91c1c;}
+  .det-cell.lv-ap{background:#22c55e;color:#fff;}
+  .det-cell.lv-a{background:#eab308;color:#fff;}
+  .det-cell.lv-am{background:#f97316;color:#fff;}
+  .det-cell.lv-b{background:#ef4444;color:#fff;}
+
+  .det-fx{
+    position:absolute;left:2px;bottom:2px;
+    width:5px;height:5px;border-radius:50%;
+    box-shadow:0 0 0 1px rgba(255,255,255,.85);
+  }
+  .det-fx[data-fx="1"]{background:#f59e0b;}
+  .det-fx[data-fx="2"]{background:#22c55e;}
+
+  .empty{text-align:center;color:#9ca3af;font-size:13px;padding:30px 0;}
+
+  @media (min-width: 640px){
+    .sheet-mask{align-items:center;}
+    .sheet{border-radius:18px;padding-bottom:16px;}
+    .summary-panel{
+      width:100%;max-width:820px;
+      height:auto;max-height:88vh;
+      border-radius:18px;overflow:hidden;
+      transform:scale(.96);
+    }
+    .summary-mask.show .summary-panel{transform:scale(1);}
+    .summary-head{padding:14px 18px;}
+  }
+
+  @media (max-width:360px){
+    .grid{gap:6px;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));}
+    .cell{font-size:14px;border-radius:8px;min-height:44px;}
+    .tab{padding:7px 12px;}
+    .stat{font-size:12px;}
+    .mode{font-size:13px;padding:9px;}
+    .lvbar .item{font-size:11px;}
+    .fixbar .item{font-size:11px;}
+    .seg-btn{font-size:13px;padding:10px 2px;}
+    .sum-table{font-size:11px;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <h1>班级登记本</h1>
+
+  <div class="topbar">
+    <div class="tabs">
+      <button class="tab active" data-cls="14" type="button">14班</button>
+      <button class="tab" data-cls="15" type="button">15班</button>
+    </div>
+    <input type="date" id="datePicker">
+  </div>
+
+  <div class="modes" id="modeTabs">
+    <button class="mode active" data-mode="hw" type="button">作业登记</button>
+    <button class="mode" data-mode="cb" type="button">课堂表现</button>
+  </div>
+
+  <div class="stats" id="stats">
+    <div class="stat"><span class="dot d1"></span><span id="lblA">已交</span><b id="cntA">0</b></div>
+    <div class="stat"><span class="dot d2"></span><span id="lblB">缺交</span><b id="cntB">0</b></div>
+    <div class="stat"><span class="dot d0"></span><span id="lblC">未登记</span><b id="cntC">0</b></div>
+  </div>
+
+  <div class="lvbar" id="lvBar">
+    <div class="item"><span class="tag tAplus">A+</span><b id="cntAp">0</b></div>
+    <div class="item"><span class="tag tA">A</span><b id="cntA1">0</b></div>
+    <div class="item"><span class="tag tAminus">A−</span><b id="cntAm">0</b></div>
+    <div class="item"><span class="tag tB">B</span><b id="cntB1">0</b></div>
+  </div>
+
+  <div class="fixbar" id="fixBar">
+    <div class="item"><span class="tag tPending">待过关</span><b id="cntPend">0</b></div>
+    <div class="item"><span class="tag tPassed">已过关</span><b id="cntPass">0</b></div>
+  </div>
+
+  <div class="note-card" id="noteCard">
+    <div class="note-head">
+      <span class="ttl">📝 今日作业</span>
+      <button class="note-edit" id="noteEditBtn" type="button">编辑</button>
+    </div>
+    <div class="note-body empty" id="noteBody">点击“编辑”填写今日作业内容</div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <p class="hint" id="hint"></p>
+
+  <button class="summary-btn" id="summaryBtn" type="button">📊 查看汇总统计</button>
+
+  <div class="data-actions">
+    <button class="data-btn" id="exportBtn" type="button">💾 导出备份</button>
+    <button class="data-btn" id="importBtn" type="button">📥 导入恢复</button>
+  </div>
+
+  <button class="clear-btn" id="clearBtn" type="button"></button>
+
+  <input type="file" id="importFile" accept=".json,application/json" style="display:none">
+
+</div>
+
+<!-- ================= 作业 & 改错面板 ================= -->
+<div class="sheet-mask" id="sheetMask">
+  <div class="sheet" id="sheet">
+    <div class="sheet-head">
+      <span class="sn" id="sheetNum">3 号</span>
+      <button class="sheet-close" id="sheetClose" type="button" aria-label="关闭">✕</button>
+    </div>
+
+    <div class="sheet-group">
+      <div class="group-label">作业状态</div>
+      <div class="seg-row" id="hwSeg">
+        <button class="seg-btn" type="button" data-hw="1">已交</button>
+        <button class="seg-btn" type="button" data-hw="2">缺交</button>
+        <button class="seg-btn" type="button" data-hw="0">未登记</button>
+      </div>
+    </div>
+
+    <div class="sheet-group">
+      <div class="group-label">作业等级</div>
+      <div class="sheet-hint">仅“已交”状态下可选</div>
+      <div class="seg-row" id="lvSeg">
+        <button class="seg-btn" type="button" data-lv="A+">A+</button>
+        <button class="seg-btn" type="button" data-lv="A">A</button>
+        <button class="seg-btn" type="button" data-lv="A-">A−</button>
+        <button class="seg-btn" type="button" data-lv="B">B</button>
+        <button class="seg-btn" type="button" data-lv="">无</button>
+      </div>
+    </div>
+
+    <div class="sheet-group">
+      <div class="group-label">改错过关</div>
+      <div class="seg-row" id="fixSeg">
+        <button class="seg-btn" type="button" data-fix="1">待过关</button>
+        <button class="seg-btn" type="button" data-fix="2">已过关</button>
+        <button class="seg-btn" type="button" data-fix="0">未登记</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 作业内容编辑弹窗 ================= -->
+<div class="note-mask" id="noteMask">
+  <div class="note-dialog">
+    <div class="note-dialog-head">
+      <span>编辑今日作业</span>
+      <button class="note-close" id="noteClose" type="button" aria-label="关闭">✕</button>
+    </div>
+    <textarea id="noteInput" placeholder="例如：&#10;数学：P23 第1-5题&#10;语文：背诵《静夜思》&#10;英语：抄写单词 Unit 3"></textarea>
+    <div class="note-actions">
+      <button class="note-cancel" id="noteCancel" type="button">取消</button>
+      <button class="note-save" id="noteSave" type="button">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 汇总统计面板 ================= -->
+<div class="summary-mask" id="summaryMask">
+  <div class="summary-panel">
+    <div class="summary-head">
+      <span class="sm-title">汇总统计</span>
+      <span class="sm-class" id="smClass">14班</span>
+      <button class="sm-close" id="summaryClose" type="button" aria-label="关闭">✕</button>
+    </div>
+    <div class="summary-body">
+      <div class="range-row">
+        <input type="date" id="rangeStart">
+        <span class="range-sep">至</span>
+        <input type="date" id="rangeEnd">
+      </div>
+      <div class="quick-row" id="quickRow">
+        <button type="button" data-days="7">近7天</button>
+        <button type="button" data-days="14">近14天</button>
+        <button type="button" data-days="30">近30天</button>
+        <button type="button" data-days="month">本月</button>
+      </div>
+      <div class="ov-line" id="ovLine"></div>
+      <div class="view-toggle" id="viewToggle">
+        <button type="button" class="active" data-view="summary">汇总表</button>
+        <button type="button" data-view="detail">明细表</button>
+      </div>
+      <div class="summary-result" id="summaryResult"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var KEY = 'homework_register_v10';
+  var LONG_PRESS_MS = 600;
+
+  function range(a, b){
+    var out = [];
+    for (var i = a; i <= b; i++) out.push(i);
+    return out;
+  }
+
+  var ROSTER = {
+    '14': range(1, 71),
+    '15': range(1, 23).concat([24]).concat(range(25, 69))
+  };
+
+  var LV_LABEL = { 'A+':'A+', 'A':'A', 'A-':'A\u2212', 'B':'B' };
+
+  var data = {};
+  var currentClass = '14';
+  var currentDate  = todayStr();
+  var mode = 'hw';
+  var cells = [];
+  var activeId = null;
+
+  var currentView = 'summary';
+  var currentQuick = '7';
+
+  function pad(n){ return n < 10 ? '0' + n : '' + n; }
+  function todayStr(){
+    var d = new Date();
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  }
+  function fmtDate(d){
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  }
+  function idsOf(cls){ return (ROSTER[cls] || []).slice(); }
+
+  function dateRange(start, end){
+    var out = [];
+    var s = new Date(start + 'T00:00:00');
+    var e = new Date(end   + 'T00:00:00');
+    if (isNaN(s.getTime()) || isNaN(e.getTime())) return out;
+    if (s > e) return out;
+    var cur = new Date(s);
+    while (cur <= e){
+      out.push(fmtDate(cur));
+      cur.setDate(cur.getDate() + 1);
+      if (out.length > 366) break;
+    }
+    return out;
+  }
+
+  function load(){
+    try{
+      var raw = localStorage.getItem(KEY);
+      data = raw ? JSON.parse(raw) : {};
+      if (!data || typeof data !== 'object' || Array.isArray(data)) data = {};
+    }catch(e){ data = {}; }
+  }
+  function save(){
+    try{ localStorage.setItem(KEY, JSON.stringify(data)); }catch(e){}
+  }
+
+  function ensure(date, cls){
+    if (!data[date]) data[date] = {};
+    if (!data[date][cls]) data[date][cls] = {};
+    var c = data[date][cls];
+    if (!c.hw)   c.hw = {};
+    if (!c.cb)   c.cb = {};
+    if (!c.hwLv) c.hwLv = {};
+    if (!c.fix)  c.fix = {};
+    return c;
+  }
+  function cleanup(date, cls){
+    var d = data[date]; if (!d) return;
+    var c = d[cls];     if (!c) return;
+    var e1 = !c.hw   || Object.keys(c.hw).length === 0;
+    var e2 = !c.cb   || Object.keys(c.cb).length === 0;
+    var e3 = !c.hwLv || Object.keys(c.hwLv).length === 0;
+    var e4 = !c.fix  || Object.keys(c.fix).length === 0;
+    var e5 = !c.note;
+    if (e1 && e2 && e3 && e4 && e5){
+      delete d[cls];
+      if (Object.keys(d).length === 0) delete data[date];
+    }
+  }
+
+  function getHw(date, cls, id){
+    var d = data[date]; if (!d) return 0;
+    var c = d[cls];     if (!c || !c.hw) return 0;
+    var v = c.hw[id];
+    return (v === 1 || v === 2) ? v : 0;
+  }
+  function setHw(date, cls, id, st){
+    if (st === 0){
+      var d = data[date]; if (!d) return;
+      var c = d[cls];     if (!c) return;
+      if (c.hw)   delete c.hw[id];
+      if (c.hwLv) delete c.hwLv[id];
+      cleanup(date, cls); save(); return;
+    }
+    var cc = ensure(date, cls);
+    cc.hw[id] = st;
+    if (st !== 1 && cc.hwLv) delete cc.hwLv[id];
+    save();
+  }
+  function getLv(date, cls, id){
+    var d = data[date]; if (!d) return '';
+    var c = d[cls];     if (!c || !c.hwLv) return '';
+    return c.hwLv[id] || '';
+  }
+  function setLv(date, cls, id, lv){
+    var c = ensure(date, cls);
+    if (!lv){ delete c.hwLv[id]; cleanup(date, cls); }
+    else { c.hwLv[id] = lv; }
+    save();
+  }
+
+  function getFix(date, cls, id){
+    var d = data[date]; if (!d) return 0;
+    var c = d[cls];     if (!c || !c.fix) return 0;
+    var v = c.fix[id];
+    return (v === 1 || v === 2) ? v : 0;
+  }
+  function setFix(date, cls, id, st){
+    if (st === 0){
+      var d = data[date]; if (!d) return;
+      var c = d[cls];     if (!c) return;
+      if (c.fix) delete c.fix[id];
+      cleanup(date, cls); save(); return;
+    }
+    ensure(date, cls).fix[id] = st;
+    save();
+  }
+
+  function getCb(date, cls, id){
+    var d = data[date]; if (!d) return 0;
+    var c = d[cls];     if (!c || !c.cb) return 0;
+    var v = c.cb[id];
+    return (typeof v === 'number' && isFinite(v)) ? v : 0;
+  }
+  function setCb(date, cls, id, v){
+    if (v === 0){
+      var d = data[date]; if (!d) return;
+      var c = d[cls];     if (!c) return;
+      if (c.cb) delete c.cb[id];
+      cleanup(date, cls); save(); return;
+    }
+    ensure(date, cls).cb[id] = v;
+    save();
+  }
+
+  function getNote(date, cls){
+    var d = data[date]; if (!d) return '';
+    var c = d[cls];     if (!c) return '';
+    return c.note || '';
+  }
+  function setNote(date, cls, text){
+    var c = ensure(date, cls);
+    if (!text || !text.trim()){
+      delete c.note;
+      cleanup(date, cls);
+    } else {
+      c.note = text;
+    }
+    save();
+  }
+
+  function currentHwMap(){
+    var d = data[currentDate]; if (!d) return {};
+    var c = d[currentClass];   if (!c) return {};
+    return c.hw || {};
+  }
+  function currentLvMap(){
+    var d = data[currentDate]; if (!d) return {};
+    var c = d[currentClass];   if (!c) return {};
+    return c.hwLv || {};
+  }
+  function currentFixMap(){
+    var d = data[currentDate]; if (!d) return {};
+    var c = d[currentClass];   if (!c) return {};
+    return c.fix || {};
+  }
+  function currentCbMap(){
+    var d = data[currentDate]; if (!d) return {};
+    var c = d[currentClass];   if (!c) return {};
+    return c.cb || {};
+  }
+
+  var gridEl     = document.getElementById('grid');
+  var statsEl    = document.getElementById('stats');
+  var lvBarEl    = document.getElementById('lvBar');
+  var fixBarEl   = document.getElementById('fixBar');
+  var noteCard   = document.getElementById('noteCard');
+  var noteBody   = document.getElementById('noteBody');
+  var noteEditBtn= document.getElementById('noteEditBtn');
+  var datePicker = document.getElementById('datePicker');
+  var lblA = document.getElementById('lblA');
+  var lblB = document.getElementById('lblB');
+  var lblC = document.getElementById('lblC');
+  var cntA = document.getElementById('cntA');
+  var cntB = document.getElementById('cntB');
+  var cntC = document.getElementById('cntC');
+  var cntAp = document.getElementById('cntAp');
+  var cntA1 = document.getElementById('cntA1');
+  var cntAm = document.getElementById('cntAm');
+  var cntB1 = document.getElementById('cntB1');
+  var cntPend = document.getElementById('cntPend');
+  var cntPass = document.getElementById('cntPass');
+  var hintEl   = document.getElementById('hint');
+  var clearBtn = document.getElementById('clearBtn');
+  var exportBtn = document.getElementById('exportBtn');
+  var importBtn = document.getElementById('importBtn');
+  var importFile = document.getElementById('importFile');
+  var tabs     = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+  var modeBtns = Array.prototype.slice.call(document.querySelectorAll('.mode'));
+
+  var sheetMask   = document.getElementById('sheetMask');
+  var sheetNum    = document.getElementById('sheetNum');
+  var sheetClose  = document.getElementById('sheetClose');
+  var hwSeg       = document.getElementById('hwSeg');
+  var lvSeg       = document.getElementById('lvSeg');
+  var fixSeg      = document.getElementById('fixSeg');
+
+  var noteMask  = document.getElementById('noteMask');
+  var noteInput = document.getElementById('noteInput');
+  var noteClose = document.getElementById('noteClose');
+  var noteCancel= document.getElementById('noteCancel');
+  var noteSave  = document.getElementById('noteSave');
+
+  var summaryBtn  = document.getElementById('summaryBtn');
+  var summaryMask = document.getElementById('summaryMask');
+  var summaryClose= document.getElementById('summaryClose');
+  var smClass     = document.getElementById('smClass');
+  var rangeStart  = document.getElementById('rangeStart');
+  var rangeEnd    = document.getElementById('rangeEnd');
+  var quickRow    = document.getElementById('quickRow');
+  var ovLine      = document.getElementById('ovLine');
+  var viewToggle  = document.getElementById('viewToggle');
+  var summaryResult = document.getElementById('summaryResult');
+
+  /* ================= 导出 / 导入 ================= */
+  exportBtn.addEventListener('click', function () {
+    try {
+      var json = JSON.stringify(data);
+      var blob = new Blob([json], { type: 'application/json' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = '作业登记备份-' + todayStr() + '.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
+    } catch (e) {
+      alert('导出失败，请检查浏览器下载权限。');
+    }
+  });
+
+  importBtn.addEventListener('click', function () {
+    importFile.click();
+  });
+
+  importFile.addEventListener('change', function (e) {
+    var file = e.target.files && e.target.files[0];
+    if (!file) return;
+
+    var reader = new FileReader();
+    reader.onload = function (ev) {
+      try {
+        var obj = JSON.parse(ev.target.result);
+        if (!obj || typeof obj !== 'object' || Array.isArray(obj)) {
+          throw new Error('格式错误');
+        }
+        if (!confirm('导入将【覆盖】当前所有记录，确定继续吗？')) return;
+        data = obj;
+        save();
+        render();
+        alert('导入成功！');
+      } catch (err) {
+        alert('文件格式错误，导入失败。\n请确认选择的是本页面导出的备份文件。');
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  });
+
+  /* ================= 面板 ================= */
+  function refreshSheet(){
+    if (activeId == null) return;
+    var hw = getHw(currentDate, currentClass, activeId);
+    var lv = getLv(currentDate, currentClass, activeId);
+    var fx = getFix(currentDate, currentClass, activeId);
+
+    Array.prototype.forEach.call(hwSeg.children, function(btn){
+      btn.classList.toggle('active', Number(btn.dataset.hw) === hw);
+    });
+    Array.prototype.forEach.call(lvSeg.children, function(btn){
+      var btnLv = btn.dataset.lv === undefined ? '' : btn.dataset.lv;
+      btn.classList.toggle('active', btnLv === lv);
+    });
+    lvSeg.classList.toggle('disabled', hw !== 1);
+
+    Array.prototype.forEach.call(fixSeg.children, function(btn){
+      btn.classList.toggle('active', Number(btn.dataset.fix) === fx);
+    });
+  }
+
+  function openSheet(id){
+    activeId = id;
+    sheetNum.textContent = id + ' 号';
+    refreshSheet();
+    sheetMask.classList.add('show');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeSheet(){
+    sheetMask.classList.remove('show');
+    document.body.style.overflow = '';
+    activeId = null;
+  }
+
+  sheetMask.addEventListener('click', function(e){
+    if (e.target === sheetMask) closeSheet();
+  });
+  sheetClose.addEventListener('click', closeSheet);
+
+  Array.prototype.forEach.call(hwSeg.children, function(btn){
+    btn.addEventListener('click', function(){
+      if (activeId == null) return;
+      setHw(currentDate, currentClass, activeId, Number(btn.dataset.hw));
+      refreshSheet();
+      render();
+    });
+  });
+  Array.prototype.forEach.call(lvSeg.children, function(btn){
+    btn.addEventListener('click', function(){
+      if (activeId == null) return;
+      var lv = btn.dataset.lv === undefined ? '' : btn.dataset.lv;
+      setLv(currentDate, currentClass, activeId, lv);
+      refreshSheet();
+      render();
+    });
+  });
+  Array.prototype.forEach.call(fixSeg.children, function(btn){
+    btn.addEventListener('click', function(){
+      if (activeId == null) return;
+      setFix(currentDate, currentClass, activeId, Number(btn.dataset.fix));
+      refreshSheet();
+      render();
+    });
+  });
+
+  function openNoteEditor(){
+    noteInput.value = getNote(currentDate, currentClass);
+    noteMask.classList.add('show');
+    document.body.style.overflow = 'hidden';
+    setTimeout(function(){ noteInput.focus(); }, 120);
+  }
+  function closeNoteEditor(){
+    noteMask.classList.remove('show');
+    document.body.style.overflow = '';
+  }
+  noteEditBtn.addEventListener('click', openNoteEditor);
+  noteClose.addEventListener('click', closeNoteEditor);
+  noteCancel.addEventListener('click', closeNoteEditor);
+  noteMask.addEventListener('click', function(e){
+    if (e.target === noteMask) closeNoteEditor();
+  });
+  noteSave.addEventListener('click', function(){
+    setNote(currentDate, currentClass, noteInput.value);
+    closeNoteEditor();
+    renderNote();
+  });
+
+  function renderNote(){
+    var txt = getNote(currentDate, currentClass);
+    if (txt && txt.trim()){
+      noteBody.textContent = txt;
+      noteBody.classList.remove('empty');
+    } else {
+      noteBody.textContent = '点击“编辑”填写今日作业内容';
+      noteBody.classList.add('empty');
+    }
+  }
+
+  function onTap(id){
+    if (mode === 'hw'){
+      var cur = getHw(currentDate, currentClass, id);
+      if (cur === 0){
+        setHw(currentDate, currentClass, id, 1);
+        render();
+      } else {
+        openSheet(id);
+      }
+    } else {
+      addCb(id, 1);
+    }
+  }
+
+  function addCb(id, delta){
+    var cur  = getCb(currentDate, currentClass, id);
+    var next = cur + delta;
+    if (next > 9)  next = 9;
+    if (next < -9) next = -9;
+    setCb(currentDate, currentClass, id, next);
+    render();
+  }
+
+  function bindCell(btn, id){
+    var timer = null;
+    var suppressClick = false;
+    var startX = 0, startY = 0;
+
+    function cancelTimer(){
+      if (timer){ clearTimeout(timer); timer = null; }
+    }
+    function pressStart(x, y){
+      suppressClick = false;
+      startX = x; startY = y;
+      cancelTimer();
+      timer = setTimeout(function(){
+        timer = null;
+        suppressClick = true;
+        if (mode === 'cb'){
+          addCb(id, -1);
+          if (navigator.vibrate){ try{ navigator.vibrate(25); }catch(err){} }
+        }
+      }, LONG_PRESS_MS);
+    }
+    function pressMove(x, y){
+      if (Math.abs(x - startX) > 12 || Math.abs(y - startY) > 12){
+        cancelTimer();
+      }
+    }
+    function pressEnd(){ cancelTimer(); }
+
+    btn.addEventListener('touchstart', function(e){
+      if (e.touches.length !== 1) return;
+      var t = e.touches[0];
+      pressStart(t.clientX, t.clientY);
+    }, {passive: true});
+    btn.addEventListener('touchmove', function(e){
+      if (e.touches.length !== 1) return;
+      var t = e.touches[0];
+      pressMove(t.clientX, t.clientY);
+    }, {passive: true});
+    btn.addEventListener('touchend', pressEnd);
+    btn.addEventListener('touchcancel', function(){
+      pressEnd();
+      suppressClick = false;
+    });
+
+    btn.addEventListener('mousedown', function(e){
+      if (e.button !== 0) return;
+      pressStart(e.clientX, e.clientY);
+    });
+    btn.addEventListener('mousemove', function(e){ pressMove(e.clientX, e.clientY); });
+    btn.addEventListener('mouseup', pressEnd);
+    btn.addEventListener('mouseleave', function(){
+      pressEnd();
+      suppressClick = false;
+    });
+
+    btn.addEventListener('click', function(e){
+      if (suppressClick){
+        suppressClick = false;
+        e.preventDefault();
+        return;
+      }
+      onTap(id);
+    });
+    btn.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+  }
+
+  function buildGrid(){
+    var ids  = idsOf(currentClass);
+    var frag = document.createDocumentFragment();
+    cells = [];
+
+    ids.forEach(function (id) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'cell';
+      btn.dataset.id = id;
+      btn.dataset.state = '0';
+      btn.dataset.fix = '0';
+      btn.textContent = id;
+      btn.setAttribute('aria-label', id + '号');
+
+      var lv = document.createElement('span');
+      lv.className = 'lv';
+      btn.appendChild(lv);
+
+      var sc = document.createElement('span');
+      sc.className = 'sc';
+      btn.appendChild(sc);
+
+      var fx = document.createElement('span');
+      fx.className = 'fx-dot';
+      btn.appendChild(fx);
+
+      bindCell(btn, id);
+      frag.appendChild(btn);
+      cells.push(btn);
+    });
+
+    gridEl.innerHTML = '';
+    gridEl.appendChild(frag);
+  }
+
+  function render(){
+    gridEl.classList.remove('mode-hw', 'mode-cb');
+    gridEl.classList.add('mode-' + mode);
+
+    if (mode === 'hw'){
+      var hwMap = currentHwMap();
+      var lvMap = currentLvMap();
+      var fixMap = currentFixMap();
+
+      cells.forEach(function (btn) {
+        var id = btn.dataset.id;
+        var st = hwMap[id] || 0;
+        var lv = (st === 1) ? (lvMap[id] || '') : '';
+        var fx = fixMap[id] || 0;
+
+        btn.dataset.state = String(st);
+        btn.dataset.lv = lv;
+        btn.dataset.fix = String(fx);
+
+        var lvEl = btn.querySelector('.lv');
+        if (lv){
+          lvEl.className = 'lv show';
+          lvEl.textContent = LV_LABEL[lv];
+        } else {
+          lvEl.className = 'lv';
+          lvEl.textContent = '';
+        }
+
+        var scEl = btn.querySelector('.sc');
+        scEl.className = 'sc';
+        scEl.textContent = '';
+
+        var fxEl = btn.querySelector('.fx-dot');
+        fxEl.className = fx > 0 ? 'fx-dot show' : 'fx-dot';
+      });
+
+      lvBarEl.style.display = 'flex';
+      fixBarEl.style.display = 'flex';
+      noteCard.style.display = 'block';
+      updateHwStats(hwMap, lvMap, fixMap);
+
+      lblA.textContent = '已交';
+      lblB.textContent = '缺交';
+      lblC.textContent = '未登记';
+      hintEl.innerHTML =
+        '单击未登记 → 已交；单击已交/缺交 → 打开面板<br>' +
+        '面板里可设「作业状态 · 等级 · 改错过关」<br>' +
+        '方格左下角 <span class="fx-mini" style="background:#f59e0b;"></span>待过关 ' +
+        '<span class="fx-mini" style="background:#22c55e;"></span>已过关';
+      clearBtn.textContent = '清空【当前日期 + 当前班级】的作业 & 改错记录';
+
+    } else {
+      var cbMap = currentCbMap();
+
+      cells.forEach(function (btn) {
+        var id = btn.dataset.id;
+        var v  = cbMap[id] || 0;
+        btn.dataset.state = v > 0 ? '1' : (v < 0 ? '2' : '0');
+        btn.removeAttribute('data-lv');
+        btn.removeAttribute('data-fix');
+
+        var lvEl = btn.querySelector('.lv');
+        lvEl.className = 'lv';
+        lvEl.textContent = '';
+
+        var fxEl = btn.querySelector('.fx-dot');
+        fxEl.className = 'fx-dot';
+
+        var scEl = btn.querySelector('.sc');
+        scEl.className = 'sc' + (v === 0 ? '' : ' show');
+        scEl.textContent = v === 0 ? '' : (v > 0 ? '+' + v : '\u2212' + Math.abs(v));
+      });
+
+      lvBarEl.style.display = 'none';
+      fixBarEl.style.display = 'none';
+      noteCard.style.display = 'none';
+      updateCbStats(cbMap);
+
+      lblA.textContent = '加分';
+      lblB.textContent = '扣分';
+      lblC.textContent = '未评价';
+      hintEl.innerHTML =
+        '单击方格 <b>+1</b> 分，长按方格 <b>−1</b> 分<br>' +
+        '记录自动保存在本机浏览器，换日期各存各的';
+      clearBtn.textContent = '清空【当前日期 + 当前班级】的课堂表现记录';
+    }
+
+    renderNote();
+  }
+
+  function updateHwStats(map, lvMap, fixMap){
+    var a = 0, b = 0;
+    var cAp = 0, cA = 0, cAm = 0, cB = 0;
+
+    for (var k in map){
+      if (!Object.prototype.hasOwnProperty.call(map, k)) continue;
+      if (map[k] === 1){
+        a++;
+        var lv = lvMap[k];
+        if (lv === 'A+') cAp++;
+        else if (lv === 'A') cA++;
+        else if (lv === 'A-') cAm++;
+        else if (lv === 'B') cB++;
+      } else if (map[k] === 2){
+        b++;
+      }
+    }
+
+    var total = cells.length;
+    cntA.textContent = a;
+    cntB.textContent = b;
+    cntC.textContent = total - a - b;
+    cntAp.textContent = cAp;
+    cntA1.textContent = cA;
+    cntAm.textContent = cAm;
+    cntB1.textContent = cB;
+
+    var pending = 0, passed = 0;
+    for (var j in fixMap){
+      if (!Object.prototype.hasOwnProperty.call(fixMap, j)) continue;
+      if (fixMap[j] === 1) pending++;
+      else if (fixMap[j] === 2) passed++;
+    }
+    cntPend.textContent = pending;
+    cntPass.textContent = passed;
+  }
+
+  function updateCbStats(map){
+    var a = 0, b = 0;
+    for (var k in map){
+      if (!Object.prototype.hasOwnProperty.call(map, k)) continue;
+      if (map[k] > 0) a++;
+      else if (map[k] < 0) b++;
+    }
+    var total = cells.length;
+    cntA.textContent = a;
+    cntB.textContent = b;
+    cntC.textContent = total - a - b;
+  }
+
+  function openSummary(){
+    smClass.textContent = currentClass + '班';
+    setQuickRange('7');
+    summaryMask.classList.add('show');
+    document.body.style.overflow = 'hidden';
+    renderSummary();
+  }
+  function closeSummary(){
+    summaryMask.classList.remove('show');
+    document.body.style.overflow = '';
+  }
+
+  function setQuickRange(kind){
+    var now = new Date();
+    var end = fmtDate(now);
+    var start;
+    if (kind === 'month'){
+      start = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-01';
+    } else {
+      var n = parseInt(kind, 10);
+      var s = new Date(now);
+      s.setDate(s.getDate() - (n - 1));
+      start = fmtDate(s);
+    }
+    rangeStart.value = start;
+    rangeEnd.value = end;
+    currentQuick = kind;
+    Array.prototype.forEach.call(quickRow.children, function(b){
+      b.classList.toggle('active', b.dataset.days === kind);
+    });
+  }
+
+  function computeStats(days, cls, m){
+    var ids = idsOf(cls);
+    var result = {};
+    ids.forEach(function(id){
+      result[id] = {
+        done: 0, miss: 0,
+        Aplus: 0, A: 0, Aminus: 0, B: 0,
+        pending: 0, passed: 0,
+        plus: 0, minus: 0, score: 0,
+        byDate: {}
+      };
+    });
+
+    days.forEach(function(date){
+      var d = data[date];
+      var c = d && d[cls];
+
+      if (!c){
+        ids.forEach(function(id){
+          result[id].byDate[date] = { st: 0, lv: '', fx: 0, v: 0 };
+        });
+        return;
+      }
+
+      if (m === 'hw'){
+        var hw = c.hw || {};
+        var lv = c.hwLv || {};
+        var fx = c.fix || {};
+        ids.forEach(function(id){
+          var st = hw[id] || 0;
+          var l = (st === 1) ? (lv[id] || '') : '';
+          var f = fx[id] || 0;
+          var r = result[id];
+          r.byDate[date] = { st: st, lv: l, fx: f };
+
+          if (st === 1){
+            r.done++;
+            if (l === 'A+') r.Aplus++;
+            else if (l === 'A') r.A++;
+            else if (l === 'A-') r.Aminus++;
+            else if (l === 'B') r.B++;
+          } else if (st === 2){
+            r.miss++;
+          }
+          if (f === 1) r.pending++;
+          else if (f === 2) r.passed++;
+        });
+      } else {
+        var cb = c.cb || {};
+        ids.forEach(function(id){
+          var v = cb[id] || 0;
+          var r = result[id];
+          r.byDate[date] = { v: v, st: 0, lv: '', fx: 0 };
+          if (v > 0) r.plus += v;
+          else if (v < 0) r.minus += Math.abs(v);
+          r.score += v;
+        });
+      }
+    });
+
+    return result;
+  }
+
+  function renderSummary(){
+    var start = rangeStart.value;
+    var end   = rangeEnd.value;
+    if (!start || !end) return;
+    if (start > end){
+      var t = start; start = end; end = t;
+      rangeStart.value = start;
+      rangeEnd.value = end;
+    }
+
+    var days = dateRange(start, end);
+    if (days.length === 0){
+      ovLine.innerHTML = '';
+      summaryResult.innerHTML = '<p class="empty">日期范围无效</p>';
+      return;
+    }
+
+    var stats = computeStats(days, currentClass, mode);
+    var totalSlots = days.length * idsOf(currentClass).length;
+
+    if (mode === 'hw'){
+      var totalDone = 0, totalPassed = 0, totalPending = 0;
+      for (var id in stats){
+        if (!Object.prototype.hasOwnProperty.call(stats, id)) continue;
+        totalDone += stats[id].done;
+        totalPassed += stats[id].passed;
+        totalPending += stats[id].pending;
+      }
+      var avgRate = totalSlots > 0 ? Math.round(totalDone / totalSlots * 100) : 0;
+      ovLine.innerHTML =
+        '共 <b>' + days.length + '</b> 天 · 平均完成率 <b>' + avgRate + '%</b>' +
+        ' · 已过关 <b>' + totalPassed + '</b> · 待过关 <b>' + totalPending + '</b>';
+    } else {
+      var totalScore = 0;
+      for (var id2 in stats) if (Object.prototype.hasOwnProperty.call(stats, id2)) totalScore += stats[id2].score;
+      ovLine.innerHTML = '共 <b>' + days.length + '</b> 天 · 全班总得分 <b>' + totalScore + '</b>';
+    }
+
+    if (currentView === 'summary'){
+      if (mode === 'hw') renderHwSummaryTable(stats, days);
+      else renderCbSummaryTable(stats, days);
+    } else {
+      renderDetailTable(stats, days);
+    }
+  }
+
+  function renderHwSummaryTable(stats, days){
+    var total = days.length;
+    var ids = idsOf(currentClass);
+
+    var html = '<div class="sum-scroll"><table class="sum-table"><colgroup>'
+      + '<col style="width:34px">'
+      + '<col style="width:30px"><col style="width:30px"><col style="width:30px">'
+      + '<col style="width:26px"><col style="width:26px"><col style="width:26px"><col style="width:26px">'
+      + '<col style="width:36px"><col style="width:36px">'
+      + '<col style="width:48px">'
+      + '</colgroup><thead><tr>'
+      + '<th>学号</th><th>已交</th><th>缺交</th><th>未登</th>'
+      + '<th>A+</th><th>A</th><th>A−</th><th>B</th>'
+      + '<th>待过</th><th>已过</th>'
+      + '<th>完成率</th>'
+      + '</tr></thead><tbody>';
+
+    ids.forEach(function(id){
+      var r = stats[id];
+      var none = total - r.done - r.miss;
+      var rate = total > 0 ? Math.round(r.done / total * 100) : 0;
+      html += '<tr>'
+        + '<td class="td-id">' + id + '</td>'
+        + '<td class="td-done">' + r.done + '</td>'
+        + '<td class="td-miss">' + r.miss + '</td>'
+        + '<td class="td-none">' + none + '</td>'
+        + '<td class="td-ap">' + r.Aplus + '</td>'
+        + '<td class="td-a">' + r.A + '</td>'
+        + '<td class="td-am">' + r.Aminus + '</td>'
+        + '<td class="td-b">' + r.B + '</td>'
+        + '<td class="td-pending">' + r.pending + '</td>'
+        + '<td class="td-passed">' + r.passed + '</td>'
+        + '<td class="td-rate">' + rate + '%</td>'
+        + '</tr>';
+    });
+    html += '</tbody></table></div>';
+    summaryResult.innerHTML = html;
+  }
+
+  function renderCbSummaryTable(stats, days){
+    var ids = idsOf(currentClass);
+    var html = '<table class="sum-table"><colgroup>'
+      + '<col style="width:44px">'
+      + '<col style="width:52px"><col style="width:52px"><col style="width:52px">'
+      + '</colgroup><thead><tr>'
+      + '<th>学号</th><th>加分</th><th>扣分</th><th>总得分</th>'
+      + '</tr></thead><tbody>';
+    ids.forEach(function(id){
+      var r = stats[id];
+      var cls = r.score > 0 ? 'td-done' : (r.score < 0 ? 'td-miss' : 'td-none');
+      html += '<tr>'
+        + '<td class="td-id">' + id + '</td>'
+        + '<td class="td-done">' + r.plus + '</td>'
+        + '<td class="td-miss">' + r.minus + '</td>'
+        + '<td class="' + cls + '">' + (r.score > 0 ? '+' : '') + r.score + '</td>'
+        + '</tr>';
+    });
+    html += '</tbody></table>';
+    summaryResult.innerHTML = html;
+  }
+
+  function detailCellInfo(m, d){
+    if (m === 'hw'){
+      var st = d.st || 0;
+      var lv = d.lv || '';
+      if (st === 2) return {cls:'det-cell st2', txt:'✕'};
+      if (st === 1){
+        if (lv === 'A+') return {cls:'det-cell lv-ap', txt:'A+'};
+        if (lv === 'A')  return {cls:'det-cell lv-a', txt:'A'};
+        if (lv === 'A-') return {cls:'det-cell lv-am', txt:'A−'};
+        if (lv === 'B')  return {cls:'det-cell lv-b', txt:'B'};
+        return {cls:'det-cell st1', txt:'✓'};
+      }
+      return {cls:'det-cell st0', txt:''};
+    }
+    var v = d.v || 0;
+    if (v > 0) return {cls:'det-cell lv-a', txt:'+'+v};
+    if (v < 0) return {cls:'det-cell st2', txt:'−'+Math.abs(v)};
+    return {cls:'det-cell st0', txt:''};
+  }
+
+  function renderDetailTable(stats, days){
+    var ids = idsOf(currentClass);
+    var colWidths = '36px';
+    days.forEach(function(){ colWidths += ' 32px'; });
+
+    var html = '<div class="det-wrap"><div class="det-grid" style="grid-template-columns:' + colWidths + ';">';
+    html += '<div class="det-h det-h-id">学号</div>';
+    days.forEach(function(date){
+      html += '<div class="det-h">' + date.slice(5) + '</div>';
+    });
+
+    ids.forEach(function(id){
+      html += '<div class="det-name">' + id + '</div>';
+      days.forEach(function(date){
+        var c = stats[id].byDate[date] || { st: 0, lv: '', fx: 0, v: 0 };
+        var info = detailCellInfo(mode, c);
+        var fxDot = '';
+        if (mode === 'hw' && c.fx > 0){
+          fxDot = '<span class="det-fx" data-fx="' + c.fx + '"></span>';
+        }
+        html += '<div class="' + info.cls + '">' + info.txt + fxDot + '</div>';
+      });
+    });
+    html += '</div></div>';
+
+    var legend;
+    if (mode === 'hw'){
+      legend = '✓ 已交（未评等级） &nbsp; ✕ 缺交 &nbsp; 空白 未登记<br>'
+        + '<span style="color:#16a34a;font-weight:700;">A+</span> · '
+        + '<span style="color:#ca8a04;font-weight:700;">A</span> · '
+        + '<span style="color:#ea580c;font-weight:700;">A−</span> · '
+        + '<span style="color:#dc2626;font-weight:700;">B</span>'
+        + '<br>左下角小圆点：'
+        + '<span style="color:#d97706;font-weight:700;">● 待过关</span> · '
+        + '<span style="color:#16a34a;font-weight:700;">● 已过关</span>';
+    } else {
+      legend = '+N 加分 &nbsp; −N 扣分 &nbsp; 空白 未评价';
+    }
+    html += '<p style="font-size:11px;color:#9ca3af;text-align:center;margin:10px 0 0;line-height:1.8;">' + legend + '</p>';
+    summaryResult.innerHTML = html;
+  }
+
+  summaryBtn.addEventListener('click', openSummary);
+  summaryClose.addEventListener('click', closeSummary);
+  summaryMask.addEventListener('click', function(e){
+    if (e.target === summaryMask) closeSummary();
+  });
+  rangeStart.addEventListener('change', function(){
+    Array.prototype.forEach.call(quickRow.children, function(b){ b.classList.remove('active'); });
+    renderSummary();
+  });
+  rangeEnd.addEventListener('change', function(){
+    Array.prototype.forEach.call(quickRow.children, function(b){ b.classList.remove('active'); });
+    renderSummary();
+  });
+  Array.prototype.forEach.call(quickRow.children, function(btn){
+    btn.addEventListener('click', function(){
+      setQuickRange(btn.dataset.days);
+      renderSummary();
+    });
+  });
+  Array.prototype.forEach.call(viewToggle.children, function(btn){
+    btn.addEventListener('click', function(){
+      var v = btn.dataset.view;
+      if (v === currentView) return;
+      currentView = v;
+      Array.prototype.forEach.call(viewToggle.children, function(b){
+        b.classList.toggle('active', b === btn);
+      });
+      renderSummary();
+    });
+  });
+
+  document.addEventListener('keydown', function(e){
+    if (e.key !== 'Escape') return;
+    if (noteMask.classList.contains('show')) closeNoteEditor();
+    else if (summaryMask.classList.contains('show')) closeSummary();
+    else if (sheetMask.classList.contains('show')) closeSheet();
+  });
+
+  tabs.forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      var cls = tab.dataset.cls;
+      if (cls === currentClass) return;
+      closeSheet(); closeNoteEditor(); closeSummary();
+      currentClass = cls;
+      tabs.forEach(function (t) { t.classList.toggle('active', t === tab); });
+      buildGrid();
+      render();
+    });
+  });
+
+  modeBtns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var m = btn.dataset.mode;
+      if (m === mode) return;
+      closeSheet(); closeNoteEditor(); closeSummary();
+      mode = m;
+      modeBtns.forEach(function (b) { b.classList.toggle('active', b === btn); });
+      render();
+    });
+  });
+
+  datePicker.value = currentDate;
+  datePicker.addEventListener('change', function () {
+    if (!datePicker.value){ datePicker.value = currentDate; return; }
+    closeSheet(); closeNoteEditor(); closeSummary();
+    currentDate = datePicker.value;
+    render();
+  });
+
+  clearBtn.addEventListener('click', function () {
+    var d = data[currentDate];
+    var c = d && d[currentClass];
+    var name = mode === 'hw' ? '作业 & 改错过关' : '课堂表现';
+    var map;
+    if (mode === 'hw') map = c && c.hw;
+    else map = c && c.cb;
+    map = map || {};
+    var n = Object.keys(map).length;
+
+    if (n === 0){
+      alert('当前日期、当前班级的【' + name + '】还没有任何记录。');
+      return;
+    }
+
+    var msg = '确定要清空吗？\n\n'
+            + '日期：' + currentDate + '\n'
+            + '班级：' + currentClass + '班\n'
+            + '内容：' + name + '\n'
+            + '共 ' + n + ' 条记录\n\n'
+            + '清空后无法恢复！';
+
+    if (!confirm(msg)) return;
+
+    if (mode === 'hw'){
+      c.hw = {}; c.hwLv = {}; c.fix = {};
+    } else {
+      c.cb = {};
+    }
+    cleanup(currentDate, currentClass);
+    save();
+    render();
+  });
+
+  load();
+  datePicker.value = currentDate;
+  buildGrid();
+  render();
+
+})();
+</script>
+</body>
+</html>
