@@ -65,15 +65,60 @@
     box-shadow:0 2px 6px rgba(15,23,42,.15);
   }
 
-  .stats{display:flex;gap:6px;margin-top:10px;}
-  .stat{
-    flex:1;display:flex;align-items:center;justify-content:center;gap:5px;
-    background:#fff;border-radius:10px;padding:9px 4px;font-size:12px;color:#64748b;
-    box-shadow:0 1px 2px rgba(15,23,42,.04);font-weight:500;
+  .task-bar{
+    display:none;align-items:center;gap:6px;margin-top:8px;
   }
-  .stat b{font-size:15px;color:#0f172a;font-weight:700;margin-left:1px;}
-  .dot{width:8px;height:8px;border-radius:50%;flex:none;}
+  .task-bar.show{display:flex;}
+  .task-tabs{
+    display:flex;gap:4px;overflow-x:auto;-webkit-overflow-scrolling:touch;
+    flex:1;min-width:0;padding:2px 0;
+  }
+  .task-tabs::-webkit-scrollbar{display:none;}
+  .task-tab{
+    display:inline-flex;align-items:center;gap:5px;
+    padding:7px 10px;border:1px solid #e2e8f0;border-radius:9px;
+    background:#fff;font:inherit;font-size:13px;font-weight:600;
+    color:#64748b;cursor:pointer;white-space:nowrap;flex:none;
+    transition:all .12s;
+    -webkit-user-select:none;user-select:none;
+  }
+  .task-tab:active{transform:scale(.96);}
+  .task-tab.active{
+    background:#0f172a;border-color:#0f172a;color:#fff;
+    box-shadow:0 2px 6px rgba(15,23,42,.15);
+  }
+  .task-tab .task-del{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:16px;height:16px;border-radius:4px;
+    background:rgba(100,116,139,.14);color:inherit;
+    font-size:12px;font-weight:700;line-height:1;
+    transition:background .12s;
+  }
+  .task-tab.active .task-del{background:rgba(255,255,255,.22);}
+  .task-tab .task-del:active{background:rgba(220,38,38,.5);color:#fff;}
+  .task-add-btn{
+    flex:none;padding:7px 12px;
+    border:1.5px dashed #cbd5e1;border-radius:9px;
+    background:transparent;font:inherit;font-size:13px;font-weight:600;
+    color:#64748b;cursor:pointer;white-space:nowrap;
+    transition:background .12s;
+    -webkit-user-select:none;user-select:none;
+  }
+  .task-add-btn:active{background:#f1f5f9;}
+
+  /* 顶部统计：4 格 */
+  .stats{display:flex;gap:5px;margin-top:10px;}
+  .stat{
+    flex:1;display:flex;align-items:center;justify-content:center;gap:4px;
+    background:#fff;border-radius:10px;padding:9px 2px;font-size:11px;color:#64748b;
+    box-shadow:0 1px 2px rgba(15,23,42,.04);font-weight:500;
+    min-width:0;
+  }
+  .stat b{font-size:14px;color:#0f172a;font-weight:700;margin-left:1px;}
+  .stat span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .dot{width:7px;height:7px;border-radius:50%;flex:none;}
   .dot.d1{background:#22c55e;}
+  .dot.dL{background:#f59e0b;}
   .dot.d2{background:#b91c1c;}
   .dot.d0{background:#cbd5e1;}
 
@@ -230,6 +275,7 @@
   .grid.mode-hw .cell[data-state="1"][data-lv="A-"]{background:#f97316;color:#fff;}
   .grid.mode-hw .cell[data-state="1"][data-lv="B"]{background:#ef4444;color:#fff;}
   .grid.mode-hw .cell[data-state="2"]{background:#b91c1c;color:#fff;}
+  .grid.mode-hw .cell[data-state="3"]{background:#f59e0b;color:#fff;}
 
   .grid.mode-cb .cell[data-state="0"]{background:#eef0f4;color:#64748b;}
   .grid.mode-cb .cell[data-state="1"]{background:#22c55e;color:#fff;}
@@ -245,11 +291,15 @@
 
   .cell .sc{
     position:absolute;top:2px;right:4px;display:none;
-    font-size:10px;font-weight:700;line-height:1;
+    font-size:10px;font-weight:800;line-height:1;
     color:rgba(255,255,255,.95);pointer-events:none;
+    letter-spacing:-.3px;
   }
   .cell .sc.show{display:block;}
-  .cell[data-state="0"] .sc{color:#94a3b8;}
+  .cell .sc.sc-pos{color:#fff;text-shadow:0 0 3px rgba(0,0,0,.25);}
+  .cell .sc.sc-neg{color:#fff;text-shadow:0 0 3px rgba(0,0,0,.3);}
+  .cell .sc.sc-zero{color:#94a3b8;}
+  .cell[data-state="0"] .sc{color:#94a3b8;text-shadow:none;}
 
   .cell .fx-dot{
     position:absolute;left:3px;bottom:3px;
@@ -260,6 +310,7 @@
   .grid.mode-hw .cell .fx-dot.show{display:block;}
   .grid.mode-hw .cell[data-fix="1"] .fx-dot{background:#f59e0b;}
   .grid.mode-hw .cell[data-fix="2"] .fx-dot{background:#22c55e;}
+  .grid.mode-hw .cell[data-fix="3"] .fx-dot{background:#86efac;}
 
   .hint{margin:12px 0 0;text-align:center;font-size:11px;color:#94a3b8;line-height:1.9;}
   .hint b{color:#64748b;}
@@ -331,9 +382,9 @@
   }
   .seg-row{display:flex;gap:6px;}
   .seg-btn{
-    flex:1;padding:11px 4px;
+    flex:1;padding:11px 2px;
     border:1.5px solid #e2e8f0;background:#fff;border-radius:10px;
-    font:inherit;font-size:14px;font-weight:700;
+    font:inherit;font-size:13px;font-weight:700;
     color:#64748b;cursor:pointer;transition:all .12s;
     -webkit-user-select:none;user-select:none;
     min-width:0;white-space:nowrap;
@@ -341,6 +392,7 @@
   .seg-btn:active{transform:scale(.96);}
 
   .seg-btn[data-hw="1"].active{background:#22c55e;border-color:#22c55e;color:#fff;}
+  .seg-btn[data-hw="3"].active{background:#f59e0b;border-color:#f59e0b;color:#fff;}
   .seg-btn[data-hw="2"].active{background:#b91c1c;border-color:#b91c1c;color:#fff;}
   .seg-btn[data-hw="0"].active{background:#94a3b8;border-color:#94a3b8;color:#fff;}
 
@@ -356,6 +408,20 @@
 
   .seg-row.disabled .seg-btn{opacity:.4;pointer-events:none;}
   .sheet-hint{font-size:11px;color:#94a3b8;margin:-2px 0 8px 2px;line-height:1.6;}
+  .sheet-hint.good{color:#16a34a;font-weight:600;}
+
+  .sheet-pts{
+    display:flex;align-items:center;justify-content:center;gap:6px;
+    padding:10px;background:#f8fafc;border-radius:10px;
+    font-size:13px;font-weight:600;color:#475569;
+    margin-bottom:14px;
+  }
+  .sheet-pts .num{
+    font-size:18px;font-weight:800;letter-spacing:-.3px;
+  }
+  .sheet-pts .num.pos{color:#16a34a;}
+  .sheet-pts .num.neg{color:#dc2626;}
+  .sheet-pts .num.zero{color:#94a3b8;}
 
   .view-profile-btn{
     display:flex;align-items:center;justify-content:center;gap:6px;
@@ -503,7 +569,6 @@
   .a-reason.danger{background:#fee2e2;color:#991b1b;}
   .a-reason.warn{background:#fef3c7;color:#92400e;}
 
-  /* 视图切换（3 个视图） */
   .view-toggle{
     display:flex;background:#eef0f4;border-radius:9px;padding:3px;gap:3px;
     margin-bottom:12px;
@@ -516,7 +581,6 @@
   .view-toggle button.active{background:#fff;color:#0f172a;box-shadow:0 1px 2px rgba(15,23,42,.08);}
   .summary-result{min-height:120px;}
 
-  /* ============ 积分榜 ============ */
   .rank-summary{
     display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;
   }
@@ -553,30 +617,21 @@
     display:inline-flex;align-items:center;justify-content:center;
     width:24px;height:24px;border-radius:8px;
     font-size:12px;font-weight:800;
-    background:#eef0f4;color:#64748b;
-    flex:none;
+    background:#eef0f4;color:#64748b;flex:none;
   }
   .rank-badge.top1{
     background:linear-gradient(135deg,#fbbf24,#f59e0b);
     color:#fff;box-shadow:0 2px 8px rgba(245,158,11,.4);
   }
-  .rank-badge.top2{
-    background:linear-gradient(135deg,#cbd5e1,#94a3b8);
-    color:#fff;
-  }
-  .rank-badge.top3{
-    background:linear-gradient(135deg,#d4a574,#b87148);
-    color:#fff;
-  }
+  .rank-badge.top2{background:linear-gradient(135deg,#cbd5e1,#94a3b8);color:#fff;}
+  .rank-badge.top3{background:linear-gradient(135deg,#d4a574,#b87148);color:#fff;}
 
   .rank-name{
     font-size:14px;font-weight:700;color:#0f172a;
     overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
     min-width:0;
   }
-  .rank-name small{
-    font-size:11px;color:#94a3b8;font-weight:500;margin-left:5px;
-  }
+  .rank-name small{font-size:11px;color:#94a3b8;font-weight:500;margin-left:5px;}
   .rank-breakdown{
     font-size:10px;color:#94a3b8;font-weight:500;
     white-space:nowrap;text-align:right;
@@ -588,8 +643,7 @@
   .rank-score{
     font-size:17px;font-weight:800;
     min-width:52px;text-align:right;
-    color:#0f172a;
-    letter-spacing:-.3px;
+    color:#0f172a;letter-spacing:-.3px;
   }
   .rank-score.pos{color:#16a34a;}
   .rank-score.neg{color:#dc2626;}
@@ -602,7 +656,7 @@
 
   .sum-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
   .sum-table{
-    width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px;min-width:520px;
+    width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px;min-width:620px;
     background:#fff;border-radius:10px;overflow:hidden;
     box-shadow:0 1px 2px rgba(15,23,42,.04);
   }
@@ -619,6 +673,7 @@
   .td-id{color:#64748b;font-weight:500;}
   .td-name{color:#334155;font-weight:600;font-size:11px;text-align:left;padding-left:6px;}
   .td-done{color:#16a34a;}
+  .td-late{color:#d97706;}
   .td-miss{color:#b91c1c;}
   .td-none{color:#cbd5e1;}
   .td-ap{color:#16a34a;}
@@ -628,6 +683,11 @@
   .td-pending{color:#d97706;}
   .td-passed{color:#16a34a;}
   .td-rate{color:#64748b;font-size:11px;}
+  .td-hwpts{color:#16a34a;}
+  .td-cbpts{color:#0891b2;}
+  .td-totalpts{color:#0f172a;font-weight:800;}
+  .td-hwpts.neg,.td-cbpts.neg,.td-totalpts.neg{color:#dc2626;}
+  .td-hwpts.zero,.td-cbpts.zero,.td-totalpts.zero{color:#cbd5e1;font-weight:600;}
 
   .det-wrap{
     overflow-x:auto;-webkit-overflow-scrolling:touch;
@@ -640,26 +700,24 @@
   .det-name{
     font-size:11px;font-weight:600;color:#334155;
     display:flex;align-items:center;padding-left:5px;white-space:nowrap;
+    height:26px;
   }
   .det-name .det-id{font-size:9px;color:#94a3b8;margin-right:3px;}
   .det-cell{
-    position:relative;display:flex;align-items:center;justify-content:center;
-    height:26px;font-size:10px;font-weight:700;border-radius:4px;
+    display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    gap:1px;height:26px;border-radius:4px;
+    padding:2px 0;background:#f8fafc;
   }
-  .det-cell.st0{background:#f1f5f9;color:#cbd5e1;}
-  .det-cell.st1{background:#bbf7d0;color:#065f46;}
-  .det-cell.st2{background:#fecaca;color:#b91c1c;}
-  .det-cell.lv-ap{background:#22c55e;color:#fff;}
-  .det-cell.lv-a{background:#eab308;color:#fff;}
-  .det-cell.lv-am{background:#f97316;color:#fff;}
-  .det-cell.lv-b{background:#ef4444;color:#fff;}
-  .det-fx{
-    position:absolute;left:2px;bottom:2px;
-    width:5px;height:5px;border-radius:50%;
-    box-shadow:0 0 0 1px rgba(255,255,255,.85);
-  }
-  .det-fx[data-fx="1"]{background:#f59e0b;}
-  .det-fx[data-fx="2"]{background:#22c55e;}
+  .det-dot{width:18px;height:3px;border-radius:1.5px;flex:none;}
+  .d-ap{background:#22c55e;}
+  .d-a{background:#eab308;}
+  .d-am{background:#f97316;}
+  .d-b{background:#ef4444;}
+  .d-late{background:#f59e0b;}
+  .d-done{background:#bbf7d0;}
+  .d-miss{background:#b91c1c;}
+  .d-none{background:#e2e8f0;}
   .empty{text-align:center;color:#94a3b8;font-size:13px;padding:30px 0;}
 
   .summary-footer{
@@ -763,19 +821,14 @@
   .st-lv-item b{font-size:15px;font-weight:700;color:#0f172a;}
   .st-lv-item b.zero{color:#cbd5e1;}
   .st-trend{display:flex;flex-wrap:wrap;gap:4px;}
-  .trend-cell{
+  .trend-day{
     width:26px;height:26px;border-radius:6px;
-    display:flex;align-items:center;justify-content:center;
-    font-size:9px;font-weight:800;line-height:1;
-    color:#fff;letter-spacing:-.5px;flex:none;
+    background:#f1f5f9;
+    display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    gap:1px;padding:2px 0;flex:none;
   }
-  .trend-cell.st0{background:#eef0f4;color:#cbd5e1;font-size:11px;}
-  .trend-cell.st1{background:#bbf7d0;color:#065f46;font-size:11px;}
-  .trend-cell.st2{background:#fecaca;color:#b91c1c;font-size:11px;}
-  .trend-cell.lv-ap{background:#22c55e;}
-  .trend-cell.lv-a{background:#eab308;}
-  .trend-cell.lv-am{background:#f97316;}
-  .trend-cell.lv-b{background:#ef4444;}
+  .trend-day .td-dot{width:16px;height:3px;border-radius:1.5px;}
   .st-legend{display:flex;flex-wrap:wrap;gap:10px;font-size:10px;color:#94a3b8;margin-top:10px;line-height:1.6;}
   .st-legend .li{display:inline-flex;align-items:center;gap:4px;}
   .st-legend .sw{width:10px;height:10px;border-radius:3px;flex:none;}
@@ -788,7 +841,6 @@
   .st-cb-row .lbl{color:#475569;font-weight:500;}
   .st-cb-row .val{color:#0f172a;font-weight:700;}
 
-  /* 跨班对比 */
   .compare-mask{
     position:fixed;left:0;top:0;right:0;bottom:0;z-index:3800;
     background:rgba(15,23,42,.45);
@@ -859,8 +911,6 @@
   }
   .cmp-rate-num i{font-style:normal;font-size:16px;font-weight:700;color:#64748b;margin-left:2px;letter-spacing:0;}
   .cmp-rate-label{font-size:12px;color:#94a3b8;font-weight:500;}
-  .cmp-bar-wrap{width:100%;height:7px;background:#eef0f4;border-radius:4px;overflow:hidden;margin-bottom:10px;}
-  .cmp-bar{height:100%;border-radius:4px;transition:width .6s cubic-bezier(.2,.8,.3,1);}
   .cmp-metrics{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:#64748b;margin-bottom:8px;}
   .cmp-metrics b{color:#0f172a;font-weight:700;margin-left:3px;}
   .cmp-levels{
@@ -873,7 +923,6 @@
   .cmp-lv b{color:#0f172a;font-weight:700;}
   .cmp-empty{text-align:center;color:#94a3b8;font-size:13px;padding:30px 0;}
 
-  /* 设置面板 */
   .settings-mask{
     position:fixed;left:0;top:0;right:0;bottom:0;z-index:4000;
     background:rgba(15,23,42,.45);
@@ -986,11 +1035,8 @@
 
   .semester-row{display:flex;align-items:center;gap:10px;padding:6px 0;}
   .semester-row label{font-size:14px;font-weight:600;color:#334155;flex:1;}
-  .semester-row input[type="date"]{
-    flex:0 0 160px;height:38px;font-size:14px;
-  }
+  .semester-row input[type="date"]{flex:0 0 160px;height:38px;font-size:14px;}
 
-  /* 分类导出面板 */
   .export-mask{
     position:fixed;left:0;top:0;right:0;bottom:0;z-index:3500;
     background:rgba(15,23,42,.45);
@@ -1098,11 +1144,15 @@
     .cell{font-size:14px;border-radius:9px;min-height:44px;}
     .grid.show-names .cell .c-name{font-size:11px;}
     .tab{padding:7px 12px;font-size:13px;}
-    .stat{font-size:11px;}
+    .stat{font-size:10px;padding:9px 1px;gap:3px;}
+    .stat b{font-size:13px;}
+    .dot{width:6px;height:6px;}
     .mode{font-size:12px;padding:9px 4px;}
+    .task-tab{font-size:12px;padding:6px 8px;}
+    .task-add-btn{font-size:12px;padding:6px 10px;}
     .lvbar .item{font-size:11px;}
     .fixbar .item{font-size:11px;}
-    .seg-btn{font-size:13px;padding:10px 2px;}
+    .seg-btn{font-size:12px;padding:10px 1px;}
     .sum-table{font-size:11px;}
     .tool-btn{padding:0 10px;font-size:12px;height:38px;}
     .tool-row .search-input{font-size:12px;height:38px;}
@@ -1113,7 +1163,8 @@
     .action-sm .ico{font-size:13px;}
     .export-cat-name{font-size:12px;}
     .export-list{font-size:11px;}
-    .trend-cell{width:22px;height:22px;font-size:8px;}
+    .trend-day{width:22px;height:22px;border-radius:5px;}
+    .trend-day .td-dot{width:13px;height:3px;}
     .st-card .st-value{font-size:22px;}
     .st-levels{gap:4px;}
     .st-lv-item{padding:7px 1px;}
@@ -1127,6 +1178,9 @@
     .rank-score{font-size:15px;min-width:44px;}
     .rank-breakdown{font-size:9px;}
     .rank-sum-card .rs-num{font-size:17px;}
+    .cell .sc{font-size:9px;}
+    .det-cell{height:22px;}
+    .det-dot{width:14px;height:3px;}
   }
 </style>
 </head>
@@ -1146,8 +1200,14 @@
     <button class="mode" data-mode="cb" type="button">课堂表现</button>
   </div>
 
+  <div class="task-bar" id="taskBar">
+    <div class="task-tabs" id="taskTabs"></div>
+    <button class="task-add-btn" id="taskAddBtn" type="button">+ 添加作业</button>
+  </div>
+
   <div class="stats" id="stats">
     <div class="stat"><span class="dot d1"></span><span id="lblA">已交</span><b id="cntA">0</b></div>
+    <div class="stat"><span class="dot dL"></span><span id="lblLate">迟交</span><b id="cntLate">0</b></div>
     <div class="stat"><span class="dot d2"></span><span id="lblB">缺交</span><b id="cntB">0</b></div>
     <div class="stat"><span class="dot d0"></span><span id="lblC">未登记</span><b id="cntC">0</b></div>
   </div>
@@ -1166,10 +1226,10 @@
 
   <div class="note-card" id="noteCard">
     <div class="note-head">
-      <span class="ttl">📝 今日作业</span>
+      <span class="ttl" id="noteTitle">📝 作业1 内容</span>
       <button class="note-edit" id="noteEditBtn" type="button">编辑</button>
     </div>
-    <div class="note-body empty" id="noteBody">点击“编辑”填写今日作业内容</div>
+    <div class="note-body empty" id="noteBody">点击"编辑"填写本次作业内容</div>
   </div>
 
   <div class="tool-row" id="toolRow">
@@ -1219,24 +1279,25 @@
 
 </div>
 
-<!-- 作业 & 改错面板 -->
 <div class="sheet-mask" id="sheetMask">
   <div class="sheet" id="sheet">
     <div class="sheet-head">
-      <span class="sn" id="sheetNum">3 号</span>
+      <span class="sn" id="sheetNum">作业1 · 3 号</span>
       <button class="sheet-close" id="sheetClose" type="button" aria-label="关闭">✕</button>
     </div>
+    <div class="sheet-pts" id="sheetPts">今日总分：<span class="num zero" id="sheetPtsNum">0</span></div>
     <div class="sheet-group">
       <div class="group-label">作业状态</div>
       <div class="seg-row" id="hwSeg">
         <button class="seg-btn" type="button" data-hw="1">已交</button>
+        <button class="seg-btn" type="button" data-hw="3">迟交</button>
         <button class="seg-btn" type="button" data-hw="2">缺交</button>
         <button class="seg-btn" type="button" data-hw="0">未登记</button>
       </div>
     </div>
     <div class="sheet-group">
       <div class="group-label">作业等级</div>
-      <div class="sheet-hint">仅“已交”状态下可选</div>
+      <div class="sheet-hint">仅"已交"状态下可选（迟交、缺交不评等级）</div>
       <div class="seg-row" id="lvSeg">
         <button class="seg-btn" type="button" data-lv="A+">A+</button>
         <button class="seg-btn" type="button" data-lv="A">A</button>
@@ -1247,6 +1308,7 @@
     </div>
     <div class="sheet-group">
       <div class="group-label">改错过关</div>
+      <div class="sheet-hint" id="fixHint">A+ 已交的学生自动视为「免过关」</div>
       <div class="seg-row" id="fixSeg">
         <button class="seg-btn" type="button" data-fix="1">待过关</button>
         <button class="seg-btn" type="button" data-fix="2">已过关</button>
@@ -1261,11 +1323,10 @@
   </div>
 </div>
 
-<!-- 作业内容编辑 -->
 <div class="note-mask" id="noteMask">
   <div class="note-dialog">
     <div class="note-dialog-head">
-      <span>编辑今日作业</span>
+      <span id="noteDialogTitle">编辑作业内容</span>
       <button class="note-close" id="noteClose" type="button" aria-label="关闭">✕</button>
     </div>
     <textarea id="noteInput" placeholder="例如：&#10;数学：P23 第1-5题&#10;语文：背诵《静夜思》&#10;英语：抄写单词 Unit 3"></textarea>
@@ -1276,7 +1337,6 @@
   </div>
 </div>
 
-<!-- 汇总统计（含积分榜） -->
 <div class="summary-mask" id="summaryMask">
   <div class="summary-panel">
     <div class="summary-head">
@@ -1318,7 +1378,6 @@
   </div>
 </div>
 
-<!-- 跨班对比 -->
 <div class="compare-mask" id="compareMask">
   <div class="compare-panel">
     <div class="compare-head">
@@ -1338,7 +1397,6 @@
   </div>
 </div>
 
-<!-- 学生档案 -->
 <div class="student-mask" id="studentMask">
   <div class="student-panel">
     <div class="student-head">
@@ -1355,7 +1413,6 @@
   </div>
 </div>
 
-<!-- 分类导出 -->
 <div class="export-mask" id="exportMask">
   <div class="export-panel">
     <div class="export-head">
@@ -1376,7 +1433,6 @@
   </div>
 </div>
 
-<!-- 设置面板 -->
 <div class="settings-mask" id="settingsMask">
   <div class="settings-panel">
     <div class="settings-head">
@@ -1400,7 +1456,11 @@
         <div class="section-label">积分规则（固定）</div>
         <div class="section-hint" style="font-size:12px;line-height:2;">
           A+ <b>+2</b> &nbsp; A <b>+1</b> &nbsp; A− <b>0</b> &nbsp; B <b>-1</b><br>
+          <span style="color:#d97706;font-weight:700;">迟交 <b>-1</b></span> &nbsp;
           缺交 <b>-2</b> &nbsp; 过关 <b>+1</b> &nbsp; 待过关 <b>0</b><br>
+          A+ 自动免过关（不额外加分）<br>
+          迟交算作"已交"，不计入缺交<br>
+          多条作业按实际条数累加<br>
           课堂表现：按实际加减分计算
         </div>
       </div>
@@ -1468,13 +1528,14 @@
 
   var LV_LABEL = { 'A+':'A+', 'A':'A', 'A-':'A\u2212', 'B':'B' };
 
-  /* ============ 积分规则 ============ */
+  /* 积分规则：迟交 = -1 */
   var POINTS = {
     'A+': 2,
     'A': 1,
     'A-': 0,
     'B': -1,
     'miss': -2,
+    'late': -1,
     'passed': 1,
     'pending': 0
   };
@@ -1487,17 +1548,13 @@
   function makeRoster(ids){
     return ids.map(function(id){ return { id: id, name: '' }; });
   }
-
-  /* 默认学期起始日 */
   function defaultSemesterStart(){
     var d = new Date();
     var y = d.getFullYear();
     var m = d.getMonth() + 1;
-    // 9-12月 → 今年9月1日；1-8月 → 去年9月1日
     if (m >= 9) return y + '-09-01';
     return (y - 1) + '-09-01';
   }
-
   function defaultConfig(){
     return {
       showNames: false,
@@ -1514,6 +1571,7 @@
   var currentClass = '14';
   var currentDate  = todayStr();
   var mode = 'hw';
+  var currentTaskIdx = 0;
   var cells = [];
   var activeId = null;
   var undoStack = [];
@@ -1523,7 +1581,7 @@
   var profileStudentId = null;
   var profileRange = 30;
 
-  var currentView = 'rank';   // 默认打开积分榜
+  var currentView = 'rank';
   var currentQuick = 'week';
   var searchTimer = null;
   var highlightTimer = null;
@@ -1680,6 +1738,27 @@
     }
   }
 
+  /* ============================================================
+     v21 数据结构
+     data[date][cls] = {
+        hwTasks: [ { hw:{0|1|2|3}, hwLv:{}, fix:{0|1|2}, note:'' }, ... ],
+        cb: { id -> 分 }
+     }
+     hw 状态：0未登记 / 1已交 / 2缺交 / 3迟交
+     ============================================================ */
+
+  function newEmptyTask(){
+    return { hw: {}, hwLv: {}, fix: {}, note: '' };
+  }
+  function taskHasData(t){
+    if (!t) return false;
+    if (t.hw && Object.keys(t.hw).length > 0) return true;
+    if (t.hwLv && Object.keys(t.hwLv).length > 0) return true;
+    if (t.fix && Object.keys(t.fix).length > 0) return true;
+    if (t.note) return true;
+    return false;
+  }
+
   function load(){
     try{
       var raw = localStorage.getItem(KEY);
@@ -1690,74 +1769,138 @@
   function save(){
     try{ localStorage.setItem(KEY, JSON.stringify(data)); }catch(e){}
   }
+
+  function migrateData(){
+    var migrated = false;
+    Object.keys(data).forEach(function(date){
+      var day = data[date];
+      if (!day || typeof day !== 'object') return;
+      Object.keys(day).forEach(function(cls){
+        var c = day[cls];
+        if (!c || typeof c !== 'object') return;
+        if (Array.isArray(c.hwTasks)) return;
+        var t = newEmptyTask();
+        if (c.hw)   t.hw   = c.hw;
+        if (c.hwLv) t.hwLv = c.hwLv;
+        if (c.fix)  t.fix  = c.fix;
+        if (c.note) t.note = c.note;
+        var nc = { hwTasks: [t] };
+        if (c.cb) nc.cb = c.cb;
+        day[cls] = nc;
+        migrated = true;
+      });
+    });
+    if (migrated) save();
+  }
+
   function ensure(date, cls){
     if (!data[date]) data[date] = {};
     if (!data[date][cls]) data[date][cls] = {};
     var c = data[date][cls];
-    if (!c.hw)   c.hw = {};
-    if (!c.cb)   c.cb = {};
-    if (!c.hwLv) c.hwLv = {};
-    if (!c.fix)  c.fix = {};
+    if (!Array.isArray(c.hwTasks) || c.hwTasks.length === 0){
+      c.hwTasks = [newEmptyTask()];
+    }
+    if (!c.cb) c.cb = {};
     return c;
   }
+
   function cleanup(date, cls){
     var d = data[date]; if (!d) return;
     var c = d[cls];     if (!c) return;
-    var e1 = !c.hw   || Object.keys(c.hw).length === 0;
-    var e2 = !c.cb   || Object.keys(c.cb).length === 0;
-    var e3 = !c.hwLv || Object.keys(c.hwLv).length === 0;
-    var e4 = !c.fix  || Object.keys(c.fix).length === 0;
-    var e5 = !c.note;
-    if (e1 && e2 && e3 && e4 && e5){
+    var tasksEmpty = !Array.isArray(c.hwTasks) || c.hwTasks.length === 0 ||
+                     c.hwTasks.every(function(t){ return !taskHasData(t); });
+    var cbEmpty = !c.cb || Object.keys(c.cb).length === 0;
+    if (tasksEmpty && cbEmpty){
       delete d[cls];
       if (Object.keys(d).length === 0) delete data[date];
     }
   }
-  function getHw(date, cls, id){
-    var d = data[date]; if (!d) return 0;
-    var c = d[cls];     if (!c || !c.hw) return 0;
-    var v = c.hw[id];
-    return (v === 1 || v === 2) ? v : 0;
+
+  function peekTasks(date, cls){
+    var d = data[date];
+    var c = d && d[cls];
+    if (!c || !Array.isArray(c.hwTasks)) return null;
+    return c.hwTasks;
   }
-  function setHw(date, cls, id, st){
+  function peekTask(date, cls, ti){
+    var tasks = peekTasks(date, cls);
+    if (!tasks || tasks.length === 0) return null;
+    if (ti < 0 || ti >= tasks.length) return null;
+    return tasks[ti];
+  }
+  function clampTaskIdx(ti, tasks){
+    if (!tasks || tasks.length === 0) return 0;
+    if (ti < 0) return 0;
+    if (ti >= tasks.length) return tasks.length - 1;
+    return ti;
+  }
+
+  /* A+ 自动免过关 */
+  function autoFix(hw, lv, fx){
+    if (fx === 1 || fx === 2) return fx;
+    if (hw === 1 && lv === 'A+') return 3;
+    return 0;
+  }
+
+  /* hw 值合法范围：0/1/2/3 */
+  function normHw(v){ return (v === 1 || v === 2 || v === 3) ? v : 0; }
+
+  function getHw(date, cls, id, ti){
+    var t = peekTask(date, cls, ti);
+    if (!t || !t.hw) return 0;
+    return normHw(t.hw[id]);
+  }
+  function setHw(date, cls, id, st, ti){
+    st = normHw(st);
     if (st === 0){
-      var d = data[date]; if (!d) return;
-      var c = d[cls];     if (!c) return;
-      if (c.hw)   delete c.hw[id];
-      if (c.hwLv) delete c.hwLv[id];
+      var t = peekTask(date, cls, ti);
+      if (!t) return;
+      if (t.hw)   delete t.hw[id];
+      if (t.hwLv) delete t.hwLv[id];
       cleanup(date, cls); save(); return;
     }
-    var cc = ensure(date, cls);
-    cc.hw[id] = st;
-    if (st !== 1 && cc.hwLv) delete cc.hwLv[id];
-    save();
-  }
-  function getLv(date, cls, id){
-    var d = data[date]; if (!d) return '';
-    var c = d[cls];     if (!c || !c.hwLv) return '';
-    return c.hwLv[id] || '';
-  }
-  function setLv(date, cls, id, lv){
     var c = ensure(date, cls);
-    if (!lv){ delete c.hwLv[id]; cleanup(date, cls); }
-    else { c.hwLv[id] = lv; }
+    var task = c.hwTasks[clampTaskIdx(ti, c.hwTasks)];
+    task.hw[id] = st;
+    // 只有已交(1)才保留等级；迟交、缺交清空等级
+    if (st !== 1 && task.hwLv) delete task.hwLv[id];
     save();
   }
-  function getFix(date, cls, id){
-    var d = data[date]; if (!d) return 0;
-    var c = d[cls];     if (!c || !c.fix) return 0;
-    var v = c.fix[id];
+  function getLv(date, cls, id, ti){
+    var t = peekTask(date, cls, ti);
+    if (!t || !t.hwLv) return '';
+    return t.hwLv[id] || '';
+  }
+  function setLv(date, cls, id, lv, ti){
+    var c = ensure(date, cls);
+    var task = c.hwTasks[clampTaskIdx(ti, c.hwTasks)];
+    if (!lv){ delete task.hwLv[id]; cleanup(date, cls); }
+    else { task.hwLv[id] = lv; }
+    save();
+  }
+  function getFix(date, cls, id, ti){
+    var t = peekTask(date, cls, ti);
+    if (!t || !t.fix) return 0;
+    var v = t.fix[id];
     return (v === 1 || v === 2) ? v : 0;
   }
-  function setFix(date, cls, id, st){
+  function setFix(date, cls, id, st, ti){
     if (st === 0){
-      var d = data[date]; if (!d) return;
-      var c = d[cls];     if (!c) return;
-      if (c.fix) delete c.fix[id];
+      var t = peekTask(date, cls, ti);
+      if (!t) return;
+      if (t.fix) delete t.fix[id];
       cleanup(date, cls); save(); return;
     }
-    ensure(date, cls).fix[id] = st;
+    var c = ensure(date, cls);
+    var task = c.hwTasks[clampTaskIdx(ti, c.hwTasks)];
+    task.fix[id] = st;
     save();
+  }
+  function getFixDisplay(date, cls, id, ti){
+    var hw = getHw(date, cls, id, ti);
+    var lv = (hw === 1) ? getLv(date, cls, id, ti) : '';
+    var fx = getFix(date, cls, id, ti);
+    return autoFix(hw, lv, fx);
   }
   function getCb(date, cls, id){
     var d = data[date]; if (!d) return 0;
@@ -1775,28 +1918,27 @@
     ensure(date, cls).cb[id] = v;
     save();
   }
-  function getNote(date, cls){
-    var d = data[date]; if (!d) return '';
-    var c = d[cls];     if (!c) return '';
-    return c.note || '';
+  function getNote(date, cls, ti){
+    var t = peekTask(date, cls, ti);
+    return t ? (t.note || '') : '';
   }
-  function setNote(date, cls, text){
+  function setNote(date, cls, text, ti){
     var c = ensure(date, cls);
+    var task = c.hwTasks[clampTaskIdx(ti, c.hwTasks)];
     if (!text || !text.trim()){
-      delete c.note; cleanup(date, cls);
-    } else { c.note = text; }
+      delete task.note;
+      cleanup(date, cls);
+    } else { task.note = text; }
     save();
   }
 
+  /* ================= 撤销 ================= */
   function pushUndo(){
     var c = data[currentDate] && data[currentDate][currentClass];
     var snap = {
       date: currentDate, cls: currentClass,
-      hw:   c && c.hw   ? JSON.parse(JSON.stringify(c.hw))   : {},
-      hwLv: c && c.hwLv ? JSON.parse(JSON.stringify(c.hwLv)) : {},
-      cb:   c && c.cb   ? JSON.parse(JSON.stringify(c.cb))   : {},
-      fix:  c && c.fix  ? JSON.parse(JSON.stringify(c.fix))  : {},
-      note: c && c.note ? c.note : ''
+      hwTasks: (c && Array.isArray(c.hwTasks)) ? JSON.parse(JSON.stringify(c.hwTasks)) : null,
+      cb:      (c && c.cb) ? JSON.parse(JSON.stringify(c.cb)) : null
     };
     undoStack.push(snap);
     if (undoStack.length > UNDO_LIMIT) undoStack.shift();
@@ -1808,33 +1950,113 @@
     if (!data[snap.date]) data[snap.date] = {};
     var c = data[snap.date][snap.cls];
     if (!c) c = data[snap.date][snap.cls] = {};
-    c.hw = snap.hw;
-    c.hwLv = snap.hwLv;
-    c.cb = snap.cb;
-    c.fix = snap.fix;
-    if (snap.note) c.note = snap.note;
-    else delete c.note;
+    if (snap.hwTasks) c.hwTasks = snap.hwTasks; else delete c.hwTasks;
+    if (snap.cb)      c.cb      = snap.cb;      else delete c.cb;
     cleanup(snap.date, snap.cls);
     save();
     updateUndoBtn();
+    currentTaskIdx = clampTaskIdx(currentTaskIdx, peekTasks(currentDate, currentClass));
     render();
     showToast('已撤销');
   }
   function clearUndo(){ undoStack = []; updateUndoBtn(); }
 
-  function currentHwMap(){ var d = data[currentDate]; if (!d) return {}; var c = d[currentClass]; if (!c) return {}; return c.hw || {}; }
-  function currentLvMap(){ var d = data[currentDate]; if (!d) return {}; var c = d[currentClass]; if (!c) return {}; return c.hwLv || {}; }
-  function currentFixMap(){ var d = data[currentDate]; if (!d) return {}; var c = d[currentClass]; if (!c) return {}; return c.fix || {}; }
-  function currentCbMap(){ var d = data[currentDate]; if (!d) return {}; var c = d[currentClass]; if (!c) return {}; return c.cb || {}; }
+  /* ================= 今日得分 ================= */
+  function calcDailyHwPoints(id){
+    var tasks = peekTasks(currentDate, currentClass);
+    if (!tasks || tasks.length === 0) return 0;
+    var p = 0;
+    tasks.forEach(function(t){
+      var st = t.hw ? normHw(t.hw[id]) : 0;
+      var lv = (st === 1 && t.hwLv) ? (t.hwLv[id] || '') : '';
+      var fx = t.fix ? (t.fix[id] || 0) : 0;
+      if (st === 1){
+        if (lv === 'A+') p += POINTS['A+'];
+        else if (lv === 'A') p += POINTS['A'];
+        else if (lv === 'A-') p += POINTS['A-'];
+        else if (lv === 'B') p += POINTS['B'];
+      } else if (st === 2){
+        p += POINTS.miss;
+      } else if (st === 3){
+        p += POINTS.late;
+      }
+      if (fx === 2) p += POINTS.passed;
+    });
+    return p;
+  }
+  function calcDailyCbPoints(id){
+    return getCb(currentDate, currentClass, id);
+  }
+  function calcDailyTotal(id){
+    if (mode === 'hw') return calcDailyHwPoints(id);
+    return calcDailyCbPoints(id);
+  }
+
+  /* ================= 一段时间的积分累计 ================= */
+  function computeStudentPoints(id, days, cls){
+    var r = {
+      hwPoints: 0, cbPoints: 0, total: 0,
+      Aplus: 0, A: 0, Aminus: 0, B: 0,
+      miss: 0, late: 0, passed: 0, pending: 0, freed: 0,
+      cbPlus: 0, cbMinus: 0,
+      slots: 0, doneSlots: 0
+    };
+    days.forEach(function(date){
+      var d = data[date];
+      var c = d && d[cls];
+      if (!c) return;
+      var tasks = Array.isArray(c.hwTasks) ? c.hwTasks : [];
+      tasks.forEach(function(t){
+        r.slots++;
+        var hw = t.hw ? normHw(t.hw[id]) : 0;
+        var lv = (hw === 1 && t.hwLv) ? (t.hwLv[id] || '') : '';
+        var fx = t.fix ? (t.fix[id] || 0) : 0;
+        if (hw === 1){
+          r.doneSlots++;
+          if (lv === 'A+'){ r.Aplus++; r.hwPoints += POINTS['A+']; }
+          else if (lv === 'A'){ r.A++; r.hwPoints += POINTS['A']; }
+          else if (lv === 'A-'){ r.Aminus++; r.hwPoints += POINTS['A-']; }
+          else if (lv === 'B'){ r.B++; r.hwPoints += POINTS['B']; }
+        } else if (hw === 2){
+          r.miss++; r.hwPoints += POINTS.miss;
+        } else if (hw === 3){
+          r.doneSlots++;   // 迟交也算"交了"
+          r.late++; r.hwPoints += POINTS.late;
+        }
+        var fd = autoFix(hw, lv, fx);
+        if (fd === 1) r.pending++;
+        else if (fd === 2){ r.passed++; r.hwPoints += POINTS.passed; }
+        else if (fd === 3) r.freed++;
+      });
+      var cb = c.cb ? (c.cb[id] || 0) : 0;
+      r.cbPoints += cb;
+      if (cb > 0) r.cbPlus += cb;
+      else if (cb < 0) r.cbMinus += Math.abs(cb);
+    });
+    r.total = r.hwPoints + r.cbPoints;
+    return r;
+  }
+  function computeAllPoints(days, cls){
+    var ids = idsOf(cls);
+    var result = {};
+    ids.forEach(function(id){
+      result[id] = computeStudentPoints(id, days, cls);
+      result[id].id = id;
+      result[id].name = nameOf(cls, id);
+    });
+    return result;
+  }
 
   /* ================= DOM ================= */
   var classTabs   = document.getElementById('classTabs');
   var gridEl     = document.getElementById('grid');
   var datePicker = document.getElementById('datePicker');
   var lblA = document.getElementById('lblA');
+  var lblLate = document.getElementById('lblLate');
   var lblB = document.getElementById('lblB');
   var lblC = document.getElementById('lblC');
   var cntA = document.getElementById('cntA');
+  var cntLate = document.getElementById('cntLate');
   var cntB = document.getElementById('cntB');
   var cntC = document.getElementById('cntC');
   var cntAp = document.getElementById('cntAp');
@@ -1846,6 +2068,7 @@
   var lvBarEl    = document.getElementById('lvBar');
   var fixBarEl   = document.getElementById('fixBar');
   var noteCard   = document.getElementById('noteCard');
+  var noteTitle  = document.getElementById('noteTitle');
   var noteBody   = document.getElementById('noteBody');
   var noteEditBtn= document.getElementById('noteEditBtn');
   var hintEl   = document.getElementById('hint');
@@ -1866,14 +2089,21 @@
   var compareBtn = document.getElementById('compareBtn');
   var modeBtns    = Array.prototype.slice.call(document.querySelectorAll('.mode'));
 
+  var taskBar   = document.getElementById('taskBar');
+  var taskTabs  = document.getElementById('taskTabs');
+  var taskAddBtn= document.getElementById('taskAddBtn');
+
   var sheetMask   = document.getElementById('sheetMask');
   var sheetNum    = document.getElementById('sheetNum');
+  var sheetPtsNum = document.getElementById('sheetPtsNum');
   var sheetClose  = document.getElementById('sheetClose');
   var hwSeg       = document.getElementById('hwSeg');
   var lvSeg       = document.getElementById('lvSeg');
   var fixSeg      = document.getElementById('fixSeg');
+  var fixHint     = document.getElementById('fixHint');
 
   var noteMask  = document.getElementById('noteMask');
+  var noteDialogTitle = document.getElementById('noteDialogTitle');
   var noteInput = document.getElementById('noteInput');
   var noteClose = document.getElementById('noteClose');
   var noteCancel= document.getElementById('noteCancel');
@@ -1971,771 +2201,76 @@
     });
   }
 
-  /* ================= 积分计算 ================= */
-  function computeStudentPoints(id, days, cls){
-    var r = {
-      hwPoints: 0,   // 作业积分
-      cbPoints: 0,   // 课堂表现积分
-      total: 0,
-      // 明细
-      Aplus: 0, A: 0, Aminus: 0, B: 0,
-      miss: 0, passed: 0, pending: 0,
-      cbPlus: 0, cbMinus: 0
-    };
-    days.forEach(function(date){
-      var d = data[date];
-      var c = d && d[cls];
-      if (!c) return;
-      var hw = c.hw ? (c.hw[id] || 0) : 0;
-      var lv = c.hwLv ? (c.hwLv[id] || '') : '';
-      var fx = c.fix ? (c.fix[id] || 0) : 0;
-      var cb = c.cb ? (c.cb[id] || 0) : 0;
-
-      // 作业
-      if (hw === 1){
-        if (lv === 'A+'){ r.Aplus++; r.hwPoints += POINTS['A+']; }
-        else if (lv === 'A'){ r.A++; r.hwPoints += POINTS['A']; }
-        else if (lv === 'A-'){ r.Aminus++; r.hwPoints += POINTS['A-']; }
-        else if (lv === 'B'){ r.B++; r.hwPoints += POINTS['B']; }
-      } else if (hw === 2){
-        r.miss++; r.hwPoints += POINTS.miss;
-      }
-
-      // 改错过关
-      if (fx === 2){ r.passed++; r.hwPoints += POINTS.passed; }
-      else if (fx === 1){ r.pending++; r.hwPoints += POINTS.pending; }
-
-      // 课堂表现
-      r.cbPoints += cb;
-      if (cb > 0) r.cbPlus += cb;
-      else if (cb < 0) r.cbMinus += Math.abs(cb);
-    });
-    r.total = r.hwPoints + r.cbPoints;
-    return r;
-  }
-
-  function computeAllPoints(days, cls){
-    var ids = idsOf(cls);
-    var result = {};
-    ids.forEach(function(id){
-      result[id] = computeStudentPoints(id, days, cls);
-      result[id].id = id;
-      result[id].name = nameOf(cls, id);
-    });
-    return result;
-  }
-
-  /* ================= 积分榜渲染 ================= */
-  function renderRankTable(pointsMap, days){
-    var ids = idsOf(currentClass);
-    var showName = config.showNames && rosterHasName(currentClass);
-    var arr = ids.map(function(id){ return pointsMap[id]; });
-    arr.sort(function(a, b){ return b.total - a.total; });
-
-    // 顶部概览
-    var totalSum = 0, maxP = -Infinity, minP = Infinity;
-    var positiveCount = 0;
-    arr.forEach(function(s){
-      totalSum += s.total;
-      if (s.total > maxP) maxP = s.total;
-      if (s.total < minP) minP = s.total;
-      if (s.total > 0) positiveCount++;
-    });
-    var avg = arr.length > 0 ? Math.round(totalSum / arr.length * 10) / 10 : 0;
-
-    var summaryHtml =
-      '<div class="rank-summary">'
-      + '<div class="rank-sum-card">'
-      +   '<div class="rs-num ' + (avg >= 0 ? 'good' : 'bad') + '">' + (avg > 0 ? '+' : '') + avg + '</div>'
-      +   '<div class="rs-label">人均积分</div>'
-      + '</div>'
-      + '<div class="rank-sum-card">'
-      +   '<div class="rs-num good">' + (maxP > -Infinity ? (maxP > 0 ? '+' + maxP : maxP) : 0) + '</div>'
-      +   '<div class="rs-label">最高分</div>'
-      + '</div>'
-      + '<div class="rank-sum-card">'
-      +   '<div class="rs-num">' + positiveCount + '<span style="font-size:12px;font-weight:500;color:#94a3b8;">/' + arr.length + '</span></div>'
-      +   '<div class="rs-label">正分人数</div>'
-      + '</div>'
-      + '</div>';
-
-    var html = summaryHtml + '<div class="rank-list">';
-    arr.forEach(function(s, idx){
-      var rank = idx + 1;
-      var rankCls = rank === 1 ? 'top1' : (rank === 2 ? 'top2' : (rank === 3 ? 'top3' : ''));
-      var scoreCls = s.total > 0 ? 'pos' : (s.total < 0 ? 'neg' : 'zero');
-      var scoreTxt = (s.total > 0 ? '+' : '') + s.total;
-
-      var hwTxt = s.hwPoints > 0 ? '+' + s.hwPoints : String(s.hwPoints);
-      var cbTxt = s.cbPoints > 0 ? '+' + s.cbPoints : String(s.cbPoints);
-
-      var nameLine = s.id + ' 号';
-      if (showName && s.name){
-        nameLine += '<small>' + escapeHtml(s.name) + '</small>';
-      }
-
-      html += '<div class="rank-item" data-id="' + s.id + '">'
-        + '<span class="rank-badge ' + rankCls + '">' + rank + '</span>'
-        + '<span class="rank-name">' + nameLine + '</span>'
-        + '<span class="rank-breakdown">'
-        +   '<span class="hw">作业 ' + hwTxt + '</span><br>'
-        +   '<span class="cb">课堂 ' + cbTxt + '</span>'
-        + '</span>'
-        + '<span class="rank-score ' + scoreCls + '">' + scoreTxt + '</span>'
-        + '</div>';
-    });
-    html += '</div>';
-    html += '<p class="rank-legend">'
-      + 'A+ +2 &nbsp; A +1 &nbsp; A− 0 &nbsp; B −1 &nbsp; 缺交 −2 &nbsp; 过关 +1<br>'
-      + '点任意学生可查看个人档案'
-      + '</p>';
-
-    summaryResult.innerHTML = html;
-
-    // 点击跳个人档案
-    var items = summaryResult.querySelectorAll('.rank-item');
-    Array.prototype.forEach.call(items, function(el){
-      el.addEventListener('click', function(){
-        var id = parseInt(el.dataset.id, 10);
-        closeSummary();
-        setTimeout(function(){ openStudentProfile(id); }, 100);
-      });
-    });
-  }
-
-  /* ================= 学生档案 ================= */
-  function getAllDates(cls){
-    var dates = [];
-    for (var d in data){
-      if (data[d] && data[d][cls]) dates.push(d);
-    }
-    dates.sort();
-    return dates;
-  }
-  function getProfileDays(){
-    var today = todayStr();
-    if (profileRange === 0){
-      var all = getAllDates(currentClass);
-      if (all.length === 0){
-        return dateRange(shiftDate(today, -29), today);
-      }
-      var first = all[0], last = all[all.length - 1];
-      if (last > today) last = today;
-      return dateRange(first, last);
-    } else {
-      return dateRange(shiftDate(today, -(profileRange - 1)), today);
-    }
-  }
-  function dateRange(start, end){
-    var out = [];
-    var s = new Date(start + 'T00:00:00');
-    var e = new Date(end + 'T00:00:00');
-    if (isNaN(s.getTime()) || isNaN(e.getTime())) return out;
-    if (s > e) return out;
-    var cur = new Date(s);
-    while (cur <= e){
-      out.push(fmtDate(cur));
-      cur.setDate(cur.getDate() + 1);
-      if (out.length > 400) break;
-    }
-    return out;
-  }
-
-  function computeProfile(id, days, cls){
-    var r = {
-      done: 0, miss: 0, none: 0,
-      Aplus: 0, A: 0, Aminus: 0, B: 0,
-      pending: 0, passed: 0,
-      plusTimes: 0, minusTimes: 0,
-      plus: 0, minus: 0, score: 0,
-      streakMiss: 0, byDate: {},
-      hwPoints: 0, cbPoints: 0, totalPoints: 0
-    };
-    days.forEach(function(date){
-      var d = data[date];
-      var c = d && d[cls];
-      var hw = c && c.hw ? (c.hw[id] || 0) : 0;
-      var lv = c && c.hwLv ? (c.hwLv[id] || '') : '';
-      var fx = c && c.fix ? (c.fix[id] || 0) : 0;
-      var cb = c && c.cb ? (c.cb[id] || 0) : 0;
-      r.byDate[date] = { st: hw, lv: lv, fx: fx, cb: cb };
-      if (hw === 1){
-        r.done++;
-        if (lv === 'A+'){ r.Aplus++; r.hwPoints += POINTS['A+']; }
-        else if (lv === 'A'){ r.A++; r.hwPoints += POINTS['A']; }
-        else if (lv === 'A-'){ r.Aminus++; r.hwPoints += POINTS['A-']; }
-        else if (lv === 'B'){ r.B++; r.hwPoints += POINTS['B']; }
-      } else if (hw === 2){ r.miss++; r.hwPoints += POINTS.miss; }
-      else { r.none++; }
-      if (fx === 1){ r.pending++; r.hwPoints += POINTS.pending; }
-      else if (fx === 2){ r.passed++; r.hwPoints += POINTS.passed; }
-      if (cb > 0){ r.plus += cb; r.plusTimes++; }
-      else if (cb < 0){ r.minus += Math.abs(cb); r.minusTimes++; }
-      r.score += cb;
-    });
-    r.cbPoints = r.score;
-    r.totalPoints = r.hwPoints + r.cbPoints;
-    for (var i = days.length - 1; i >= 0; i--){
-      var dd = r.byDate[days[i]];
-      if (dd.st === 2) r.streakMiss++;
-      else break;
-    }
-    return r;
-  }
-
-  function openStudentProfile(id){
-    profileStudentId = id;
-    closeSheet();
-    stId.textContent = id + ' 号';
-    var nm = nameOf(currentClass, id);
-    stName.textContent = nm || '（无姓名）';
-    studentMask.classList.add('show');
-    document.body.style.overflow = 'hidden';
-    renderStudentProfile();
-  }
-  function closeStudentProfile(){
-    studentMask.classList.remove('show');
-    document.body.style.overflow = '';
-    profileStudentId = null;
-  }
-  function renderStudentProfile(){
-    if (profileStudentId == null) return;
-    var id = profileStudentId;
-    var cls = currentClass;
-    var days = getProfileDays();
-    var profile = computeProfile(id, days, cls);
-    var total = days.length;
-
-    var rangeHtml = '<div class="st-range" id="stRange">'
-      + '<button type="button" data-days="7"' + (profileRange === 7 ? ' class="active"' : '') + '>近7天</button>'
-      + '<button type="button" data-days="30"' + (profileRange === 30 ? ' class="active"' : '') + '>近30天</button>'
-      + '<button type="button" data-days="0"' + (profileRange === 0 ? ' class="active"' : '') + '>全部</button>'
-      + '</div>';
-
-    var rate = total > 0 ? Math.round(profile.done / total * 100) : 0;
-    var rateCls = rate >= 90 ? 'up' : (rate >= 70 ? 'mid' : 'down');
-    var scoreCls = profile.totalPoints > 0 ? 'up' : (profile.totalPoints < 0 ? 'down' : '');
-
-    var cardsHtml =
-      '<div class="st-cards">'
-      + '<div class="st-card">'
-      +   '<div class="st-value ' + scoreCls + '">'
-      +     (profile.totalPoints > 0 ? '+' : '') + profile.totalPoints
-      +   '</div>'
-      +   '<div class="st-label">总积分</div>'
-      +   '<div class="st-sub">作业 ' + (profile.hwPoints > 0 ? '+' : '') + profile.hwPoints
-      +     ' · 课堂 ' + (profile.cbPoints > 0 ? '+' : '') + profile.cbPoints + '</div>'
-      + '</div>'
-      + '<div class="st-card">'
-      +   '<div class="st-value ' + rateCls + '">' + rate + '%</div>'
-      +   '<div class="st-label">作业完成率</div>'
-      +   '<div class="st-sub">' + profile.done + '/' + total + ' 天</div>'
-      + '</div>'
-      + '</div>';
-
-    var lvHtml =
-      '<div class="st-section">'
-      + '<div class="st-section-title">等级分布（积分）</div>'
-      + '<div class="st-levels">'
-      + '<div class="st-lv-item"><span class="tag tAplus">A+</span><b class="' + (profile.Aplus === 0 ? 'zero' : '') + '">' + profile.Aplus + '</b></div>'
-      + '<div class="st-lv-item"><span class="tag tA">A</span><b class="' + (profile.A === 0 ? 'zero' : '') + '">' + profile.A + '</b></div>'
-      + '<div class="st-lv-item"><span class="tag tAminus">A−</span><b class="' + (profile.Aminus === 0 ? 'zero' : '') + '">' + profile.Aminus + '</b></div>'
-      + '<div class="st-lv-item"><span class="tag tB">B</span><b class="' + (profile.B === 0 ? 'zero' : '') + '">' + profile.B + '</b></div>'
-      + '</div></div>';
-
-    var trendHtml = '<div class="st-section">'
-      + '<div class="st-section-title">每日记录</div>'
-      + '<div class="st-trend">';
-    days.forEach(function(date){
-      var d = profile.byDate[date];
-      var cls2 = 'trend-cell';
-      var txt = '';
-      if (d.st === 2){ cls2 += ' st2'; txt = '✕'; }
-      else if (d.st === 1){
-        if (d.lv === 'A+'){ cls2 += ' lv-ap'; txt = 'A+'; }
-        else if (d.lv === 'A'){ cls2 += ' lv-a'; txt = 'A'; }
-        else if (d.lv === 'A-'){ cls2 += ' lv-am'; txt = 'A−'; }
-        else if (d.lv === 'B'){ cls2 += ' lv-b'; txt = 'B'; }
-        else { cls2 += ' st1'; txt = '✓'; }
-      } else { cls2 += ' st0'; txt = '·'; }
-      trendHtml += '<div class="' + cls2 + '" title="' + date.slice(5) + '">' + txt + '</div>';
-    });
-    trendHtml += '</div>';
-    trendHtml += '<div class="st-legend">'
-      + '<span class="li"><span class="sw" style="background:#eef0f4"></span>未登记</span>'
-      + '<span class="li"><span class="sw" style="background:#bbf7d0"></span>已交</span>'
-      + '<span class="li"><span class="sw" style="background:#fecaca"></span>缺交</span>'
-      + '<span class="li"><span class="sw" style="background:#22c55e"></span>A+</span>'
-      + '<span class="li"><span class="sw" style="background:#eab308"></span>A</span>'
-      + '<span class="li"><span class="sw" style="background:#f97316"></span>A−</span>'
-      + '<span class="li"><span class="sw" style="background:#ef4444"></span>B</span>'
-      + '</div></div>';
-
-    var fixHtml = '';
-    if (profile.pending > 0 || profile.passed > 0){
-      fixHtml =
-        '<div class="st-section">'
-        + '<div class="st-section-title">改错过关</div>'
-        + '<div class="st-cb-row"><span class="lbl">待过关</span><span class="val" style="color:#d97706;">' + profile.pending + ' 次（0分）</span></div>'
-        + '<div class="st-cb-row"><span class="lbl">已过关</span><span class="val" style="color:#16a34a;">' + profile.passed + ' 次（+' + profile.passed + '分）</span></div>'
-        + '</div>';
-    }
-
-    var tipHtml = '';
-    if (profile.streakMiss >= 3){
-      tipHtml = '<div class="st-section"><div class="st-tip danger">⚠️ 已连续 ' + profile.streakMiss + ' 天缺交，建议尽快联系家长</div></div>';
-    } else if (rate < 60 && total >= 5){
-      tipHtml = '<div class="st-section"><div class="st-tip warn">📉 近段完成率偏低（' + rate + '%），需要重点关注</div></div>';
-    } else if (rate >= 90 && total >= 5){
-      tipHtml = '<div class="st-section"><div class="st-tip good">✨ 表现优秀，作业完成率 ' + rate + '%</div></div>';
-    }
-
-    stBody.innerHTML = rangeHtml + cardsHtml + tipHtml + lvHtml + trendHtml + fixHtml;
-
-    var rangeEl = document.getElementById('stRange');
-    if (rangeEl){
-      Array.prototype.forEach.call(rangeEl.children, function(btn){
-        btn.addEventListener('click', function(){
-          profileRange = parseInt(btn.dataset.days, 10);
-          renderStudentProfile();
-        });
-      });
-    }
-  }
-
-  function buildReport(id, days, cls){
-    var profile = computeProfile(id, days, cls);
-    var total = days.length;
-    var name = nameOf(cls, id);
-    var cname = classNameOf(cls);
-    var rate = total > 0 ? Math.round(profile.done / total * 100) : 0;
-    var start = days[0], end = days[days.length - 1];
-    var fmtShort = function(d){
-      var parts = d.split('-');
-      return parseInt(parts[1], 10) + '月' + parseInt(parts[2], 10) + '日';
-    };
-    var lines = [];
-    lines.push('【' + cname + ' · ' + (name || id + '号') + '】');
-    lines.push(fmtShort(start) + ' - ' + fmtShort(end) + '（共' + total + '天）');
-    lines.push('');
-    lines.push('🏆 总积分：' + (profile.totalPoints > 0 ? '+' : '') + profile.totalPoints);
-    lines.push('   作业积分：' + (profile.hwPoints > 0 ? '+' : '') + profile.hwPoints);
-    lines.push('   课堂积分：' + (profile.cbPoints > 0 ? '+' : '') + profile.cbPoints);
-    lines.push('');
-    lines.push('📚 作业完成：' + profile.done + '/' + total + ' 天（' + rate + '%）');
-    if (profile.miss > 0){
-      lines.push('   缺交 ' + profile.miss + ' 天');
-    }
-    var lvParts = [];
-    if (profile.Aplus > 0) lvParts.push('A+ ' + profile.Aplus + '次');
-    if (profile.A > 0) lvParts.push('A ' + profile.A + '次');
-    if (profile.Aminus > 0) lvParts.push('A− ' + profile.Aminus + '次');
-    if (profile.B > 0) lvParts.push('B ' + profile.B + '次');
-    if (lvParts.length > 0){
-      lines.push('📊 等级分布：' + lvParts.join(' · '));
-    }
-    if (profile.pending > 0 || profile.passed > 0){
-      var fixParts = [];
-      if (profile.pending > 0) fixParts.push('待过关 ' + profile.pending + '次');
-      if (profile.passed > 0) fixParts.push('已过关 ' + profile.passed + '次');
-      lines.push('✏️ 改错过关：' + fixParts.join(' · '));
-    }
-    lines.push('');
-    if (profile.streakMiss >= 3){
-      lines.push('提示：已连续 ' + profile.streakMiss + ' 天缺交，请家长配合督促。');
-    } else if (rate >= 90){
-      lines.push('整体表现优秀，继续保持！');
-    } else if (rate >= 75){
-      lines.push('表现良好，偶有疏漏，继续加油。');
-    } else if (rate >= 60){
-      lines.push('基本完成，希望加强督促。');
-    } else {
-      lines.push('近期完成率偏低，请重点关注。');
-    }
-    return lines.join('\n');
-  }
-
-  stClose.addEventListener('click', closeStudentProfile);
-  studentMask.addEventListener('click', function(e){
-    if (e.target === studentMask) closeStudentProfile();
-  });
-  copyReportBtn.addEventListener('click', function(){
-    if (profileStudentId == null) return;
-    var days = getProfileDays();
-    if (days.length === 0){ showToast('暂无数据'); return; }
-    var text = buildReport(profileStudentId, days, currentClass);
-    copyToClipboard(text, function(ok){
-      if (ok){
-        copyReportBtn.classList.add('done');
-        copyReportBtn.textContent = '✓ 已复制，可粘贴到微信';
-        showToast('家长报告已复制');
-        setTimeout(function(){
-          copyReportBtn.classList.remove('done');
-          copyReportBtn.textContent = '📋 复制家长报告';
-        }, 1800);
-      } else { showToast('复制失败，请长按选择'); }
-    });
-  });
-  viewProfileBtn.addEventListener('click', function(){
-    if (activeId == null) return;
-    openStudentProfile(activeId);
-  });
-
-  /* ================= 跨班对比 ================= */
-  function getCompareDays(){
-    var today = todayStr();
-    if (compareRange === 'month'){
-      var now = new Date();
-      var start = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-01';
-      return dateRange(start, today);
-    } else {
-      var n = parseInt(compareRange, 10);
-      return dateRange(shiftDate(today, -(n - 1)), today);
-    }
-  }
-  function computeCompareData(days){
-    var result = [];
-    config.classes.forEach(function(c){
-      var cls = c.id;
-      var ids = c.roster.map(function(r){ return r.id; });
-      var s = {
-        id: cls, name: c.name, count: ids.length,
-        done: 0, miss: 0, none: 0,
-        Aplus: 0, A: 0, Aminus: 0, B: 0,
-        pending: 0, passed: 0,
-        plusTimes: 0, minusTimes: 0,
-        plus: 0, minus: 0, score: 0,
-        totalPoints: 0
-      };
-      days.forEach(function(date){
-        var d = data[date];
-        var dayCls = d && d[cls];
-        if (!dayCls) return;
-        if (mode === 'hw'){
-          var hw = dayCls.hw || {};
-          var lv = dayCls.hwLv || {};
-          var fx = dayCls.fix || {};
-          ids.forEach(function(id){
-            var st = hw[id] || 0;
-            var l = (st === 1) ? (lv[id] || '') : '';
-            var f = fx[id] || 0;
-            if (st === 1){
-              s.done++;
-              if (l === 'A+'){ s.Aplus++; s.totalPoints += POINTS['A+']; }
-              else if (l === 'A'){ s.A++; s.totalPoints += POINTS['A']; }
-              else if (l === 'A-'){ s.Aminus++; s.totalPoints += POINTS['A-']; }
-              else if (l === 'B'){ s.B++; s.totalPoints += POINTS['B']; }
-            } else if (st === 2){
-              s.miss++;
-              s.totalPoints += POINTS.miss;
-            } else { s.none++; }
-            if (f === 1){ s.pending++; s.totalPoints += POINTS.pending; }
-            else if (f === 2){ s.passed++; s.totalPoints += POINTS.passed; }
-          });
-        } else {
-          var cb = dayCls.cb || {};
-          ids.forEach(function(id){
-            var v = cb[id] || 0;
-            if (v > 0){ s.plus += v; s.plusTimes++; }
-            else if (v < 0){ s.minus += Math.abs(v); s.minusTimes++; }
-            s.score += v;
-            s.totalPoints += v;
-          });
-        }
-      });
-      var totalSlots = ids.length * days.length;
-      s.totalSlots = totalSlots;
-      s.doneRate = totalSlots > 0 ? (s.done / totalSlots) : 0;
-      s.avgPerStudent = ids.length > 0 ? Math.round(s.totalPoints / ids.length * 10) / 10 : 0;
-      result.push(s);
-    });
-    if (mode === 'hw'){
-      result.sort(function(a, b){ return b.avgPerStudent - a.avgPerStudent; });
-    } else {
-      result.sort(function(a, b){ return b.avgPerStudent - a.avgPerStudent; });
-    }
-    return result;
-  }
-  function renderCompare(){
-    var days = getCompareDays();
-    if (days.length === 0){
-      cmpInfo.innerHTML = '';
-      cmpCards.innerHTML = '<p class="cmp-empty">日期范围无效</p>';
+  /* ================= 作业条 ================= */
+  function renderTaskTabs(){
+    if (mode !== 'hw'){
+      taskBar.classList.remove('show');
       return;
     }
-    var stats = computeCompareData(days);
-    cmpInfo.innerHTML = '共 <b>' + days.length + '</b> 天 · '
-      + days[0] + ' 至 ' + days[days.length - 1] + ' · '
-      + (mode === 'hw' ? '作业积分' : '课堂表现');
-    cmpCards.innerHTML = '';
-    if (stats.length === 0){
-      cmpCards.innerHTML = '<p class="cmp-empty">暂无班级</p>';
+    taskBar.classList.add('show');
+    var c = data[currentDate] && data[currentDate][currentClass];
+    var tasks = (c && Array.isArray(c.hwTasks)) ? c.hwTasks : [];
+    currentTaskIdx = clampTaskIdx(currentTaskIdx, tasks);
+    taskTabs.innerHTML = '';
+    tasks.forEach(function(t, i){
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'task-tab' + (i === currentTaskIdx ? ' active' : '');
+      btn.dataset.idx = i;
+      var label = document.createElement('span');
+      label.textContent = '作业' + (i + 1);
+      btn.appendChild(label);
+      if (tasks.length > 1){
+        var del = document.createElement('span');
+        del.className = 'task-del';
+        del.textContent = '×';
+        del.setAttribute('role', 'button');
+        del.addEventListener('click', function(ev){
+          ev.stopPropagation();
+          ev.preventDefault();
+          deleteTask(i);
+        });
+        btn.appendChild(del);
+      }
+      btn.addEventListener('click', function(){
+        if (currentTaskIdx === i) return;
+        currentTaskIdx = i;
+        render();
+      });
+      taskTabs.appendChild(btn);
+    });
+  }
+  function addTask(){
+    pushUndo();
+    var c = ensure(currentDate, currentClass);
+    c.hwTasks.push(newEmptyTask());
+    currentTaskIdx = c.hwTasks.length - 1;
+    save();
+    render();
+    showToast('已添加 作业' + (currentTaskIdx + 1));
+  }
+  function deleteTask(idx){
+    var c = data[currentDate] && data[currentDate][currentClass];
+    if (!c || !Array.isArray(c.hwTasks)) return;
+    if (c.hwTasks.length <= 1){
+      showToast('至少保留一条作业');
       return;
     }
-    stats.forEach(function(s, idx){
-      var card = document.createElement('div');
-      card.className = 'cmp-card';
-      var rank = idx + 1;
-      var rankCls = rank === 1 ? 'top1' : (rank === 2 ? 'top2' : (rank === 3 ? 'top3' : ''));
-
-      var html = '<div class="cmp-card-head">'
-        + '<span class="cmp-rank ' + rankCls + '">' + rank + '</span>'
-        + '<span class="cmp-name">' + escapeHtml(s.name) + '</span>'
-        + '<span class="cmp-count">' + s.count + '人</span>'
-        + '</div>';
-
-      var avgCls = s.avgPerStudent > 0 ? 'color:#16a34a;' : (s.avgPerStudent < 0 ? 'color:#dc2626;' : '');
-      html += '<div class="cmp-rate">'
-        + '<span class="cmp-rate-num" style="' + avgCls + '">'
-        +   (s.avgPerStudent > 0 ? '+' : '') + s.avgPerStudent
-        + '</span>'
-        + '<span class="cmp-rate-label">人均积分</span>'
-        + '</div>';
-
-      if (mode === 'hw'){
-        var totalPts = s.totalPoints;
-        var totalCls = totalPts > 0 ? 'color:#16a34a;' : (totalPts < 0 ? 'color:#dc2626;' : '');
-        html += '<div class="cmp-metrics">'
-          + '<span>班级总积分<b style="' + totalCls + '">'
-          +   (totalPts > 0 ? '+' : '') + totalPts + '</b></span>'
-          + '<span>完成率<b>' + Math.round(s.doneRate * 100) + '%</b></span>'
-          + '</div>'
-          + '<div class="cmp-metrics">'
-          + '<span>已交<b>' + s.done + '</b></span>'
-          + '<span>缺交<b>' + s.miss + '</b></span>'
-          + '<span>过关<b>' + s.passed + '</b></span>'
-          + '</div>'
-          + '<div class="cmp-levels">'
-          + '<span class="cmp-lv"><i style="background:#22c55e;"></i>A+ <b>' + s.Aplus + '</b></span>'
-          + '<span class="cmp-lv"><i style="background:#eab308;"></i>A <b>' + s.A + '</b></span>'
-          + '<span class="cmp-lv"><i style="background:#f97316;"></i>A− <b>' + s.Aminus + '</b></span>'
-          + '<span class="cmp-lv"><i style="background:#ef4444;"></i>B <b>' + s.B + '</b></span>'
-          + '</div>';
-      } else {
-        var totalCls2 = s.totalPoints > 0 ? 'color:#16a34a;' : (s.totalPoints < 0 ? 'color:#dc2626;' : '');
-        html += '<div class="cmp-metrics">'
-          + '<span>班级总积分<b style="' + totalCls2 + '">'
-          +   (s.totalPoints > 0 ? '+' : '') + s.totalPoints + '</b></span>'
-          + '</div>'
-          + '<div class="cmp-metrics">'
-          + '<span>加分<b>' + s.plusTimes + '</b>次</span>'
-          + '<span>扣分<b>' + s.minusTimes + '</b>次</span>'
-          + '</div>';
-      }
-
-      card.innerHTML = html;
-      cmpCards.appendChild(card);
-    });
-  }
-  function openCompare(){
-    compareMask.classList.add('show');
-    document.body.style.overflow = 'hidden';
-    renderCompare();
-  }
-  function closeCompare(){
-    compareMask.classList.remove('show');
-    document.body.style.overflow = '';
-  }
-  compareBtn.addEventListener('click', openCompare);
-  compareClose.addEventListener('click', closeCompare);
-  compareMask.addEventListener('click', function(e){
-    if (e.target === compareMask) closeCompare();
-  });
-  Array.prototype.forEach.call(cmpRange.children, function(btn){
-    btn.addEventListener('click', function(){
-      compareRange = btn.dataset.days;
-      Array.prototype.forEach.call(cmpRange.children, function(b){
-        b.classList.toggle('active', b === btn);
-      });
-      renderCompare();
-    });
-  });
-
-  /* ================= 分类导出 ================= */
-  function getExportShowNames(){
-    if (exportShowNames === null) return config.showNames;
-    return exportShowNames;
-  }
-  function classifyStudents(){
-    var cls = currentClass;
-    var ids = idsOf(cls);
-    var nameMap = {};
-    rosterOf(cls).forEach(function(r){ nameMap[r.id] = r.name || ''; });
-    var groups;
-    if (mode === 'hw'){
-      var hwMap = currentHwMap();
-      var lvMap = currentLvMap();
-      var fixMap = currentFixMap();
-      groups = {
-        miss:    { name: '缺交',     color: '#b91c1c', students: [] },
-        pending: { name: '待过关',   color: '#f59e0b', students: [] },
-        Aplus:   { name: 'A+',       color: '#22c55e', students: [] },
-        A:       { name: 'A',        color: '#eab308', students: [] },
-        Aminus:  { name: 'A−',       color: '#f97316', students: [] },
-        B:       { name: 'B',        color: '#ef4444', students: [] },
-        none:    { name: '未登记',   color: '#94a3b8', students: [] },
-        passed:  { name: '已过关',   color: '#16a34a', students: [] }
-      };
-      ids.forEach(function(id){
-        var st = hwMap[id] || 0;
-        var lv = (st === 1) ? (lvMap[id] || '') : '';
-        var fx = fixMap[id] || 0;
-        var stu = { id: id, name: nameMap[id] || '' };
-        if (st === 2) groups.miss.students.push(stu);
-        if (st === 0) groups.none.students.push(stu);
-        if (st === 1){
-          if (lv === 'A+') groups.Aplus.students.push(stu);
-          else if (lv === 'A') groups.A.students.push(stu);
-          else if (lv === 'A-') groups.Aminus.students.push(stu);
-          else if (lv === 'B') groups.B.students.push(stu);
-        }
-        if (fx === 1) groups.pending.students.push(stu);
-        else if (fx === 2) groups.passed.students.push(stu);
-      });
-      return [
-        groups.miss, groups.pending, groups.Aplus, groups.A,
-        groups.Aminus, groups.B, groups.none, groups.passed
-      ];
-    } else {
-      var cbMap = currentCbMap();
-      var plus = { name: '加分学生', color: '#16a34a', students: [] };
-      var minus = { name: '扣分学生', color: '#b91c1c', students: [] };
-      ids.forEach(function(id){
-        var v = cbMap[id] || 0;
-        if (v === 0) return;
-        var stu = { id: id, name: nameMap[id] || '', score: v };
-        if (v > 0) plus.students.push(stu);
-        else if (v < 0) minus.students.push(stu);
-      });
-      return [plus, minus];
+    if (idx < 0 || idx >= c.hwTasks.length) return;
+    var t = c.hwTasks[idx];
+    if (taskHasData(t)){
+      if (!confirm('删除【作业' + (idx + 1) + '】？\n\n该作业的所有登记数据（状态、等级、改错、内容）都会一起删除。')) return;
     }
+    pushUndo();
+    c.hwTasks.splice(idx, 1);
+    if (currentTaskIdx >= c.hwTasks.length) currentTaskIdx = c.hwTasks.length - 1;
+    if (currentTaskIdx < 0) currentTaskIdx = 0;
+    cleanup(currentDate, currentClass);
+    save();
+    render();
+    showToast('已删除 作业' + (idx + 1));
   }
-  function formatStudentLine(stu, showName){
-    if (showName && stu.name) return stu.id + ' ' + stu.name;
-    return String(stu.id);
-  }
-  function formatCategoryText(group, showName, withHeader){
-    var lines = group.students.map(function(s){ return formatStudentLine(s, showName); });
-    var head = group.name + '（' + group.students.length + '人）';
-    if (withHeader) return head + '：\n' + lines.join('、');
-    return lines.join('、');
-  }
-  function renderExport(){
-    var showName = getExportShowNames();
-    var hasName = rosterHasName(currentClass);
-    var effectiveShowName = showName && hasName;
-    if (effectiveShowName){
-      exportNameToggle.classList.add('on');
-      exportNameToggleIcon.textContent = '👁';
-      exportNameToggleText.textContent = '显示姓名';
-    } else {
-      exportNameToggle.classList.remove('on');
-      exportNameToggleIcon.textContent = '🚫';
-      exportNameToggleText.textContent = hasName ? '只显学号' : '未录入姓名';
-    }
-    var modeName = mode === 'hw' ? '作业登记' : '课堂表现';
-    exportSubLine.innerHTML = '<b>' + escapeHtml(classNameOf(currentClass)) + '</b> · '
-      + currentDate + ' · ' + modeName;
-    var groups = classifyStudents();
-    exportBody.innerHTML = '';
-    groups.forEach(function(g){
-      var card = document.createElement('div');
-      card.className = 'export-card';
-      var head = document.createElement('div');
-      head.className = 'export-card-head';
-      var dot = document.createElement('span');
-      dot.className = 'export-cat-dot';
-      dot.style.background = g.color;
-      head.appendChild(dot);
-      var nameEl = document.createElement('span');
-      nameEl.className = 'export-cat-name';
-      nameEl.textContent = g.name;
-      head.appendChild(nameEl);
-      var countEl = document.createElement('span');
-      countEl.className = 'export-cat-count';
-      countEl.textContent = '（' + g.students.length + '人）';
-      head.appendChild(countEl);
-      var copyBtn = document.createElement('button');
-      copyBtn.type = 'button';
-      copyBtn.className = 'export-copy-btn';
-      copyBtn.textContent = '复制';
-      if (g.students.length > 0){
-        copyBtn.addEventListener('click', function(){
-          var text = formatCategoryText(g, effectiveShowName, true);
-          copyToClipboard(text, function(ok){
-            if (ok){
-              copyBtn.textContent = '✓ 已复制';
-              copyBtn.classList.add('done');
-              showToast('已复制：' + g.name);
-              setTimeout(function(){
-                copyBtn.textContent = '复制';
-                copyBtn.classList.remove('done');
-              }, 1500);
-            } else { showToast('复制失败，请长按选择'); }
-          });
-        });
-      } else {
-        copyBtn.disabled = true;
-        copyBtn.style.opacity = '0.35';
-        copyBtn.style.pointerEvents = 'none';
-      }
-      head.appendChild(copyBtn);
-      card.appendChild(head);
-      var listEl = document.createElement('div');
-      listEl.className = 'export-list';
-      if (g.students.length === 0){
-        listEl.className += ' export-empty';
-        listEl.textContent = '暂无';
-      } else {
-        var lines = g.students.map(function(s){ return formatStudentLine(s, effectiveShowName); });
-        listEl.textContent = lines.join('、');
-      }
-      card.appendChild(listEl);
-      exportBody.appendChild(card);
-    });
-  }
-  function openExport(){
-    exportShowNames = null;
-    renderExport();
-    exportMask.classList.add('show');
-    document.body.style.overflow = 'hidden';
-  }
-  function closeExport(){
-    exportMask.classList.remove('show');
-    document.body.style.overflow = '';
-  }
-  exportCatBtn.addEventListener('click', openExport);
-  exportClose.addEventListener('click', closeExport);
-  exportMask.addEventListener('click', function(e){
-    if (e.target === exportMask) closeExport();
-  });
-  exportNameToggle.addEventListener('click', function(){
-    var cur = getExportShowNames();
-    exportShowNames = !cur;
-    renderExport();
-  });
-  copyAllBtn.addEventListener('click', function(){
-    var showName = getExportShowNames();
-    var effectiveShowName = showName && rosterHasName(currentClass);
-    var modeName = mode === 'hw' ? '作业登记' : '课堂表现';
-    var groups = classifyStudents();
-    var lines = [];
-    lines.push('【' + classNameOf(currentClass) + ' · ' + modeName + ' · ' + currentDate + '】');
-    lines.push('');
-    groups.forEach(function(g){
-      if (g.students.length === 0) return;
-      var students = g.students.map(function(s){
-        return formatStudentLine(s, effectiveShowName);
-      }).join('、');
-      lines.push(g.name + '（' + g.students.length + '人）：' + students);
-      lines.push('');
-    });
-    var text = lines.join('\n').replace(/\n+$/, '');
-    copyToClipboard(text, function(ok){
-      if (ok) showToast('已复制全部内容');
-      else showToast('复制失败，请长按选择');
-    });
-  });
+  taskAddBtn.addEventListener('click', addTask);
 
   /* ================= 班级 tabs ================= */
   function renderTabs(){
@@ -2754,6 +2289,7 @@
         searchInput.value = '';
         searchClear.classList.remove('show');
         currentClass = c.id;
+        currentTaskIdx = 0;
         Array.prototype.forEach.call(classTabs.children, function(t){
           t.classList.toggle('active', t.dataset.clsId === c.id);
         });
@@ -2883,8 +2419,8 @@
     if (mode !== 'hw') return;
     pushUndo();
     idsOf(currentClass).forEach(function(id){
-      if (getHw(currentDate, currentClass, id) === 0){
-        setHw(currentDate, currentClass, id, 1);
+      if (getHw(currentDate, currentClass, id, currentTaskIdx) === 0){
+        setHw(currentDate, currentClass, id, 1, currentTaskIdx);
       }
     });
     render();
@@ -2894,7 +2430,7 @@
   exportBtn.addEventListener('click', function () {
     try {
       var bundle = {
-        version: 18,
+        version: 21,
         exportTime: new Date().toISOString(),
         config: config,
         data: data
@@ -2939,7 +2475,8 @@
           config = newConfig;
           saveConfig();
         }
-        data = newData;
+        data = newData || {};
+        migrateData();
         save();
         ensureCurrentClass();
         clearUndo();
@@ -2958,9 +2495,10 @@
 
   function refreshSheet(){
     if (activeId == null) return;
-    var hw = getHw(currentDate, currentClass, activeId);
-    var lv = getLv(currentDate, currentClass, activeId);
-    var fx = getFix(currentDate, currentClass, activeId);
+    var ti = currentTaskIdx;
+    var hw = getHw(currentDate, currentClass, activeId, ti);
+    var lv = getLv(currentDate, currentClass, activeId, ti);
+    var fx = getFix(currentDate, currentClass, activeId, ti);
     Array.prototype.forEach.call(hwSeg.children, function(btn){
       btn.classList.toggle('active', Number(btn.dataset.hw) === hw);
     });
@@ -2972,11 +2510,22 @@
     Array.prototype.forEach.call(fixSeg.children, function(btn){
       btn.classList.toggle('active', Number(btn.dataset.fix) === fx);
     });
+    var fd = autoFix(hw, lv, fx);
+    if (fd === 3){
+      fixHint.textContent = '✓ 当前状态：免过关（A+ 自动）';
+      fixHint.classList.add('good');
+    } else {
+      fixHint.textContent = 'A+ 已交的学生自动视为「免过关」';
+      fixHint.classList.remove('good');
+    }
+    var pts = calcDailyHwPoints(activeId);
+    sheetPtsNum.textContent = (pts > 0 ? '+' : '') + pts;
+    sheetPtsNum.className = 'num ' + (pts > 0 ? 'pos' : (pts < 0 ? 'neg' : 'zero'));
   }
   function openSheet(id){
     activeId = id;
     var name = nameOf(currentClass, id);
-    sheetNum.textContent = id + ' 号' + (name ? '  ' + name : '');
+    sheetNum.textContent = '作业' + (currentTaskIdx + 1) + ' · ' + id + ' 号' + (name ? '  ' + name : '');
     refreshSheet();
     sheetMask.classList.add('show');
     document.body.style.overflow = 'hidden';
@@ -2994,7 +2543,7 @@
     btn.addEventListener('click', function(){
       if (activeId == null) return;
       pushUndo();
-      setHw(currentDate, currentClass, activeId, Number(btn.dataset.hw));
+      setHw(currentDate, currentClass, activeId, Number(btn.dataset.hw), currentTaskIdx);
       refreshSheet(); render();
     });
   });
@@ -3003,7 +2552,7 @@
       if (activeId == null) return;
       pushUndo();
       var lv = btn.dataset.lv === undefined ? '' : btn.dataset.lv;
-      setLv(currentDate, currentClass, activeId, lv);
+      setLv(currentDate, currentClass, activeId, lv, currentTaskIdx);
       refreshSheet(); render();
     });
   });
@@ -3011,13 +2560,14 @@
     btn.addEventListener('click', function(){
       if (activeId == null) return;
       pushUndo();
-      setFix(currentDate, currentClass, activeId, Number(btn.dataset.fix));
+      setFix(currentDate, currentClass, activeId, Number(btn.dataset.fix), currentTaskIdx);
       refreshSheet(); render();
     });
   });
 
   function openNoteEditor(){
-    noteInput.value = getNote(currentDate, currentClass);
+    noteDialogTitle.textContent = '编辑「作业' + (currentTaskIdx + 1) + '」内容';
+    noteInput.value = getNote(currentDate, currentClass, currentTaskIdx);
     noteMask.classList.add('show');
     document.body.style.overflow = 'hidden';
     setTimeout(function(){ noteInput.focus(); }, 120);
@@ -3034,27 +2584,28 @@
   });
   noteSave.addEventListener('click', function(){
     pushUndo();
-    setNote(currentDate, currentClass, noteInput.value);
+    setNote(currentDate, currentClass, noteInput.value, currentTaskIdx);
     closeNoteEditor();
     renderNote();
   });
   function renderNote(){
-    var txt = getNote(currentDate, currentClass);
+    noteTitle.textContent = '📝 作业' + (currentTaskIdx + 1) + ' 内容';
+    var txt = getNote(currentDate, currentClass, currentTaskIdx);
     if (txt && txt.trim()){
       noteBody.textContent = txt;
       noteBody.classList.remove('empty');
     } else {
-      noteBody.textContent = '点击“编辑”填写今日作业内容';
+      noteBody.textContent = '点击"编辑"填写本次作业内容';
       noteBody.classList.add('empty');
     }
   }
 
   function onTap(id){
     if (mode === 'hw'){
-      var cur = getHw(currentDate, currentClass, id);
+      var cur = getHw(currentDate, currentClass, id, currentTaskIdx);
       if (cur === 0){
         pushUndo();
-        setHw(currentDate, currentClass, id, 1);
+        setHw(currentDate, currentClass, id, 1, currentTaskIdx);
         render();
       } else {
         openSheet(id);
@@ -3161,35 +2712,53 @@
     }
 
     if (mode === 'hw'){
-      var hwMap = currentHwMap();
-      var lvMap = currentLvMap();
-      var fixMap = currentFixMap();
+      var cc = ensure(currentDate, currentClass);
+      currentTaskIdx = clampTaskIdx(currentTaskIdx, cc.hwTasks);
+    }
+
+    renderTaskTabs();
+
+    if (mode === 'hw'){
+      var t = peekTask(currentDate, currentClass, currentTaskIdx);
+      var hwMap = (t && t.hw) || {};
+      var lvMap = (t && t.hwLv) || {};
+      var fixMap = (t && t.fix) || {};
       cells.forEach(function (btn) {
         var id = btn.dataset.id;
-        var st = hwMap[id] || 0;
+        var st = normHw(hwMap[id]);
         var lv = (st === 1) ? (lvMap[id] || '') : '';
         var fx = fixMap[id] || 0;
+        var fd = autoFix(st, lv, fx);
         btn.dataset.state = String(st);
         btn.dataset.lv = lv;
-        btn.dataset.fix = String(fx);
+        btn.dataset.fix = String(fd);
         var lvEl = btn.querySelector('.lv');
         if (lv){ lvEl.className = 'lv show'; lvEl.textContent = LV_LABEL[lv]; }
         else { lvEl.className = 'lv'; lvEl.textContent = ''; }
+        var pts = calcDailyHwPoints(Number(id));
         var scEl = btn.querySelector('.sc');
-        scEl.className = 'sc'; scEl.textContent = '';
+        if (pts !== 0){
+          scEl.className = 'sc show ' + (pts > 0 ? 'sc-pos' : 'sc-neg');
+          scEl.textContent = (pts > 0 ? '+' : '') + pts;
+        } else {
+          scEl.className = 'sc';
+          scEl.textContent = '';
+        }
         var fxEl = btn.querySelector('.fx-dot');
-        fxEl.className = fx > 0 ? 'fx-dot show' : 'fx-dot';
+        fxEl.className = fd > 0 ? 'fx-dot show' : 'fx-dot';
       });
       lvBarEl.style.display = 'flex';
       fixBarEl.style.display = 'flex';
       noteCard.style.display = 'block';
-      updateHwStats(hwMap, lvMap, fixMap);
+      updateHwStats();
       lblA.textContent = '已交';
+      lblLate.textContent = '迟交';
       lblB.textContent = '缺交';
       lblC.textContent = '未登记';
       hintEl.innerHTML =
-        '① 点「全部已交」→ ② 点缺交的同学 → ③ 点已交方格改等级<br>' +
-        'A+ +2 · A +1 · A− 0 · B −1 · 缺交 −2 · 过关 +1';
+        '① 点「全部已交」→ ② 点缺交/迟交的同学去面板改状态 → ③ 点已交方格改等级<br>' +
+        '多作业：点上方「作业条」切换；「+ 添加作业」增加一条<br>' +
+        '右上角 = <b>今日总分</b>（所有作业累加）：A+ +2 · A +1 · A− 0 · B −1 · <span style="color:#d97706;">迟交 −1</span> · 缺交 −2 · 过关 +1';
       clearBtnText.textContent = '清空';
     } else {
       var cbMap = currentCbMap();
@@ -3204,51 +2773,97 @@
         var fxEl = btn.querySelector('.fx-dot');
         fxEl.className = 'fx-dot';
         var scEl = btn.querySelector('.sc');
-        scEl.className = 'sc' + (v === 0 ? '' : ' show');
-        scEl.textContent = v === 0 ? '' : (v > 0 ? '+' + v : '\u2212' + Math.abs(v));
+        if (v !== 0){
+          scEl.className = 'sc show ' + (v > 0 ? 'sc-pos' : 'sc-neg');
+          scEl.textContent = (v > 0 ? '+' : '\u2212') + Math.abs(v);
+        } else {
+          scEl.className = 'sc';
+          scEl.textContent = '';
+        }
       });
       lvBarEl.style.display = 'none';
       fixBarEl.style.display = 'none';
       noteCard.style.display = 'none';
       updateCbStats(cbMap);
       lblA.textContent = '加分';
+      lblLate.textContent = '';
       lblB.textContent = '扣分';
       lblC.textContent = '未评价';
+      // 课堂模式下把迟交格子隐藏
+      cntLate.textContent = '';
+      var statLate = cntLate.parentNode;
+      if (statLate) statLate.style.display = 'none';
       hintEl.innerHTML =
         '单击方格 <b>+1</b> 分，长按方格 <b>−1</b> 分<br>' +
         '课堂表现分直接计入积分';
       clearBtnText.textContent = '清空';
+      updateNamesBtnState();
+      renderNote();
+      return;
     }
+    // 恢复迟交统计显示（作业模式）
+    var statLate2 = cntLate.parentNode;
+    if (statLate2) statLate2.style.display = '';
     updateNamesBtnState();
     renderNote();
   }
 
-  function updateHwStats(map, lvMap, fixMap){
-    var a = 0, b = 0;
+  function currentHwMap(){
+    var t = peekTask(currentDate, currentClass, currentTaskIdx);
+    return (t && t.hw) || {};
+  }
+  function currentLvMap(){
+    var t = peekTask(currentDate, currentClass, currentTaskIdx);
+    return (t && t.hwLv) || {};
+  }
+  function currentFixMap(){
+    var t = peekTask(currentDate, currentClass, currentTaskIdx);
+    return (t && t.fix) || {};
+  }
+  function currentCbMap(){
+    var d = data[currentDate];
+    var c = d && d[currentClass];
+    return (c && c.cb) || {};
+  }
+
+  function updateHwStats(){
+    var t = peekTask(currentDate, currentClass, currentTaskIdx);
+    var hwMap = (t && t.hw) || {};
+    var lvMap = (t && t.hwLv) || {};
+    var fixMap = (t && t.fix) || {};
+    var a = 0, late = 0, b = 0;
     var cAp = 0, cA = 0, cAm = 0, cB = 0;
-    for (var k in map){
-      if (!Object.prototype.hasOwnProperty.call(map, k)) continue;
-      if (map[k] === 1){
+    for (var k in hwMap){
+      if (!Object.prototype.hasOwnProperty.call(hwMap, k)) continue;
+      var st = normHw(hwMap[k]);
+      if (st === 1){
         a++;
         var lv = lvMap[k];
         if (lv === 'A+') cAp++;
         else if (lv === 'A') cA++;
         else if (lv === 'A-') cAm++;
         else if (lv === 'B') cB++;
-      } else if (map[k] === 2){ b++; }
+      } else if (st === 2){ b++; }
+      else if (st === 3){ late++; }
     }
     var total = cells.length;
-    cntA.textContent = a; cntB.textContent = b;
-    cntC.textContent = total - a - b;
+    cntA.textContent = a;
+    cntLate.textContent = late;
+    cntB.textContent = b;
+    cntC.textContent = total - a - late - b;
     cntAp.textContent = cAp; cntA1.textContent = cA;
     cntAm.textContent = cAm; cntB1.textContent = cB;
     var pending = 0, passed = 0;
-    for (var j in fixMap){
-      if (!Object.prototype.hasOwnProperty.call(fixMap, j)) continue;
-      if (fixMap[j] === 1) pending++;
-      else if (fixMap[j] === 2) passed++;
-    }
-    cntPend.textContent = pending; cntPass.textContent = passed;
+    idsOf(currentClass).forEach(function(id){
+      var hw = normHw(hwMap[id]);
+      var lv = (hw === 1) ? (lvMap[id] || '') : '';
+      var fx = fixMap[id] || 0;
+      var fd = autoFix(hw, lv, fx);
+      if (fd === 1) pending++;
+      else if (fd === 2 || fd === 3) passed++;
+    });
+    cntPend.textContent = pending;
+    cntPass.textContent = passed;
   }
   function updateCbStats(map){
     var a = 0, b = 0;
@@ -3260,6 +2875,766 @@
     cntA.textContent = a; cntB.textContent = b;
     cntC.textContent = total - a - b;
   }
+
+  /* ================= 积分榜 ================= */
+  function renderRankTable(pointsMap, days){
+    var ids = idsOf(currentClass);
+    var showName = config.showNames && rosterHasName(currentClass);
+    var arr = ids.map(function(id){ return pointsMap[id]; });
+    arr.sort(function(a, b){ return b.total - a.total; });
+
+    var totalSum = 0, maxP = -Infinity;
+    var positiveCount = 0;
+    arr.forEach(function(s){
+      totalSum += s.total;
+      if (s.total > maxP) maxP = s.total;
+      if (s.total > 0) positiveCount++;
+    });
+    var avg = arr.length > 0 ? Math.round(totalSum / arr.length * 10) / 10 : 0;
+
+    var summaryHtml =
+      '<div class="rank-summary">'
+      + '<div class="rank-sum-card">'
+      +   '<div class="rs-num ' + (avg >= 0 ? 'good' : 'bad') + '">' + (avg > 0 ? '+' : '') + avg + '</div>'
+      +   '<div class="rs-label">人均积分</div>'
+      + '</div>'
+      + '<div class="rank-sum-card">'
+      +   '<div class="rs-num good">' + (maxP > -Infinity ? (maxP > 0 ? '+' + maxP : maxP) : 0) + '</div>'
+      +   '<div class="rs-label">最高分</div>'
+      + '</div>'
+      + '<div class="rank-sum-card">'
+      +   '<div class="rs-num">' + positiveCount + '<span style="font-size:12px;font-weight:500;color:#94a3b8;">/' + arr.length + '</span></div>'
+      +   '<div class="rs-label">正分人数</div>'
+      + '</div>'
+      + '</div>';
+
+    var html = summaryHtml + '<div class="rank-list">';
+    arr.forEach(function(s, idx){
+      var rank = idx + 1;
+      var rankCls = rank === 1 ? 'top1' : (rank === 2 ? 'top2' : (rank === 3 ? 'top3' : ''));
+      var scoreCls = s.total > 0 ? 'pos' : (s.total < 0 ? 'neg' : 'zero');
+      var scoreTxt = (s.total > 0 ? '+' : '') + s.total;
+
+      var hwTxt = s.hwPoints > 0 ? '+' + s.hwPoints : String(s.hwPoints);
+      var cbTxt = s.cbPoints > 0 ? '+' + s.cbPoints : String(s.cbPoints);
+
+      var nameLine = s.id + ' 号';
+      if (showName && s.name){
+        nameLine += '<small>' + escapeHtml(s.name) + '</small>';
+      }
+
+      html += '<div class="rank-item" data-id="' + s.id + '">'
+        + '<span class="rank-badge ' + rankCls + '">' + rank + '</span>'
+        + '<span class="rank-name">' + nameLine + '</span>'
+        + '<span class="rank-breakdown">'
+        +   '<span class="hw">作业 ' + hwTxt + '</span><br>'
+        +   '<span class="cb">课堂 ' + cbTxt + '</span>'
+        + '</span>'
+        + '<span class="rank-score ' + scoreCls + '">' + scoreTxt + '</span>'
+        + '</div>';
+    });
+    html += '</div>';
+    html += '<p class="rank-legend">'
+      + 'A+ +2 &nbsp; A +1 &nbsp; A− 0 &nbsp; B −1 &nbsp; <span style="color:#d97706;">迟交 −1</span> &nbsp; 缺交 −2 &nbsp; 过关 +1<br>'
+      + '多条作业按实际条数累加，A+ 免过关不加分<br>'
+      + '点任意学生可查看个人档案'
+      + '</p>';
+
+    summaryResult.innerHTML = html;
+
+    var items = summaryResult.querySelectorAll('.rank-item');
+    Array.prototype.forEach.call(items, function(el){
+      el.addEventListener('click', function(){
+        var id = parseInt(el.dataset.id, 10);
+        closeSummary();
+        setTimeout(function(){ openStudentProfile(id); }, 100);
+      });
+    });
+  }
+
+  /* ================= 学生档案 ================= */
+  function getAllDates(cls){
+    var dates = [];
+    for (var d in data){
+      if (data[d] && data[d][cls]) dates.push(d);
+    }
+    dates.sort();
+    return dates;
+  }
+  function getProfileDays(){
+    var today = todayStr();
+    if (profileRange === 0){
+      var all = getAllDates(currentClass);
+      if (all.length === 0){
+        return dateRange(shiftDate(today, -29), today);
+      }
+      var first = all[0], last = all[all.length - 1];
+      if (last > today) last = today;
+      return dateRange(first, last);
+    } else {
+      return dateRange(shiftDate(today, -(profileRange - 1)), today);
+    }
+  }
+  function dateRange(start, end){
+    var out = [];
+    var s = new Date(start + 'T00:00:00');
+    var e = new Date(end + 'T00:00:00');
+    if (isNaN(s.getTime()) || isNaN(e.getTime())) return out;
+    if (s > e) return out;
+    var cur = new Date(s);
+    while (cur <= e){
+      out.push(fmtDate(cur));
+      cur.setDate(cur.getDate() + 1);
+      if (out.length > 400) break;
+    }
+    return out;
+  }
+  function computeProfile(id, days, cls){
+    var r = {
+      done: 0, late: 0, miss: 0, none: 0,
+      Aplus: 0, A: 0, Aminus: 0, B: 0,
+      pending: 0, passed: 0, freed: 0,
+      plusTimes: 0, minusTimes: 0,
+      plus: 0, minus: 0, score: 0,
+      streakMiss: 0, byDate: {},
+      hwPoints: 0, cbPoints: 0, totalPoints: 0,
+      totalSlots: 0, dayCount: 0
+    };
+    days.forEach(function(date){
+      var d = data[date];
+      var c = d && d[cls];
+      if (!c) return;
+      var tasks = Array.isArray(c.hwTasks) ? c.hwTasks : [];
+      if (tasks.length === 0) return;
+      r.dayCount++;
+      var dayTasks = [];
+      tasks.forEach(function(t){
+        r.totalSlots++;
+        var hw = t.hw ? normHw(t.hw[id]) : 0;
+        var lv = (hw === 1 && t.hwLv) ? (t.hwLv[id] || '') : '';
+        var fx = t.fix ? (t.fix[id] || 0) : 0;
+        dayTasks.push({ st: hw, lv: lv, fx: fx });
+        if (hw === 1){
+          r.done++;
+          if (lv === 'A+'){ r.Aplus++; r.hwPoints += POINTS['A+']; }
+          else if (lv === 'A'){ r.A++; r.hwPoints += POINTS['A']; }
+          else if (lv === 'A-'){ r.Aminus++; r.hwPoints += POINTS['A-']; }
+          else if (lv === 'B'){ r.B++; r.hwPoints += POINTS['B']; }
+        } else if (hw === 2){
+          r.miss++; r.hwPoints += POINTS.miss;
+        } else if (hw === 3){
+          r.late++; r.hwPoints += POINTS.late;
+        } else {
+          r.none++;
+        }
+        var fd = autoFix(hw, lv, fx);
+        if (fd === 1) r.pending++;
+        else if (fd === 2){ r.passed++; r.hwPoints += POINTS.passed; }
+        else if (fd === 3) r.freed++;
+      });
+      var cb = c.cb ? (c.cb[id] || 0) : 0;
+      if (cb > 0){ r.plus += cb; r.plusTimes++; }
+      else if (cb < 0){ r.minus += Math.abs(cb); r.minusTimes++; }
+      r.score += cb;
+      r.byDate[date] = { tasks: dayTasks, cb: cb, v: cb };
+    });
+    r.cbPoints = r.score;
+    r.totalPoints = r.hwPoints + r.cbPoints;
+    for (var i = days.length - 1; i >= 0; i--){
+      var dd = r.byDate[days[i]];
+      if (!dd || !dd.tasks || dd.tasks.length === 0) break;
+      var allMiss = dd.tasks.every(function(t){ return t.st === 2; });
+      if (allMiss) r.streakMiss++;
+      else break;
+    }
+    return r;
+  }
+
+  function openStudentProfile(id){
+    profileStudentId = id;
+    closeSheet();
+    stId.textContent = id + ' 号';
+    var nm = nameOf(currentClass, id);
+    stName.textContent = nm || '（无姓名）';
+    studentMask.classList.add('show');
+    document.body.style.overflow = 'hidden';
+    renderStudentProfile();
+  }
+  function closeStudentProfile(){
+    studentMask.classList.remove('show');
+    document.body.style.overflow = '';
+    profileStudentId = null;
+  }
+  function dotClass(t){
+    if (!t) return 'd-none';
+    if (t.st === 2) return 'd-miss';
+    if (t.st === 3) return 'd-late';
+    if (t.st === 1){
+      if (t.lv === 'A+') return 'd-ap';
+      if (t.lv === 'A')  return 'd-a';
+      if (t.lv === 'A-') return 'd-am';
+      if (t.lv === 'B')  return 'd-b';
+      return 'd-done';
+    }
+    return 'd-none';
+  }
+  function renderStudentProfile(){
+    if (profileStudentId == null) return;
+    var id = profileStudentId;
+    var cls = currentClass;
+    var days = getProfileDays();
+    var profile = computeProfile(id, days, cls);
+    var total = profile.totalSlots;
+
+    var rangeHtml = '<div class="st-range" id="stRange">'
+      + '<button type="button" data-days="7"' + (profileRange === 7 ? ' class="active"' : '') + '>近7天</button>'
+      + '<button type="button" data-days="30"' + (profileRange === 30 ? ' class="active"' : '') + '>近30天</button>'
+      + '<button type="button" data-days="0"' + (profileRange === 0 ? ' class="active"' : '') + '>全部</button>'
+      + '</div>';
+
+    var rate = total > 0 ? Math.round((profile.done + profile.late) / total * 100) : 0;
+    var rateCls = rate >= 90 ? 'up' : (rate >= 70 ? 'mid' : 'down');
+    var scoreCls = profile.totalPoints > 0 ? 'up' : (profile.totalPoints < 0 ? 'down' : '');
+
+    var cardsHtml =
+      '<div class="st-cards">'
+      + '<div class="st-card">'
+      +   '<div class="st-value ' + scoreCls + '">'
+      +     (profile.totalPoints > 0 ? '+' : '') + profile.totalPoints
+      +   '</div>'
+      +   '<div class="st-label">总积分</div>'
+      +   '<div class="st-sub">作业 ' + (profile.hwPoints > 0 ? '+' : '') + profile.hwPoints
+      +     ' · 课堂 ' + (profile.cbPoints > 0 ? '+' : '') + profile.cbPoints + '</div>'
+      + '</div>'
+      + '<div class="st-card">'
+      +   '<div class="st-value ' + rateCls + '">' + rate + '%</div>'
+      +   '<div class="st-label">作业完成率</div>'
+      +   '<div class="st-sub">交 ' + (profile.done + profile.late) + '/' + total + ' 次</div>'
+      + '</div>'
+      + '</div>';
+
+    var lvHtml =
+      '<div class="st-section">'
+      + '<div class="st-section-title">等级分布</div>'
+      + '<div class="st-levels">'
+      + '<div class="st-lv-item"><span class="tag tAplus">A+</span><b class="' + (profile.Aplus === 0 ? 'zero' : '') + '">' + profile.Aplus + '</b></div>'
+      + '<div class="st-lv-item"><span class="tag tA">A</span><b class="' + (profile.A === 0 ? 'zero' : '') + '">' + profile.A + '</b></div>'
+      + '<div class="st-lv-item"><span class="tag tAminus">A−</span><b class="' + (profile.Aminus === 0 ? 'zero' : '') + '">' + profile.Aminus + '</b></div>'
+      + '<div class="st-lv-item"><span class="tag tB">B</span><b class="' + (profile.B === 0 ? 'zero' : '') + '">' + profile.B + '</b></div>'
+      + '</div></div>';
+
+    var trendHtml = '<div class="st-section">'
+      + '<div class="st-section-title">每日记录</div>'
+      + '<div class="st-trend">';
+    days.forEach(function(date){
+      var d = profile.byDate[date] || { tasks: [] };
+      var tasks = d.tasks || [];
+      var inner = '';
+      if (tasks.length === 0){
+        inner = '<span class="td-dot d-none"></span>';
+      } else {
+        tasks.forEach(function(t){
+          inner += '<span class="td-dot ' + dotClass(t) + '"></span>';
+        });
+      }
+      trendHtml += '<div class="trend-day" title="' + date.slice(5) + '">' + inner + '</div>';
+    });
+    trendHtml += '</div>';
+    trendHtml += '<div class="st-legend">'
+      + '<span class="li"><span class="sw" style="background:#e2e8f0"></span>未登记</span>'
+      + '<span class="li"><span class="sw" style="background:#bbf7d0"></span>已交</span>'
+      + '<span class="li"><span class="sw" style="background:#f59e0b"></span>迟交</span>'
+      + '<span class="li"><span class="sw" style="background:#b91c1c"></span>缺交</span>'
+      + '<span class="li"><span class="sw" style="background:#22c55e"></span>A+</span>'
+      + '<span class="li"><span class="sw" style="background:#eab308"></span>A</span>'
+      + '<span class="li"><span class="sw" style="background:#f97316"></span>A−</span>'
+      + '<span class="li"><span class="sw" style="background:#ef4444"></span>B</span>'
+      + '<span class="li">每条作业一个小圆点</span>'
+      + '</div></div>';
+
+    var fixHtml = '';
+    if (profile.pending > 0 || profile.passed > 0 || profile.freed > 0){
+      fixHtml =
+        '<div class="st-section">'
+        + '<div class="st-section-title">改错过关</div>'
+        + (profile.pending > 0
+            ? '<div class="st-cb-row"><span class="lbl">待过关</span><span class="val" style="color:#d97706;">' + profile.pending + ' 次（0分）</span></div>'
+            : '')
+        + (profile.passed > 0
+            ? '<div class="st-cb-row"><span class="lbl">已过关</span><span class="val" style="color:#16a34a;">' + profile.passed + ' 次（+' + profile.passed + '分）</span></div>'
+            : '')
+        + (profile.freed > 0
+            ? '<div class="st-cb-row"><span class="lbl">免过关（A+）</span><span class="val" style="color:#16a34a;">' + profile.freed + ' 次</span></div>'
+            : '')
+        + '</div>';
+    }
+
+    var tipHtml = '';
+    if (profile.streakMiss >= 3){
+      tipHtml = '<div class="st-section"><div class="st-tip danger">⚠️ 已连续 ' + profile.streakMiss + ' 天缺交，建议尽快联系家长</div></div>';
+    } else if (rate < 60 && total >= 5){
+      tipHtml = '<div class="st-section"><div class="st-tip warn">📉 近段完成率偏低（' + rate + '%），需要重点关注</div></div>';
+    } else if (rate >= 90 && total >= 5){
+      tipHtml = '<div class="st-section"><div class="st-tip good">✨ 表现优秀，作业完成率 ' + rate + '%</div></div>';
+    }
+
+    stBody.innerHTML = rangeHtml + cardsHtml + tipHtml + lvHtml + trendHtml + fixHtml;
+
+    var rangeEl = document.getElementById('stRange');
+    if (rangeEl){
+      Array.prototype.forEach.call(rangeEl.children, function(btn){
+        btn.addEventListener('click', function(){
+          profileRange = parseInt(btn.dataset.days, 10);
+          renderStudentProfile();
+        });
+      });
+    }
+  }
+
+  function buildReport(id, days, cls){
+    var profile = computeProfile(id, days, cls);
+    var total = profile.totalSlots;
+    var name = nameOf(cls, id);
+    var cname = classNameOf(cls);
+    var rate = total > 0 ? Math.round((profile.done + profile.late) / total * 100) : 0;
+    var start = days[0], end = days[days.length - 1];
+    var fmtShort = function(d){
+      var parts = d.split('-');
+      return parseInt(parts[1], 10) + '月' + parseInt(parts[2], 10) + '日';
+    };
+    var lines = [];
+    lines.push('【' + cname + ' · ' + (name || id + '号') + '】');
+    lines.push(fmtShort(start) + ' - ' + fmtShort(end) + '（共' + total + ' 次作业）');
+    lines.push('');
+    lines.push('🏆 总积分：' + (profile.totalPoints > 0 ? '+' : '') + profile.totalPoints);
+    lines.push('   作业积分：' + (profile.hwPoints > 0 ? '+' : '') + profile.hwPoints);
+    lines.push('   课堂积分：' + (profile.cbPoints > 0 ? '+' : '') + profile.cbPoints);
+    lines.push('');
+    lines.push('📚 作业完成：' + (profile.done + profile.late) + '/' + total + ' 次（' + rate + '%）');
+    if (profile.done > 0) lines.push('   按时交 ' + profile.done + ' 次');
+    if (profile.late > 0) lines.push('   迟交 ' + profile.late + ' 次');
+    if (profile.miss > 0) lines.push('   缺交 ' + profile.miss + ' 次');
+    var lvParts = [];
+    if (profile.Aplus > 0) lvParts.push('A+ ' + profile.Aplus + '次');
+    if (profile.A > 0) lvParts.push('A ' + profile.A + '次');
+    if (profile.Aminus > 0) lvParts.push('A− ' + profile.Aminus + '次');
+    if (profile.B > 0) lvParts.push('B ' + profile.B + '次');
+    if (lvParts.length > 0){
+      lines.push('📊 等级分布：' + lvParts.join(' · '));
+    }
+    if (profile.pending > 0 || profile.passed > 0 || profile.freed > 0){
+      var fixParts = [];
+      if (profile.pending > 0) fixParts.push('待过关 ' + profile.pending + '次');
+      if (profile.passed > 0) fixParts.push('已过关 ' + profile.passed + '次');
+      if (profile.freed > 0)  fixParts.push('免过关 ' + profile.freed + '次');
+      lines.push('✏️ 改错过关：' + fixParts.join(' · '));
+    }
+    lines.push('');
+    if (profile.streakMiss >= 3){
+      lines.push('提示：已连续 ' + profile.streakMiss + ' 天缺交，请家长配合督促。');
+    } else if (rate >= 90){
+      lines.push('整体表现优秀，继续保持！');
+    } else if (rate >= 75){
+      lines.push('表现良好，偶有疏漏，继续加油。');
+    } else if (rate >= 60){
+      lines.push('基本完成，希望加强督促。');
+    } else {
+      lines.push('近期完成率偏低，请重点关注。');
+    }
+    return lines.join('\n');
+  }
+
+  stClose.addEventListener('click', closeStudentProfile);
+  studentMask.addEventListener('click', function(e){
+    if (e.target === studentMask) closeStudentProfile();
+  });
+  copyReportBtn.addEventListener('click', function(){
+    if (profileStudentId == null) return;
+    var days = getProfileDays();
+    if (days.length === 0){ showToast('暂无数据'); return; }
+    var text = buildReport(profileStudentId, days, currentClass);
+    copyToClipboard(text, function(ok){
+      if (ok){
+        copyReportBtn.classList.add('done');
+        copyReportBtn.textContent = '✓ 已复制，可粘贴到微信';
+        showToast('家长报告已复制');
+        setTimeout(function(){
+          copyReportBtn.classList.remove('done');
+          copyReportBtn.textContent = '📋 复制家长报告';
+        }, 1800);
+      } else { showToast('复制失败，请长按选择'); }
+    });
+  });
+  viewProfileBtn.addEventListener('click', function(){
+    if (activeId == null) return;
+    openStudentProfile(activeId);
+  });
+
+  /* ================= 跨班对比 ================= */
+  function getCompareDays(){
+    var today = todayStr();
+    if (compareRange === 'month'){
+      var now = new Date();
+      var start = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-01';
+      return dateRange(start, today);
+    } else {
+      var n = parseInt(compareRange, 10);
+      return dateRange(shiftDate(today, -(n - 1)), today);
+    }
+  }
+  function computeCompareData(days){
+    var result = [];
+    config.classes.forEach(function(c){
+      var cls = c.id;
+      var ids = c.roster.map(function(r){ return r.id; });
+      var s = {
+        id: cls, name: c.name, count: ids.length,
+        done: 0, late: 0, miss: 0, none: 0,
+        Aplus: 0, A: 0, Aminus: 0, B: 0,
+        pending: 0, passed: 0,
+        plusTimes: 0, minusTimes: 0,
+        plus: 0, minus: 0, score: 0,
+        totalPoints: 0, slots: 0
+      };
+      days.forEach(function(date){
+        var d = data[date];
+        var dayCls = d && d[cls];
+        if (!dayCls) return;
+        if (mode === 'hw'){
+          var tasks = Array.isArray(dayCls.hwTasks) ? dayCls.hwTasks : [];
+          tasks.forEach(function(t){
+            var hw = t.hw || {};
+            var lv = t.hwLv || {};
+            var fx = t.fix || {};
+            ids.forEach(function(id){
+              s.slots++;
+              var st = normHw(hw[id]);
+              var l = (st === 1) ? (lv[id] || '') : '';
+              var f = fx[id] || 0;
+              if (st === 1){
+                s.done++;
+                if (l === 'A+'){ s.Aplus++; s.totalPoints += POINTS['A+']; }
+                else if (l === 'A'){ s.A++; s.totalPoints += POINTS['A']; }
+                else if (l === 'A-'){ s.Aminus++; s.totalPoints += POINTS['A-']; }
+                else if (l === 'B'){ s.B++; s.totalPoints += POINTS['B']; }
+              } else if (st === 2){
+                s.miss++; s.totalPoints += POINTS.miss;
+              } else if (st === 3){
+                s.late++; s.totalPoints += POINTS.late;
+              } else { s.none++; }
+              var fd = autoFix(st, l, f);
+              if (fd === 1) s.pending++;
+              else if (fd === 2){ s.passed++; s.totalPoints += POINTS.passed; }
+            });
+          });
+        } else {
+          var cb = dayCls.cb || {};
+          ids.forEach(function(id){
+            var v = cb[id] || 0;
+            if (v > 0){ s.plus += v; s.plusTimes++; }
+            else if (v < 0){ s.minus += Math.abs(v); s.minusTimes++; }
+            s.score += v;
+            s.totalPoints += v;
+          });
+        }
+      });
+      s.totalSlots = s.slots;
+      s.doneRate = s.slots > 0 ? ((s.done + s.late) / s.slots) : 0;
+      s.avgPerStudent = ids.length > 0 ? Math.round(s.totalPoints / ids.length * 10) / 10 : 0;
+      result.push(s);
+    });
+    result.sort(function(a, b){ return b.avgPerStudent - a.avgPerStudent; });
+    return result;
+  }
+  function renderCompare(){
+    var days = getCompareDays();
+    if (days.length === 0){
+      cmpInfo.innerHTML = '';
+      cmpCards.innerHTML = '<p class="cmp-empty">日期范围无效</p>';
+      return;
+    }
+    var stats = computeCompareData(days);
+    cmpInfo.innerHTML = '共 <b>' + days.length + '</b> 天 · '
+      + days[0] + ' 至 ' + days[days.length - 1] + ' · '
+      + (mode === 'hw' ? '作业积分' : '课堂表现');
+    cmpCards.innerHTML = '';
+    if (stats.length === 0){
+      cmpCards.innerHTML = '<p class="cmp-empty">暂无班级</p>';
+      return;
+    }
+    stats.forEach(function(s, idx){
+      var card = document.createElement('div');
+      card.className = 'cmp-card';
+      var rank = idx + 1;
+      var rankCls = rank === 1 ? 'top1' : (rank === 2 ? 'top2' : (rank === 3 ? 'top3' : ''));
+
+      var html = '<div class="cmp-card-head">'
+        + '<span class="cmp-rank ' + rankCls + '">' + rank + '</span>'
+        + '<span class="cmp-name">' + escapeHtml(s.name) + '</span>'
+        + '<span class="cmp-count">' + s.count + '人</span>'
+        + '</div>';
+
+      var avgCls = s.avgPerStudent > 0 ? 'color:#16a34a;' : (s.avgPerStudent < 0 ? 'color:#dc2626;' : '');
+      html += '<div class="cmp-rate">'
+        + '<span class="cmp-rate-num" style="' + avgCls + '">'
+        +   (s.avgPerStudent > 0 ? '+' : '') + s.avgPerStudent
+        + '</span>'
+        + '<span class="cmp-rate-label">人均积分</span>'
+        + '</div>';
+
+      if (mode === 'hw'){
+        var totalPts = s.totalPoints;
+        var totalCls = totalPts > 0 ? 'color:#16a34a;' : (totalPts < 0 ? 'color:#dc2626;' : '');
+        html += '<div class="cmp-metrics">'
+          + '<span>班级总积分<b style="' + totalCls + '">'
+          +   (totalPts > 0 ? '+' : '') + totalPts + '</b></span>'
+          + '<span>完成率<b>' + Math.round(s.doneRate * 100) + '%</b></span>'
+          + '</div>'
+          + '<div class="cmp-metrics">'
+          + '<span>已交<b>' + s.done + '</b></span>'
+          + '<span style="color:#d97706;">迟交<b style="color:#d97706;">' + s.late + '</b></span>'
+          + '<span>缺交<b>' + s.miss + '</b></span>'
+          + '</div>'
+          + '<div class="cmp-levels">'
+          + '<span class="cmp-lv"><i style="background:#22c55e;"></i>A+ <b>' + s.Aplus + '</b></span>'
+          + '<span class="cmp-lv"><i style="background:#eab308;"></i>A <b>' + s.A + '</b></span>'
+          + '<span class="cmp-lv"><i style="background:#f97316;"></i>A− <b>' + s.Aminus + '</b></span>'
+          + '<span class="cmp-lv"><i style="background:#ef4444;"></i>B <b>' + s.B + '</b></span>'
+          + '</div>';
+      } else {
+        var totalCls2 = s.totalPoints > 0 ? 'color:#16a34a;' : (s.totalPoints < 0 ? 'color:#dc2626;' : '');
+        html += '<div class="cmp-metrics">'
+          + '<span>班级总积分<b style="' + totalCls2 + '">'
+          +   (s.totalPoints > 0 ? '+' : '') + s.totalPoints + '</b></span>'
+          + '</div>'
+          + '<div class="cmp-metrics">'
+          + '<span>加分<b>' + s.plusTimes + '</b>次</span>'
+          + '<span>扣分<b>' + s.minusTimes + '</b>次</span>'
+          + '</div>';
+      }
+
+      card.innerHTML = html;
+      cmpCards.appendChild(card);
+    });
+  }
+  function openCompare(){
+    compareMask.classList.add('show');
+    document.body.style.overflow = 'hidden';
+    renderCompare();
+  }
+  function closeCompare(){
+    compareMask.classList.remove('show');
+    document.body.style.overflow = '';
+  }
+  compareBtn.addEventListener('click', openCompare);
+  compareClose.addEventListener('click', closeCompare);
+  compareMask.addEventListener('click', function(e){
+    if (e.target === compareMask) closeCompare();
+  });
+  Array.prototype.forEach.call(cmpRange.children, function(btn){
+    btn.addEventListener('click', function(){
+      compareRange = btn.dataset.days;
+      Array.prototype.forEach.call(cmpRange.children, function(b){
+        b.classList.toggle('active', b === btn);
+      });
+      renderCompare();
+    });
+  });
+
+  /* ================= 分类导出 ================= */
+  function getExportShowNames(){
+    if (exportShowNames === null) return config.showNames;
+    return exportShowNames;
+  }
+  function classifyStudents(){
+    var cls = currentClass;
+    var ids = idsOf(cls);
+    var nameMap = {};
+    rosterOf(cls).forEach(function(r){ nameMap[r.id] = r.name || ''; });
+    var groups;
+    if (mode === 'hw'){
+      var hwMap = currentHwMap();
+      var lvMap = currentLvMap();
+      var fixMap = currentFixMap();
+      groups = {
+        miss:    { name: '缺交',     color: '#b91c1c', students: [] },
+        late:    { name: '迟交',     color: '#f59e0b', students: [] },
+        pending: { name: '待过关',   color: '#f59e0b', students: [] },
+        Aplus:   { name: 'A+',       color: '#22c55e', students: [] },
+        A:       { name: 'A',        color: '#eab308', students: [] },
+        Aminus:  { name: 'A−',       color: '#f97316', students: [] },
+        B:       { name: 'B',        color: '#ef4444', students: [] },
+        none:    { name: '未登记',   color: '#94a3b8', students: [] },
+        passed:  { name: '已过关',   color: '#16a34a', students: [] },
+        freed:   { name: '免过关（A+）', color: '#86efac', students: [] }
+      };
+      ids.forEach(function(id){
+        var st = normHw(hwMap[id]);
+        var lv = (st === 1) ? (lvMap[id] || '') : '';
+        var fx = fixMap[id] || 0;
+        var stu = { id: id, name: nameMap[id] || '' };
+        if (st === 2) groups.miss.students.push(stu);
+        if (st === 3) groups.late.students.push(stu);
+        if (st === 0) groups.none.students.push(stu);
+        if (st === 1){
+          if (lv === 'A+') groups.Aplus.students.push(stu);
+          else if (lv === 'A') groups.A.students.push(stu);
+          else if (lv === 'A-') groups.Aminus.students.push(stu);
+          else if (lv === 'B') groups.B.students.push(stu);
+        }
+        var fd = autoFix(st, lv, fx);
+        if (fd === 1) groups.pending.students.push(stu);
+        else if (fd === 2) groups.passed.students.push(stu);
+        else if (fd === 3) groups.freed.students.push(stu);
+      });
+      return [
+        groups.miss, groups.late, groups.pending, groups.Aplus, groups.A,
+        groups.Aminus, groups.B, groups.none, groups.passed, groups.freed
+      ];
+    } else {
+      var cbMap = currentCbMap();
+      var plus = { name: '加分学生', color: '#16a34a', students: [] };
+      var minus = { name: '扣分学生', color: '#b91c1c', students: [] };
+      ids.forEach(function(id){
+        var v = cbMap[id] || 0;
+        if (v === 0) return;
+        var stu = { id: id, name: nameMap[id] || '', score: v };
+        if (v > 0) plus.students.push(stu);
+        else if (v < 0) minus.students.push(stu);
+      });
+      return [plus, minus];
+    }
+  }
+  function formatStudentLine(stu, showName){
+    if (showName && stu.name) return stu.id + ' ' + stu.name;
+    return String(stu.id);
+  }
+  function formatCategoryText(group, showName, withHeader){
+    var lines = group.students.map(function(s){ return formatStudentLine(s, showName); });
+    var head = group.name + '（' + group.students.length + '人）';
+    if (withHeader) return head + '：\n' + lines.join('、');
+    return lines.join('、');
+  }
+  function renderExport(){
+    var showName = getExportShowNames();
+    var hasName = rosterHasName(currentClass);
+    var effectiveShowName = showName && hasName;
+    if (effectiveShowName){
+      exportNameToggle.classList.add('on');
+      exportNameToggleIcon.textContent = '👁';
+      exportNameToggleText.textContent = '显示姓名';
+    } else {
+      exportNameToggle.classList.remove('on');
+      exportNameToggleIcon.textContent = '🚫';
+      exportNameToggleText.textContent = hasName ? '只显学号' : '未录入姓名';
+    }
+    var modeName = mode === 'hw'
+      ? ('作业登记 · 作业' + (currentTaskIdx + 1))
+      : '课堂表现';
+    exportSubLine.innerHTML = '<b>' + escapeHtml(classNameOf(currentClass)) + '</b> · '
+      + currentDate + ' · ' + modeName;
+    var groups = classifyStudents();
+    exportBody.innerHTML = '';
+    groups.forEach(function(g){
+      var card = document.createElement('div');
+      card.className = 'export-card';
+      var head = document.createElement('div');
+      head.className = 'export-card-head';
+      var dot = document.createElement('span');
+      dot.className = 'export-cat-dot';
+      dot.style.background = g.color;
+      head.appendChild(dot);
+      var nameEl = document.createElement('span');
+      nameEl.className = 'export-cat-name';
+      nameEl.textContent = g.name;
+      head.appendChild(nameEl);
+      var countEl = document.createElement('span');
+      countEl.className = 'export-cat-count';
+      countEl.textContent = '（' + g.students.length + '人）';
+      head.appendChild(countEl);
+      var copyBtn = document.createElement('button');
+      copyBtn.type = 'button';
+      copyBtn.className = 'export-copy-btn';
+      copyBtn.textContent = '复制';
+      if (g.students.length > 0){
+        copyBtn.addEventListener('click', function(){
+          var text = formatCategoryText(g, effectiveShowName, true);
+          copyToClipboard(text, function(ok){
+            if (ok){
+              copyBtn.textContent = '✓ 已复制';
+              copyBtn.classList.add('done');
+              showToast('已复制：' + g.name);
+              setTimeout(function(){
+                copyBtn.textContent = '复制';
+                copyBtn.classList.remove('done');
+              }, 1500);
+            } else { showToast('复制失败，请长按选择'); }
+          });
+        });
+      } else {
+        copyBtn.disabled = true;
+        copyBtn.style.opacity = '0.35';
+        copyBtn.style.pointerEvents = 'none';
+      }
+      head.appendChild(copyBtn);
+      card.appendChild(head);
+      var listEl = document.createElement('div');
+      listEl.className = 'export-list';
+      if (g.students.length === 0){
+        listEl.className += ' export-empty';
+        listEl.textContent = '暂无';
+      } else {
+        var lines = g.students.map(function(s){ return formatStudentLine(s, effectiveShowName); });
+        listEl.textContent = lines.join('、');
+      }
+      card.appendChild(listEl);
+      exportBody.appendChild(card);
+    });
+  }
+  function openExport(){
+    exportShowNames = null;
+    renderExport();
+    exportMask.classList.add('show');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeExport(){
+    exportMask.classList.remove('show');
+    document.body.style.overflow = '';
+  }
+  exportCatBtn.addEventListener('click', openExport);
+  exportClose.addEventListener('click', closeExport);
+  exportMask.addEventListener('click', function(e){
+    if (e.target === exportMask) closeExport();
+  });
+  exportNameToggle.addEventListener('click', function(){
+    var cur = getExportShowNames();
+    exportShowNames = !cur;
+    renderExport();
+  });
+  copyAllBtn.addEventListener('click', function(){
+    var showName = getExportShowNames();
+    var effectiveShowName = showName && rosterHasName(currentClass);
+    var modeName = mode === 'hw'
+      ? ('作业登记 · 作业' + (currentTaskIdx + 1))
+      : '课堂表现';
+    var groups = classifyStudents();
+    var lines = [];
+    lines.push('【' + classNameOf(currentClass) + ' · ' + modeName + ' · ' + currentDate + '】');
+    lines.push('');
+    groups.forEach(function(g){
+      if (g.students.length === 0) return;
+      var students = g.students.map(function(s){
+        return formatStudentLine(s, effectiveShowName);
+      }).join('、');
+      lines.push(g.name + '（' + g.students.length + '人）：' + students);
+      lines.push('');
+    });
+    var text = lines.join('\n').replace(/\n+$/, '');
+    copyToClipboard(text, function(ok){
+      if (ok) showToast('已复制全部内容');
+      else showToast('复制失败，请长按选择');
+    });
+  });
 
   /* ================= 汇总与预警 ================= */
   function openSummary(){
@@ -3302,9 +3677,9 @@
     ids.forEach(function(id){
       result[id] = {
         id: id, name: nameOf(cls, id),
-        done: 0, miss: 0, none: 0,
+        done: 0, late: 0, miss: 0, none: 0,
         Aplus: 0, A: 0, Aminus: 0, B: 0,
-        pending: 0, passed: 0,
+        pending: 0, passed: 0, freed: 0,
         plus: 0, minus: 0, score: 0,
         streakMiss: 0, byDate: {}
       };
@@ -3312,39 +3687,39 @@
     days.forEach(function(date){
       var d = data[date];
       var c = d && d[cls];
-      if (!c){
-        ids.forEach(function(id){
-          result[id].byDate[date] = { st: 0, lv: '', fx: 0, v: 0 };
-        });
-        return;
-      }
       if (m === 'hw'){
-        var hw = c.hw || {};
-        var lv = c.hwLv || {};
-        var fx = c.fix || {};
+        var tasks = (c && Array.isArray(c.hwTasks)) ? c.hwTasks : [];
         ids.forEach(function(id){
-          var st = hw[id] || 0;
-          var l = (st === 1) ? (lv[id] || '') : '';
-          var f = fx[id] || 0;
           var r = result[id];
-          r.byDate[date] = { st: st, lv: l, fx: f };
-          if (st === 1){
-            r.done++;
-            if (l === 'A+') r.Aplus++;
-            else if (l === 'A') r.A++;
-            else if (l === 'A-') r.Aminus++;
-            else if (l === 'B') r.B++;
-          } else if (st === 2){ r.miss++; }
-          else { r.none++; }
-          if (f === 1) r.pending++;
-          else if (f === 2) r.passed++;
+          var dayTasks = [];
+          for (var i = 0; i < tasks.length; i++){
+            var t = tasks[i];
+            var hw = t.hw ? normHw(t.hw[id]) : 0;
+            var lv = (hw === 1 && t.hwLv) ? (t.hwLv[id] || '') : '';
+            var fx = t.fix ? (t.fix[id] || 0) : 0;
+            dayTasks.push({ st: hw, lv: lv, fx: fx });
+            if (hw === 1){
+              r.done++;
+              if (lv === 'A+') r.Aplus++;
+              else if (lv === 'A') r.A++;
+              else if (lv === 'A-') r.Aminus++;
+              else if (lv === 'B') r.B++;
+            } else if (hw === 2){ r.miss++; }
+            else if (hw === 3){ r.late++; }
+            else { r.none++; }
+            var fd = autoFix(hw, lv, fx);
+            if (fd === 1) r.pending++;
+            else if (fd === 2) r.passed++;
+            else if (fd === 3) r.freed++;
+          }
+          r.byDate[date] = { tasks: dayTasks };
         });
       } else {
-        var cb = c.cb || {};
+        var cb = (c && c.cb) || {};
         ids.forEach(function(id){
           var v = cb[id] || 0;
           var r = result[id];
-          r.byDate[date] = { v: v, st: 0, lv: '', fx: 0 };
+          r.byDate[date] = { v: v, tasks: [] };
           if (v > 0) r.plus += v;
           else if (v < 0) r.minus += Math.abs(v);
           r.score += v;
@@ -3356,7 +3731,9 @@
         var r = result[id];
         for (var i = days.length - 1; i >= 0; i--){
           var dd = r.byDate[days[i]];
-          if (dd.st === 2) r.streakMiss++;
+          if (!dd || !dd.tasks || dd.tasks.length === 0) break;
+          var allMiss = dd.tasks.every(function(t){ return t.st === 2; });
+          if (allMiss) r.streakMiss++;
           else break;
         }
       });
@@ -3371,6 +3748,8 @@
     for (var id in stats){
       if (!Object.prototype.hasOwnProperty.call(stats, id)) continue;
       var r = stats[id];
+      var slots = r.done + r.late + r.miss + r.none;
+      if (slots === 0) continue;
       var reasons = [];
       var severity = 'warn';
       if (r.streakMiss >= 3){
@@ -3380,8 +3759,8 @@
         reasons.push('待过关 ' + r.pending + ' 次');
         severity = 'danger';
       }
-      if (total >= 5){
-        var rate = Math.round(r.done / total * 100);
+      if (slots >= 5){
+        var rate = Math.round((r.done + r.late) / slots * 100);
         if (rate < 60){
           reasons.push('完成率 ' + rate + '%');
           if (severity !== 'danger') severity = 'warn';
@@ -3449,31 +3828,32 @@
     var stats = computeStats(days, currentClass, mode);
     var pointsMap = computeAllPoints(days, currentClass);
     lastStats = { stats: stats, days: days, pointsMap: pointsMap };
-    var totalSlots = days.length * idsOf(currentClass).length;
 
     if (mode === 'hw'){
-      var totalDone = 0, totalPassed = 0, totalPending = 0;
+      var totalDone = 0, totalSlots = 0, totalLate = 0;
       for (var id in stats){
         if (!Object.prototype.hasOwnProperty.call(stats, id)) continue;
-        totalDone += stats[id].done;
-        totalPassed += stats[id].passed;
-        totalPending += stats[id].pending;
+        totalDone += stats[id].done + stats[id].late;
+        totalSlots += stats[id].done + stats[id].late + stats[id].miss + stats[id].none;
+        totalLate += stats[id].late;
       }
       var avgRate = totalSlots > 0 ? Math.round(totalDone / totalSlots * 100) : 0;
-      // 计算人均积分
       var sumPoints = 0;
       for (var pid in pointsMap){
         if (!Object.prototype.hasOwnProperty.call(pointsMap, pid)) continue;
         sumPoints += pointsMap[pid].total;
       }
-      var avgPoints = idsOf(currentClass).length > 0 ? Math.round(sumPoints / idsOf(currentClass).length * 10) / 10 : 0;
+      var idCount = idsOf(currentClass).length;
+      var avgPoints = idCount > 0 ? Math.round(sumPoints / idCount * 10) / 10 : 0;
+      var lateTxt = totalLate > 0 ? (' · 迟交 <b style="color:#d97706;">' + totalLate + '</b> 次') : '';
       ovLine.innerHTML =
         '共 <b>' + days.length + '</b> 天 · 人均积分 <b>' + (avgPoints > 0 ? '+' : '') + avgPoints + '</b>'
-        + ' · 完成率 <b>' + avgRate + '%</b>';
+        + ' · 完成率 <b>' + avgRate + '%</b>' + lateTxt;
     } else {
       var totalScore = 0;
       for (var id2 in stats) if (Object.prototype.hasOwnProperty.call(stats, id2)) totalScore += stats[id2].score;
-      var avg2 = idsOf(currentClass).length > 0 ? Math.round(totalScore / idsOf(currentClass).length * 10) / 10 : 0;
+      var idCount2 = idsOf(currentClass).length;
+      var avg2 = idCount2 > 0 ? Math.round(totalScore / idCount2 * 10) / 10 : 0;
       ovLine.innerHTML = '共 <b>' + days.length + '</b> 天 · 全班总得分 <b>' + (totalScore > 0 ? '+' : '') + totalScore + '</b>'
         + ' · 人均 <b>' + (avg2 > 0 ? '+' : '') + avg2 + '</b>';
     }
@@ -3484,100 +3864,107 @@
     if (currentView === 'rank'){
       renderRankTable(pointsMap, days);
     } else if (currentView === 'summary'){
-      if (mode === 'hw') renderHwSummaryTable(stats, days);
-      else renderCbSummaryTable(stats);
+      if (mode === 'hw') renderHwSummaryTable(stats, days, pointsMap);
+      else renderCbSummaryTable(stats, pointsMap);
     } else {
       renderDetailTable(stats, days);
     }
   }
-  function renderHwSummaryTable(stats, days){
+
+  function renderHwSummaryTable(stats, days, pointsMap){
     var total = days.length;
     var ids = idsOf(currentClass);
     var showName = config.showNames && rosterHasName(currentClass);
     var nameMap = {};
     rosterOf(currentClass).forEach(function(r){ nameMap[r.id] = r.name || ''; });
+
     var cols = '<col style="width:34px">';
-    if (showName) cols += '<col style="width:66px">';
-    cols += '<col style="width:30px"><col style="width:30px"><col style="width:30px">'
-          + '<col style="width:26px"><col style="width:26px"><col style="width:26px"><col style="width:26px">'
-          + '<col style="width:36px"><col style="width:36px"><col style="width:48px">';
+    if (showName) cols += '<col style="width:60px">';
+    cols += '<col style="width:26px"><col style="width:26px"><col style="width:26px"><col style="width:26px">'
+          + '<col style="width:22px"><col style="width:22px"><col style="width:22px"><col style="width:22px">'
+          + '<col style="width:30px"><col style="width:30px"><col style="width:42px">'
+          + '<col style="width:42px"><col style="width:42px"><col style="width:46px">';
+
     var html = '<div class="sum-scroll"><table class="sum-table"><colgroup>' + cols + '</colgroup><thead><tr>'
       + '<th>学号</th>';
     if (showName) html += '<th>姓名</th>';
-    html += '<th>已交</th><th>缺交</th><th>未登</th>'
+    html += '<th>已交</th><th>迟交</th><th>缺交</th><th>未登</th>'
       + '<th>A+</th><th>A</th><th>A−</th><th>B</th>'
       + '<th>待过</th><th>已过</th><th>完成率</th>'
+      + '<th>作业分</th><th>课堂分</th><th>总积分</th>'
       + '</tr></thead><tbody>';
     ids.forEach(function(id){
       var r = stats[id];
-      var none = total - r.done - r.miss;
-      var rate = total > 0 ? Math.round(r.done / total * 100) : 0;
+      var p = pointsMap[id] || { hwPoints: 0, cbPoints: 0, total: 0 };
+      var slots = r.done + r.late + r.miss + r.none;
+      var rate = slots > 0 ? Math.round((r.done + r.late) / slots * 100) : 0;
+      var hwTxt = (p.hwPoints > 0 ? '+' : '') + p.hwPoints;
+      var cbTxt = (p.cbPoints > 0 ? '+' : '') + p.cbPoints;
+      var toTxt = (p.total > 0 ? '+' : '') + p.total;
+      var hwCls = p.hwPoints > 0 ? '' : (p.hwPoints < 0 ? ' neg' : ' zero');
+      var cbCls = p.cbPoints > 0 ? '' : (p.cbPoints < 0 ? ' neg' : ' zero');
+      var toCls = p.total > 0 ? '' : (p.total < 0 ? ' neg' : ' zero');
+      var passedCount = r.passed + r.freed;
+
       html += '<tr><td class="td-id">' + id + '</td>';
       if (showName) html += '<td class="td-name">' + escapeHtml(nameMap[id] || '') + '</td>';
       html += '<td class="td-done">' + r.done + '</td>'
+        + '<td class="td-late">' + (r.late > 0 ? r.late : '—') + '</td>'
         + '<td class="td-miss">' + r.miss + '</td>'
-        + '<td class="td-none">' + none + '</td>'
+        + '<td class="td-none">' + r.none + '</td>'
         + '<td class="td-ap">' + r.Aplus + '</td>'
         + '<td class="td-a">' + r.A + '</td>'
         + '<td class="td-am">' + r.Aminus + '</td>'
         + '<td class="td-b">' + r.B + '</td>'
         + '<td class="td-pending">' + r.pending + '</td>'
-        + '<td class="td-passed">' + r.passed + '</td>'
-        + '<td class="td-rate">' + rate + '%</td></tr>';
+        + '<td class="td-passed">' + passedCount + '</td>'
+        + '<td class="td-rate">' + rate + '%</td>'
+        + '<td class="td-hwpts' + hwCls + '">' + hwTxt + '</td>'
+        + '<td class="td-cbpts' + cbCls + '">' + cbTxt + '</td>'
+        + '<td class="td-totalpts' + toCls + '">' + toTxt + '</td>'
+        + '</tr>';
     });
     html += '</tbody></table></div>';
     summaryResult.innerHTML = html;
   }
-  function renderCbSummaryTable(stats){
+
+  function renderCbSummaryTable(stats, pointsMap){
     var ids = idsOf(currentClass);
     var showName = config.showNames && rosterHasName(currentClass);
     var nameMap = {};
     rosterOf(currentClass).forEach(function(r){ nameMap[r.id] = r.name || ''; });
     var cols = '<col style="width:44px">';
-    if (showName) cols += '<col style="width:66px">';
-    cols += '<col style="width:52px"><col style="width:52px"><col style="width:52px">';
+    if (showName) cols += '<col style="width:60px">';
+    cols += '<col style="width:52px"><col style="width:52px"><col style="width:52px">'
+          + '<col style="width:52px">';
     var html = '<table class="sum-table"><colgroup>' + cols + '</colgroup><thead><tr>'
       + '<th>学号</th>';
     if (showName) html += '<th>姓名</th>';
-    html += '<th>加分</th><th>扣分</th><th>总得分</th></tr></thead><tbody>';
+    html += '<th>加分</th><th>扣分</th><th>总得分</th><th>作业分</th></tr></thead><tbody>';
     ids.forEach(function(id){
       var r = stats[id];
+      var p = pointsMap[id] || { hwPoints: 0 };
       var cls = r.score > 0 ? 'td-done' : (r.score < 0 ? 'td-miss' : 'td-none');
+      var hwCls = p.hwPoints > 0 ? '' : (p.hwPoints < 0 ? ' neg' : ' zero');
       html += '<tr><td class="td-id">' + id + '</td>';
       if (showName) html += '<td class="td-name">' + escapeHtml(nameMap[id] || '') + '</td>';
       html += '<td class="td-done">' + r.plus + '</td>'
         + '<td class="td-miss">' + r.minus + '</td>'
-        + '<td class="' + cls + '">' + (r.score > 0 ? '+' : '') + r.score + '</td></tr>';
+        + '<td class="' + cls + '">' + (r.score > 0 ? '+' : '') + r.score + '</td>'
+        + '<td class="td-hwpts' + hwCls + '">' + (p.hwPoints > 0 ? '+' : '') + p.hwPoints + '</td>'
+        + '</tr>';
     });
     html += '</tbody></table>';
     summaryResult.innerHTML = html;
   }
-  function detailCellInfo(m, d){
-    if (m === 'hw'){
-      var st = d.st || 0;
-      var lv = d.lv || '';
-      if (st === 2) return {cls:'det-cell st2', txt:'✕'};
-      if (st === 1){
-        if (lv === 'A+') return {cls:'det-cell lv-ap', txt:'A+'};
-        if (lv === 'A')  return {cls:'det-cell lv-a', txt:'A'};
-        if (lv === 'A-') return {cls:'det-cell lv-am', txt:'A−'};
-        if (lv === 'B')  return {cls:'det-cell lv-b', txt:'B'};
-        return {cls:'det-cell st1', txt:'✓'};
-      }
-      return {cls:'det-cell st0', txt:''};
-    }
-    var v = d.v || 0;
-    if (v > 0) return {cls:'det-cell lv-a', txt:'+'+v};
-    if (v < 0) return {cls:'det-cell st2', txt:'−'+Math.abs(v)};
-    return {cls:'det-cell st0', txt:''};
-  }
+
   function renderDetailTable(stats, days){
     var ids = idsOf(currentClass);
     var showName = config.showNames && rosterHasName(currentClass);
     var nameMap = {};
     rosterOf(currentClass).forEach(function(r){ nameMap[r.id] = r.name || ''; });
     var colWidths = showName ? '86px' : '36px';
-    days.forEach(function(){ colWidths += ' 32px'; });
+    days.forEach(function(){ colWidths += ' 34px'; });
     var html = '<div class="det-wrap"><div class="det-grid" style="grid-template-columns:' + colWidths + ';">';
     html += '<div class="det-h det-h-id">学号</div>';
     days.forEach(function(date){ html += '<div class="det-h">' + date.slice(5) + '</div>'; });
@@ -3589,26 +3976,38 @@
         html += '<div class="det-name">' + id + '</div>';
       }
       days.forEach(function(date){
-        var c = stats[id].byDate[date] || { st: 0, lv: '', fx: 0, v: 0 };
-        var info = detailCellInfo(mode, c);
-        var fxDot = '';
-        if (mode === 'hw' && c.fx > 0){
-          fxDot = '<span class="det-fx" data-fx="' + c.fx + '"></span>';
+        var dayData = stats[id].byDate[date] || { tasks: [], v: 0 };
+        var inner = '';
+        if (mode === 'hw'){
+          var tasks = dayData.tasks || [];
+          if (tasks.length === 0){
+            inner = '<span class="det-dot d-none"></span>';
+          } else {
+            tasks.forEach(function(t){
+              inner += '<span class="det-dot ' + dotClass(t) + '"></span>';
+            });
+          }
+        } else {
+          var v = dayData.v || 0;
+          if (v > 0) inner = '<span class="det-dot d-a"></span>';
+          else if (v < 0) inner = '<span class="det-dot d-b"></span>';
+          else inner = '<span class="det-dot d-none"></span>';
         }
-        html += '<div class="' + info.cls + '">' + info.txt + fxDot + '</div>';
+        html += '<div class="det-cell">' + inner + '</div>';
       });
     });
     html += '</div></div>';
     var legend;
     if (mode === 'hw'){
-      legend = '✓ 已交（未评等级） &nbsp; ✕ 缺交 &nbsp; 空白 未登记<br>'
-        + '<span style="color:#16a34a;font-weight:700;">A+</span> · '
-        + '<span style="color:#ca8a04;font-weight:700;">A</span> · '
-        + '<span style="color:#ea580c;font-weight:700;">A−</span> · '
-        + '<span style="color:#dc2626;font-weight:700;">B</span>'
-        + '<br>左下角小圆点：'
-        + '<span style="color:#d97706;font-weight:700;">● 待过关</span> · '
-        + '<span style="color:#16a34a;font-weight:700;">● 已过关</span>';
+      legend = '<span class="sw" style="display:inline-block;width:12px;height:3px;background:#22c55e;border-radius:1.5px;"></span> A+ &nbsp; '
+        + '<span class="sw" style="display:inline-block;width:12px;height:3px;background:#eab308;border-radius:1.5px;"></span> A &nbsp; '
+        + '<span class="sw" style="display:inline-block;width:12px;height:3px;background:#f97316;border-radius:1.5px;"></span> A− &nbsp; '
+        + '<span class="sw" style="display:inline-block;width:12px;height:3px;background:#ef4444;border-radius:1.5px;"></span> B &nbsp; '
+        + '<span class="sw" style="display:inline-block;width:12px;height:3px;background:#bbf7d0;border-radius:1.5px;"></span> 已交 &nbsp; '
+        + '<span class="sw" style="display:inline-block;width:12px;height:3px;background:#f59e0b;border-radius:1.5px;"></span> 迟交 &nbsp; '
+        + '<span class="sw" style="display:inline-block;width:12px;height:3px;background:#b91c1c;border-radius:1.5px;"></span> 缺交 &nbsp; '
+        + '<span class="sw" style="display:inline-block;width:12px;height:3px;background:#e2e8f0;border-radius:1.5px;"></span> 未登记<br>'
+        + '每个格子里的每条小横杠 = 一条作业';
     } else {
       legend = '+N 加分 &nbsp; −N 扣分 &nbsp; 空白 未评价';
     }
@@ -3617,7 +4016,6 @@
   }
 
   function buildSummaryPlainText(stats, days, pointsMap){
-    var total = days.length;
     var ids = idsOf(currentClass);
     var showName = config.showNames && rosterHasName(currentClass);
     var nameMap = {};
@@ -3625,7 +4023,6 @@
     var lines = [];
 
     if (currentView === 'rank' && pointsMap){
-      // 积分榜模式：输出排名表
       var arr = ids.map(function(id){ return pointsMap[id]; });
       arr.sort(function(a, b){ return b.total - a.total; });
       var head = '排名\t学号';
@@ -3644,27 +4041,30 @@
     if (mode === 'hw'){
       var head2 = '学号';
       if (showName) head2 += '\t姓名';
-      head2 += '\t已交\t缺交\t未登\tA+\tA\tA-\tB\t待过\t已过\t完成率';
+      head2 += '\t已交\t迟交\t缺交\t未登\tA+\tA\tA-\tB\t待过\t已过\t完成率\t作业分\t课堂分\t总积分';
       lines.push(head2);
       ids.forEach(function(id){
         var r = stats[id];
-        var none = total - r.done - r.miss;
-        var rate = total > 0 ? Math.round(r.done / total * 100) : 0;
+        var p = pointsMap[id] || { hwPoints: 0, cbPoints: 0, total: 0 };
+        var slots = r.done + r.late + r.miss + r.none;
+        var rate = slots > 0 ? Math.round((r.done + r.late) / slots * 100) : 0;
         var parts = [id];
         if (showName) parts.push(nameMap[id] || '');
-        parts.push(r.done, r.miss, none, r.Aplus, r.A, r.Aminus, r.B, r.pending, r.passed, rate + '%');
+        parts.push(r.done, r.late, r.miss, r.none, r.Aplus, r.A, r.Aminus, r.B, r.pending, r.passed + r.freed, rate + '%',
+                   p.hwPoints, p.cbPoints, p.total);
         lines.push(parts.join('\t'));
       });
     } else {
       var head3 = '学号';
       if (showName) head3 += '\t姓名';
-      head3 += '\t加分次数\t加分\t扣分次数\t扣分\t总得分';
+      head3 += '\t加分\t扣分\t总得分\t作业分';
       lines.push(head3);
       ids.forEach(function(id){
         var r = stats[id];
+        var p = pointsMap[id] || { hwPoints: 0 };
         var parts = [id];
         if (showName) parts.push(nameMap[id] || '');
-        parts.push(r.plus > 0 ? '—' : '0', r.plus, r.minus > 0 ? '—' : '0', r.minus, r.score);
+        parts.push(r.plus, r.minus, r.score, p.hwPoints);
         lines.push(parts.join('\t'));
       });
     }
@@ -3685,14 +4085,13 @@
     return s;
   }
   function buildCsv(stats, days, pointsMap){
-    var total = days.length;
     var ids = idsOf(currentClass);
     var showName = config.showNames && rosterHasName(currentClass);
     var nameMap = {};
     rosterOf(currentClass).forEach(function(r){ nameMap[r.id] = r.name || ''; });
     var rows = [];
     rows.push(['# 班级：' + classNameOf(currentClass)]);
-    rows.push(['# 时间范围：' + days[0] + ' 至 ' + days[days.length - 1] + '（共' + total + '天）']);
+    rows.push(['# 时间范围：' + days[0] + ' 至 ' + days[days.length - 1] + '（共' + days.length + '天）']);
     rows.push(['# 导出时间：' + new Date().toLocaleString('zh-CN')]);
     rows.push([]);
 
@@ -3715,27 +4114,30 @@
     if (mode === 'hw'){
       var header = ['学号'];
       if (showName) header.push('姓名');
-      header = header.concat(['已交', '缺交', '未登记', 'A+', 'A', 'A−', 'B', '待过关', '已过关', '完成率']);
+      header = header.concat(['已交', '迟交', '缺交', '未登记', 'A+', 'A', 'A−', 'B', '待过关', '已过关', '完成率', '作业分', '课堂分', '总积分']);
       rows.push(header);
       ids.forEach(function(id){
         var r = stats[id];
-        var none = total - r.done - r.miss;
-        var rate = total > 0 ? Math.round(r.done / total * 100) + '%' : '0%';
+        var p = pointsMap[id] || { hwPoints: 0, cbPoints: 0, total: 0 };
+        var slots = r.done + r.late + r.miss + r.none;
+        var rate = slots > 0 ? Math.round((r.done + r.late) / slots * 100) + '%' : '0%';
         var row = [id];
         if (showName) row.push(nameMap[id] || '');
-        row = row.concat([r.done, r.miss, none, r.Aplus, r.A, r.Aminus, r.B, r.pending, r.passed, rate]);
+        row = row.concat([r.done, r.late, r.miss, r.none, r.Aplus, r.A, r.Aminus, r.B, r.pending, r.passed + r.freed, rate,
+                          p.hwPoints, p.cbPoints, p.total]);
         rows.push(row);
       });
     } else {
       var header2 = ['学号'];
       if (showName) header2.push('姓名');
-      header2 = header2.concat(['加分次数', '加分', '扣分次数', '扣分', '总得分']);
+      header2 = header2.concat(['加分', '扣分', '总得分', '作业分']);
       rows.push(header2);
       ids.forEach(function(id){
         var r = stats[id];
+        var p = pointsMap[id] || { hwPoints: 0 };
         var row = [id];
         if (showName) row.push(nameMap[id] || '');
-        row = row.concat([r.plusTimes, r.plus, r.minusTimes, r.minus, r.score]);
+        row = row.concat([r.plus, r.minus, r.score, p.hwPoints]);
         rows.push(row);
       });
     }
@@ -3927,6 +4329,7 @@
     save();
     if (currentClass === c.id){
       currentClass = config.classes[0].id;
+      currentTaskIdx = 0;
       clearUndo();
       buildGrid();
       render();
@@ -4001,6 +4404,7 @@
     searchInput.value = '';
     searchClear.classList.remove('show');
     currentDate = datePicker.value;
+    currentTaskIdx = 0;
     clearUndo();
     render();
   });
@@ -4008,34 +4412,56 @@
   clearBtn.addEventListener('click', function () {
     var d = data[currentDate];
     var c = d && d[currentClass];
-    var name = mode === 'hw' ? '作业 & 改错过关' : '课堂表现';
-    var map;
-    if (mode === 'hw') map = c && c.hw;
-    else map = c && c.cb;
-    map = map || {};
-    var n = Object.keys(map).length;
-    if (n === 0){
-      alert('当前日期、当前班级的【' + name + '】还没有任何记录。');
-      return;
+    if (mode === 'hw'){
+      var t = c && Array.isArray(c.hwTasks) ? c.hwTasks[currentTaskIdx] : null;
+      if (!t){ alert('当前没有可清空的数据'); return; }
+      var n = (t.hw ? Object.keys(t.hw).length : 0)
+            + (t.fix ? Object.keys(t.fix).length : 0);
+      if (n === 0){
+        alert('【作业' + (currentTaskIdx + 1) + '】还没有任何记录。');
+        return;
+      }
+      var msg = '确定要清空吗？\n\n'
+              + '日期：' + currentDate + '\n'
+              + '班级：' + classNameOf(currentClass) + '\n'
+              + '内容：作业' + (currentTaskIdx + 1) + '（含状态、等级、改错）\n'
+              + '共 ' + n + ' 条记录\n\n'
+              + '清空后无法恢复！';
+      if (!confirm(msg)) return;
+      pushUndo();
+      t.hw = {};
+      t.hwLv = {};
+      t.fix = {};
+      cleanup(currentDate, currentClass);
+      save();
+      render();
+    } else {
+      var cbMap = (c && c.cb) || {};
+      var n2 = Object.keys(cbMap).length;
+      if (n2 === 0){
+        alert('当前日期、当前班级的【课堂表现】还没有任何记录。');
+        return;
+      }
+      var msg2 = '确定要清空吗？\n\n'
+              + '日期：' + currentDate + '\n'
+              + '班级：' + classNameOf(currentClass) + '\n'
+              + '内容：课堂表现\n'
+              + '共 ' + n2 + ' 条记录\n\n'
+              + '清空后无法恢复！';
+      if (!confirm(msg2)) return;
+      pushUndo();
+      c.cb = {};
+      cleanup(currentDate, currentClass);
+      save();
+      render();
     }
-    var msg = '确定要清空吗？\n\n'
-            + '日期：' + currentDate + '\n'
-            + '班级：' + classNameOf(currentClass) + '\n'
-            + '内容：' + name + '\n'
-            + '共 ' + n + ' 条记录\n\n'
-            + '清空后无法恢复！';
-    if (!confirm(msg)) return;
-    pushUndo();
-    if (mode === 'hw'){ c.hw = {}; c.hwLv = {}; c.fix = {}; }
-    else { c.cb = {}; }
-    cleanup(currentDate, currentClass);
-    save();
-    render();
   });
 
   loadConfig();
   load();
+  migrateData();
   ensureCurrentClass();
+  ensure(currentDate, currentClass);
   datePicker.value = currentDate;
   renderTabs();
   buildGrid();
