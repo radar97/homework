@@ -299,6 +299,17 @@
   .grid.mode-hw .cell[data-fix="2"] .fx-dot{background:#16a34a;}
   .grid.mode-hw .cell[data-fix="3"] .fx-dot{background:#86efac;}
 
+  /* 课堂模式：格子右上角显示课堂分 */
+  .cell .c-score{
+    position:absolute;top:3px;right:5px;
+    display:none;
+    font-size:11px;font-weight:800;line-height:1;
+    color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.4);
+    pointer-events:none;
+    letter-spacing:-.3px;
+  }
+  .grid.mode-cb .cell .c-score.show{display:block;}
+
   .hint{margin:12px 0 0;text-align:center;font-size:11px;color:#94a3b8;line-height:1.9;}
   .hint b{color:#64748b;}
 
@@ -569,7 +580,6 @@
   .view-toggle button.active{background:#fff;color:#0f172a;box-shadow:0 1px 2px rgba(15,23,42,.08);}
   .summary-result{min-height:120px;}
 
-  /* 排序切换（积分榜内） */
   .rank-sort{
     display:flex;gap:4px;margin-bottom:10px;
     background:#fff;border-radius:9px;padding:3px;
@@ -1141,6 +1151,7 @@
     .det-cell{height:22px;}
     .det-dot{width:14px;height:3px;}
     .rank-sort button{font-size:11px;padding:7px;}
+    .cell .c-score{font-size:10px;top:2px;right:3px;}
   }
 </style>
 </head>
@@ -1180,8 +1191,8 @@
   </div>
 
   <div class="fixbar" id="fixBar">
-    <div class="item"><span class="tag tPending">待过关</span><b id="cntPend">0</b></div>
-    <div class="item"><span class="tag tPassed">已过关</span><b id="cntPass">0</b></div>
+    <div class="item"><span class="tag tPending">未改错</span><b id="cntPend">0</b></div>
+    <div class="item"><span class="tag tPassed">已改错</span><b id="cntPass">0</b></div>
   </div>
 
   <div class="note-card" id="noteCard">
@@ -1267,11 +1278,11 @@
       </div>
     </div>
     <div class="sheet-group">
-      <div class="group-label">改错过关</div>
-      <div class="sheet-hint" id="fixHint">A+ 已交的学生自动视为「免过关」</div>
+      <div class="group-label">改错情况</div>
+      <div class="sheet-hint" id="fixHint">A+ 已交的学生自动视为「免改错」</div>
       <div class="seg-row" id="fixSeg">
-        <button class="seg-btn" type="button" data-fix="1">待过关</button>
-        <button class="seg-btn" type="button" data-fix="2">已过关</button>
+        <button class="seg-btn" type="button" data-fix="1">未改错</button>
+        <button class="seg-btn" type="button" data-fix="2">已改错</button>
         <button class="seg-btn" type="button" data-fix="0">未登记</button>
       </div>
     </div>
@@ -1418,8 +1429,8 @@
         <div class="section-hint" style="font-size:12px;line-height:2;">
           A+ <b>+2</b> &nbsp; A <b>+1</b> &nbsp; A− <b>0</b> &nbsp; B <b>-1</b><br>
           <span style="color:#d97706;font-weight:700;">迟交 <b>-1</b></span> &nbsp;
-          缺交 <b>-2</b> &nbsp; 过关 <b>+1</b> &nbsp; 待过关 <b>0</b><br>
-          A+ 自动免过关（不额外加分）<br>
+          缺交 <b>-2</b> &nbsp; 已改错 <b>+1</b> &nbsp; 未改错 <b>0</b><br>
+          A+ 自动免改错（不额外加分）<br>
           迟交算作"已交"，不计入缺交<br>
           多条作业按实际条数累加<br>
           课堂表现：按实际加减分计算
@@ -1542,7 +1553,7 @@
   var profileRange = 30;
 
   var currentView = 'rank';
-  var rankSortMode = 'score';   // 'score' | 'id'
+  var rankSortMode = 'score';
   var currentQuick = 'week';
   var searchTimer = null;
   var highlightTimer = null;
@@ -1698,15 +1709,6 @@
       return ranges.join('\n');
     }
   }
-
-  /* ============================================================
-     数据结构
-     data[date][cls] = {
-        hwTasks: [ { hw:{0|1|2|3}, hwLv:{}, fix:{0|1|2}, note:'' }, ... ],
-        cb: { id -> 分 }
-     }
-     hw 状态：0未登记 / 1已交 / 2缺交 / 3迟交
-     ============================================================ */
 
   function newEmptyTask(){
     return { hw: {}, hwLv: {}, fix: {}, note: '' };
@@ -1884,7 +1886,6 @@
     save();
   }
 
-  /* ================= 撤销 ================= */
   function pushUndo(){
     var c = data[currentDate] && data[currentDate][currentClass];
     var snap = {
@@ -1913,7 +1914,6 @@
   }
   function clearUndo(){ undoStack = []; updateUndoBtn(); }
 
-  /* ================= 今日得分 ================= */
   function calcDailyHwPoints(id){
     var tasks = peekTasks(currentDate, currentClass);
     if (!tasks || tasks.length === 0) return 0;
@@ -1940,7 +1940,6 @@
     return getCb(currentDate, currentClass, id);
   }
 
-  /* ================= 一段时间的积分累计 ================= */
   function computeStudentPoints(id, days, cls){
     var r = {
       hwPoints: 0, cbPoints: 0, total: 0,
@@ -1995,7 +1994,6 @@
     return result;
   }
 
-  /* ================= DOM ================= */
   var classTabs   = document.getElementById('classTabs');
   var gridEl     = document.getElementById('grid');
   var datePicker = document.getElementById('datePicker');
@@ -2149,7 +2147,6 @@
     });
   }
 
-  /* ================= 作业条 ================= */
   function renderTaskTabs(){
     if (mode !== 'hw'){
       taskBar.classList.remove('show');
@@ -2220,7 +2217,6 @@
   }
   taskAddBtn.addEventListener('click', addTask);
 
-  /* ================= 班级 tabs ================= */
   function renderTabs(){
     classTabs.innerHTML = '';
     config.classes.forEach(function(c){
@@ -2378,7 +2374,7 @@
   exportBtn.addEventListener('click', function () {
     try {
       var bundle = {
-        version: 22,
+        version: 23,
         exportTime: new Date().toISOString(),
         config: config,
         data: data
@@ -2460,10 +2456,10 @@
     });
     var fd = autoFix(hw, lv, fx);
     if (fd === 3){
-      fixHint.textContent = '✓ 当前状态：免过关（A+ 自动）';
+      fixHint.textContent = '✓ 当前状态：免改错（A+ 自动）';
       fixHint.classList.add('good');
     } else {
-      fixHint.textContent = 'A+ 已交的学生自动视为「免过关」';
+      fixHint.textContent = 'A+ 已交的学生自动视为「免改错」';
       fixHint.classList.remove('good');
     }
     var pts = calcDailyHwPoints(activeId);
@@ -2637,6 +2633,8 @@
       lv.className = 'lv'; btn.appendChild(lv);
       var fx = document.createElement('span');
       fx.className = 'fx-dot'; btn.appendChild(fx);
+      var sc = document.createElement('span');
+      sc.className = 'c-score'; btn.appendChild(sc);
       bindCell(btn, id);
       frag.appendChild(btn);
       cells.push(btn);
@@ -2683,6 +2681,9 @@
         else { lvEl.className = 'lv'; lvEl.textContent = ''; }
         var fxEl = btn.querySelector('.fx-dot');
         fxEl.className = fd > 0 ? 'fx-dot show' : 'fx-dot';
+        var scEl = btn.querySelector('.c-score');
+        scEl.className = 'c-score';
+        scEl.textContent = '';
       });
       lvBarEl.style.display = 'flex';
       fixBarEl.style.display = 'flex';
@@ -2695,7 +2696,7 @@
       hintEl.innerHTML =
         '① 点「全部已交」→ ② 点缺交/迟交的同学去面板改状态 → ③ 点已交方格改等级<br>' +
         '多作业：点上方「作业条」切换；「+ 添加作业」增加一条<br>' +
-        '积分规则：A+ +2 · A +1 · A− 0 · B −1 · <span style="color:#d97706;">迟交 −1</span> · 缺交 −2 · 过关 +1';
+        '积分规则：A+ +2 · A +1 · A− 0 · B −1 · <span style="color:#d97706;">迟交 −1</span> · 缺交 −2 · 已改错 +1';
       clearBtnText.textContent = '清空';
     } else {
       var cbMap = currentCbMap();
@@ -2709,6 +2710,14 @@
         lvEl.className = 'lv'; lvEl.textContent = '';
         var fxEl = btn.querySelector('.fx-dot');
         fxEl.className = 'fx-dot';
+        var scEl = btn.querySelector('.c-score');
+        if (v !== 0){
+          scEl.className = 'c-score show';
+          scEl.textContent = (v > 0 ? '+' : '\u2212') + Math.abs(v);
+        } else {
+          scEl.className = 'c-score';
+          scEl.textContent = '';
+        }
       });
       lvBarEl.style.display = 'none';
       fixBarEl.style.display = 'none';
@@ -2723,7 +2732,7 @@
       if (statLate) statLate.style.display = 'none';
       hintEl.innerHTML =
         '单击方格 <b>+1</b> 分，长按方格 <b>−1</b> 分<br>' +
-        '课堂表现分直接计入积分';
+        '右上角显示该生当日课堂得分';
       clearBtnText.textContent = '清空';
       updateNamesBtnState();
       renderNote();
@@ -2803,7 +2812,6 @@
     cntC.textContent = total - a - b;
   }
 
-  /* ================= 积分榜（含排序切换） ================= */
   function renderRankTable(pointsMap, days){
     var ids = idsOf(currentClass);
     var showName = config.showNames && rosterHasName(currentClass);
@@ -2815,13 +2823,11 @@
       arr.sort(function(a, b){ return b.total - a.total; });
     }
 
-    // 排名映射（总是按分数排，因为要显示金银铜）
     var rankMap = {};
     var sortedByScore = ids.map(function(id){ return pointsMap[id]; });
     sortedByScore.sort(function(a, b){ return b.total - a.total; });
     sortedByScore.forEach(function(s, idx){ rankMap[s.id] = idx + 1; });
 
-    // 统计卡片
     var totalSum = 0, maxP = -Infinity, positiveCount = 0;
     sortedByScore.forEach(function(s){
       totalSum += s.total;
@@ -2837,13 +2843,11 @@
       + '<div class="rank-sum-card"><div class="rs-num">' + positiveCount + '<span style="font-size:12px;font-weight:500;color:#94a3b8;">/' + sortedByScore.length + '</span></div><div class="rs-label">正分人数</div></div>'
       + '</div>';
 
-    // 排序切换
     var sortHtml = '<div class="rank-sort" id="rankSort">'
       + '<button type="button" data-sort="score"' + (rankSortMode === 'score' ? ' class="active"' : '') + '>🏆 按积分排名</button>'
       + '<button type="button" data-sort="id"' + (rankSortMode === 'id' ? ' class="active"' : '') + '>🔢 按学号顺序</button>'
       + '</div>';
 
-    // 表格
     var cols = '<col style="width:36px"><col style="width:44px">';
     if (showName) cols += '<col style="width:56px">';
     cols += '<col style="width:54px"><col style="width:54px"><col style="width:60px">';
@@ -2857,7 +2861,6 @@
     arr.forEach(function(s){
       var rank = rankMap[s.id];
       var rankCls = rank === 1 ? 'top1' : (rank === 2 ? 'top2' : (rank === 3 ? 'top3' : ''));
-      var scoreCls = s.total > 0 ? 'td-done' : (s.total < 0 ? 'td-miss' : 'td-none');
       var hwCls = s.hwPoints > 0 ? 'td-done' : (s.hwPoints < 0 ? 'td-miss' : 'td-none');
       var cbCls = s.cbPoints > 0 ? 'td-done' : (s.cbPoints < 0 ? 'td-miss' : 'td-none');
       var totCls = s.total > 0 ? '' : (s.total < 0 ? ' neg' : ' zero');
@@ -2873,11 +2876,10 @@
     });
     html += '</tbody></table></div>';
     html += '<p class="rank-legend">点任意学生可查看个人档案<br>'
-      + '作业分 = 作业等级分 + 改错过关分 · 课堂分 = 课堂加减分 · 总积分 = 作业分 + 课堂分</p>';
+      + '作业分 = 作业等级分 + 改错分 · 课堂分 = 课堂加减分 · 总积分 = 作业分 + 课堂分</p>';
 
     summaryResult.innerHTML = html;
 
-    // 排序切换
     var sortEl = document.getElementById('rankSort');
     if (sortEl){
       Array.prototype.forEach.call(sortEl.children, function(btn){
@@ -2890,7 +2892,6 @@
       });
     }
 
-    // 点击行 → 个人档案
     var rows = summaryResult.querySelectorAll('tr.clickable');
     Array.prototype.forEach.call(rows, function(row){
       row.addEventListener('click', function(){
@@ -2901,7 +2902,6 @@
     });
   }
 
-  /* ================= 学生档案 ================= */
   function getAllDates(cls){
     var dates = [];
     for (var d in data){
@@ -3115,10 +3115,10 @@
     if (profile.pending > 0 || profile.passed > 0 || profile.freed > 0){
       fixHtml =
         '<div class="st-section">'
-        + '<div class="st-section-title">改错过关</div>'
-        + (profile.pending > 0 ? '<div class="st-cb-row"><span class="lbl">待过关</span><span class="val" style="color:#d97706;">' + profile.pending + ' 次（0分）</span></div>' : '')
-        + (profile.passed > 0 ? '<div class="st-cb-row"><span class="lbl">已过关</span><span class="val" style="color:#16a34a;">' + profile.passed + ' 次（+' + profile.passed + '分）</span></div>' : '')
-        + (profile.freed > 0 ? '<div class="st-cb-row"><span class="lbl">免过关（A+）</span><span class="val" style="color:#16a34a;">' + profile.freed + ' 次</span></div>' : '')
+        + '<div class="st-section-title">改错情况</div>'
+        + (profile.pending > 0 ? '<div class="st-cb-row"><span class="lbl">未改错</span><span class="val" style="color:#d97706;">' + profile.pending + ' 次（0分）</span></div>' : '')
+        + (profile.passed > 0 ? '<div class="st-cb-row"><span class="lbl">已改错</span><span class="val" style="color:#16a34a;">' + profile.passed + ' 次（+' + profile.passed + '分）</span></div>' : '')
+        + (profile.freed > 0 ? '<div class="st-cb-row"><span class="lbl">免改错（A+）</span><span class="val" style="color:#16a34a;">' + profile.freed + ' 次</span></div>' : '')
         + '</div>';
     }
 
@@ -3177,10 +3177,10 @@
     }
     if (profile.pending > 0 || profile.passed > 0 || profile.freed > 0){
       var fixParts = [];
-      if (profile.pending > 0) fixParts.push('待过关 ' + profile.pending + '次');
-      if (profile.passed > 0) fixParts.push('已过关 ' + profile.passed + '次');
-      if (profile.freed > 0)  fixParts.push('免过关 ' + profile.freed + '次');
-      lines.push('✏️ 改错过关：' + fixParts.join(' · '));
+      if (profile.pending > 0) fixParts.push('未改错 ' + profile.pending + '次');
+      if (profile.passed > 0) fixParts.push('已改错 ' + profile.passed + '次');
+      if (profile.freed > 0)  fixParts.push('免改错 ' + profile.freed + '次');
+      lines.push('✏️ 改错：' + fixParts.join(' · '));
     }
     lines.push('');
     if (profile.streakMiss >= 3){
@@ -3223,7 +3223,6 @@
     openStudentProfile(activeId);
   });
 
-  /* ================= 跨班对比 ================= */
   function getCompareDays(){
     var today = todayStr();
     if (compareRange === 'month'){
@@ -3394,7 +3393,6 @@
     });
   });
 
-  /* ================= 分类导出 ================= */
   function getExportShowNames(){
     if (exportShowNames === null) return config.showNames;
     return exportShowNames;
@@ -3412,14 +3410,14 @@
       groups = {
         miss:    { name: '缺交',     color: '#b91c1c', students: [] },
         late:    { name: '迟交',     color: '#f59e0b', students: [] },
-        pending: { name: '待过关',   color: '#f59e0b', students: [] },
+        pending: { name: '未改错',   color: '#f59e0b', students: [] },
         Aplus:   { name: 'A+',       color: '#16a34a', students: [] },
         A:       { name: 'A',        color: '#3b82f6', students: [] },
         Aminus:  { name: 'A−',       color: '#f97316', students: [] },
         B:       { name: 'B',        color: '#dc2626', students: [] },
         none:    { name: '未登记',   color: '#94a3b8', students: [] },
-        passed:  { name: '已过关',   color: '#16a34a', students: [] },
-        freed:   { name: '免过关（A+）', color: '#86efac', students: [] }
+        passed:  { name: '已改错',   color: '#16a34a', students: [] },
+        freed:   { name: '免改错（A+）', color: '#86efac', students: [] }
       };
       ids.forEach(function(id){
         var st = normHw(hwMap[id]);
@@ -3589,7 +3587,6 @@
     });
   });
 
-  /* ================= 汇总与预警 ================= */
   function openSummary(){
     smClass.textContent = classNameOf(currentClass);
     setQuickRange('week');
@@ -3625,7 +3622,6 @@
     });
   }
 
-  /* 计算作业+课堂两套统计（无论当前模式） */
   function computeStats(days, cls){
     var ids = idsOf(cls);
     var result = {};
@@ -3666,7 +3662,6 @@
           else if (fd === 2) r.passed++;
           else if (fd === 3) r.freed++;
         }
-        // 课堂
         var cb = (c && c.cb) ? (c.cb[id] || 0) : 0;
         if (cb > 0){ r.plus += cb; r.plusTimes++; }
         else if (cb < 0){ r.minus += Math.abs(cb); r.minusTimes++; }
@@ -3674,7 +3669,6 @@
         r.byDate[date] = { tasks: dayTasks, v: cb };
       });
     });
-    // 连续缺交
     ids.forEach(function(id){
       var r = result[id];
       for (var i = days.length - 1; i >= 0; i--){
@@ -3703,7 +3697,7 @@
         reasons.push('连续缺交 ' + r.streakMiss + ' 天');
         severity = 'danger';
       } else if (r.pending >= 3){
-        reasons.push('待过关 ' + r.pending + ' 次');
+        reasons.push('未改错 ' + r.pending + ' 次');
         severity = 'danger';
       }
       if (slots >= 5){
@@ -3776,7 +3770,6 @@
     var pointsMap = computeAllPoints(days, currentClass);
     lastStats = { stats: stats, days: days, pointsMap: pointsMap };
 
-    // 顶部信息：作业 + 课堂 一起显示
     var totalDone = 0, totalSlots = 0, totalLate = 0;
     var totalScore = 0;
     for (var id in stats){
@@ -3808,7 +3801,6 @@
     }
   }
 
-  /* 作业统计表 */
   function renderHwSummaryTable(stats, days, pointsMap){
     var total = days.length;
     var ids = idsOf(currentClass);
@@ -3818,13 +3810,13 @@
 
     var cols = '<col style="width:40px">';
     if (showName) cols += '<col style="width:60px">';
-    cols += '<col style="width:70px"><col style="width:60px"><col style="width:56px"><col style="width:60px">';
+    cols += '<col style="width:70px"><col style="width:64px"><col style="width:56px"><col style="width:60px">';
 
     var html = '<div class="sum-scroll"><table class="sum-table"><colgroup>' + cols + '</colgroup><thead><tr>'
       + '<th>学号</th>';
     if (showName) html += '<th>姓名</th>';
     html += '<th>等级 A+·A·A−·B</th>'
-      + '<th>过关 过/待</th>'
+      + '<th>改错 已/未</th>'
       + '<th>完成率</th>'
       + '<th>总积分</th>'
       + '</tr></thead><tbody>';
@@ -3848,7 +3840,7 @@
     });
     html += '</tbody></table></div>';
     html += '<p class="rank-legend">等级从左到右：A+ · A · A− · B 的次数<br>'
-      + '过关：已过（含免过关） / 待过 · 点任意学生查看档案</p>';
+      + '改错：已改（含免改错） / 未改 · 点任意学生查看档案</p>';
     summaryResult.innerHTML = html;
 
     var rows = summaryResult.querySelectorAll('tr.clickable');
@@ -3861,14 +3853,12 @@
     });
   }
 
-  /* 课堂统计表（新增） */
   function renderClassroomTable(stats, days, pointsMap){
     var ids = idsOf(currentClass);
     var showName = config.showNames && rosterHasName(currentClass);
     var nameMap = {};
     rosterOf(currentClass).forEach(function(r){ nameMap[r.id] = r.name || ''; });
 
-    // 班级汇总
     var totalPlus = 0, totalMinus = 0, totalPlusTimes = 0, totalMinusTimes = 0, totalNet = 0;
     ids.forEach(function(id){
       var r = stats[id];
@@ -3878,7 +3868,6 @@
       totalMinusTimes += r.minusTimes;
       totalNet += r.score;
     });
-    var avg = ids.length > 0 ? Math.round(totalNet / ids.length * 10) / 10 : 0;
 
     var summaryHtml = '<div class="rank-summary" style="grid-template-columns:1fr 1fr 1fr;">'
       + '<div class="rank-sum-card"><div class="rs-num ' + (totalNet > 0 ? 'good' : (totalNet < 0 ? 'bad' : '')) + '">' + (totalNet > 0 ? '+' : '') + totalNet + '</div><div class="rs-label">班级净得分</div></div>'
@@ -3980,7 +3969,6 @@
     summaryResult.innerHTML = html;
   }
 
-  /* ================= 复制 / 导出 ================= */
   function buildSummaryPlainText(stats, days, pointsMap){
     var ids = idsOf(currentClass);
     var showName = config.showNames && rosterHasName(currentClass);
@@ -4011,7 +3999,7 @@
     if (currentView === 'hwstat'){
       var head2 = '学号';
       if (showName) head2 += '\t姓名';
-      head2 += '\t已交\t迟交\t缺交\t未登\tA+\tA\tA-\tB\t已过\t待过\t完成率\t总积分';
+      head2 += '\t已交\t迟交\t缺交\t未登\tA+\tA\tA-\tB\t已改\t未改\t完成率\t总积分';
       lines.push(head2);
       ids.forEach(function(id){
         var r = stats[id];
@@ -4041,11 +4029,10 @@
       return lines.join('\n');
     }
 
-    // 明细表：退回按当前模式导出汇总
     if (mode === 'hw'){
       var headH = '学号';
       if (showName) headH += '\t姓名';
-      headH += '\t已交\t迟交\t缺交\t未登\tA+\tA\tA-\tB\t已过\t待过\t完成率\t总积分';
+      headH += '\t已交\t迟交\t缺交\t未登\tA+\tA\tA-\tB\t已改\t未改\t完成率\t总积分';
       lines.push(headH);
       ids.forEach(function(id){
         var r = stats[id];
@@ -4121,7 +4108,7 @@
     if (currentView === 'hwstat' || (currentView === 'detail' && mode === 'hw')){
       var header = ['学号'];
       if (showName) header.push('姓名');
-      header = header.concat(['已交', '迟交', '缺交', '未登记', 'A+', 'A', 'A−', 'B', '待过关', '已过关', '完成率', '总积分']);
+      header = header.concat(['已交', '迟交', '缺交', '未登记', 'A+', 'A', 'A−', 'B', '未改错', '已改错', '完成率', '总积分']);
       rows.push(header);
       ids.forEach(function(id){
         var r = stats[id];
@@ -4208,7 +4195,6 @@
     });
   });
 
-  /* ================= 设置 ================= */
   function renderSettingsChips(){
     classChips.innerHTML = '';
     config.classes.forEach(function(c){
